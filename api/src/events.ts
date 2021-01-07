@@ -6,7 +6,7 @@ import { client, fetchElk, getIndexPrefix } from './elasticsearch';
 interface ISaveEventArgs {
   type?: string;
   name?: string;
-  customerId?: string;
+  visitorId?: string;
   attributes?: any;
   additionalQuery?: any;
 }
@@ -29,17 +29,17 @@ export const saveEvent = async (args: ISaveEventArgs) => {
     throw new Error('Name is required');
   }
 
-  let customerId = args.customerId;
+  let visitorId = args.visitorId;
   let newlyCreatedId;
 
-  if (!customerId) {
-    customerId = await Customers.createVisitor();
-    newlyCreatedId = customerId;
+  if (!visitorId) {
+    visitorId = await Customers.createVisitor();
+    newlyCreatedId = visitorId;
   }
 
   const searchQuery = {
     bool: {
-      must: [{ term: { name } }, { term: { customerId } }]
+      must: [{ term: { name } }, { term: { visitorId } }]
     }
   };
 
@@ -59,7 +59,7 @@ export const saveEvent = async (args: ISaveEventArgs) => {
         upsert: {
           type,
           name,
-          customerId,
+          visitorId,
           createdAt: new Date(),
           count: 1,
           attributes: Fields.generateTypedListFromMap(attributes || {})
@@ -75,10 +75,10 @@ export const saveEvent = async (args: ISaveEventArgs) => {
       await Customers.remove({ _id: newlyCreatedId });
     }
 
-    customerId = undefined;
+    visitorId = undefined;
   }
 
-  return { customerId };
+  return { visitorId };
 };
 
 export const getNumberOfVisits = async (
@@ -114,15 +114,15 @@ export const getNumberOfVisits = async (
 };
 
 export const trackViewPageEvent = (args: {
-  customerId: string;
+  visitorId: string;
   attributes: any;
 }) => {
-  const { attributes, customerId } = args;
+  const { attributes, visitorId } = args;
 
   return saveEvent({
     type: 'lifeCycle',
     name: 'viewPage',
-    customerId,
+    visitorId,
     attributes,
     additionalQuery: {
       bool: {
@@ -145,13 +145,13 @@ export const trackViewPageEvent = (args: {
 
 export const trackCustomEvent = (args: {
   name: string;
-  customerId: string;
+  visitorId: string;
   attributes: any;
 }) => {
   return saveEvent({
     type: 'custom',
     name: args.name,
-    customerId: args.customerId,
+    visitorId: args.visitorId,
     attributes: args.attributes
   });
 };

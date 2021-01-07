@@ -332,6 +332,7 @@ const widgetMutations = {
       data?: any;
       cachedCustomerId?: string;
       deviceToken?: string;
+      visitorId?: string;
     }
   ) {
     const {
@@ -343,7 +344,8 @@ const widgetMutations = {
       companyData,
       data,
       cachedCustomerId,
-      deviceToken
+      deviceToken,
+      visitorId
     } = args;
 
     const customData = data;
@@ -370,7 +372,8 @@ const widgetMutations = {
       cachedCustomerId,
       email,
       phone,
-      code
+      code,
+      visitorId
     });
 
     const doc = {
@@ -382,13 +385,21 @@ const widgetMutations = {
       deviceToken
     };
 
-    customer = customer
-      ? await Customers.updateMessengerCustomer({
-          _id: customer._id,
-          doc,
-          customData
-        })
-      : await Customers.createMessengerCustomer({ doc, customData });
+    // customer = customer
+    //   ? await Customers.updateMessengerCustomer({
+    //       _id: customer._id,
+    //       doc,
+    //       customData
+    //     })
+    //   : await Customers.createMessengerCustomer({ doc, customData });
+
+    if (customer) {
+      customer = await Customers.updateMessengerCustomer({
+        _id: customer._id,
+        doc,
+        customData
+      });
+    }
 
     // get or create company
     if (companyData && companyData.name) {
@@ -408,14 +419,15 @@ const widgetMutations = {
           scopeBrandIds: [brand._id]
         });
       }
-
-      // add company to customer's companyIds list
-      await Conformities.create({
-        mainType: 'customer',
-        mainTypeId: customer._id,
-        relType: 'company',
-        relTypeId: company._id
-      });
+      if (customer) {
+        // add company to customer's companyIds list
+        await Conformities.create({
+          mainType: 'customer',
+          mainTypeId: customer._id,
+          relType: 'company',
+          relTypeId: company._id
+        });
+      }
     }
 
     if (integration.createdUserId) {
@@ -429,7 +441,8 @@ const widgetMutations = {
       uiOptions: integration.uiOptions,
       languageCode: integration.languageCode,
       messengerData: await getMessengerData(integration),
-      customerId: customer._id,
+      customerId: customer ? customer?._id : null,
+      visitorId,
       brand
     };
   },
@@ -677,17 +690,14 @@ const widgetMutations = {
    */
   async widgetsSaveBrowserInfo(
     _root,
-    {
-      customerId,
-      browserInfo
-    }: { customerId: string; browserInfo: IBrowserInfo }
+    { visitorId, browserInfo }: { visitorId: string; browserInfo: IBrowserInfo }
   ) {
     // update location
-    await Customers.updateLocation(customerId, browserInfo);
+    const customer = await Customers.updateLocation(visitorId, browserInfo);
 
     try {
       await trackViewPageEvent({
-        customerId,
+        visitorId,
         attributes: { url: browserInfo.url }
       });
     } catch (e) {
@@ -695,9 +705,9 @@ const widgetMutations = {
       debugBase(`Error occurred during widgets save browser info ${e.message}`);
     }
 
-    await Customers.updateSession(customerId);
+    await Customers.updateSession(customer._id);
 
-    return await getOrCreateEngageMessage(customerId, browserInfo);
+    return await getOrCreateEngageMessage(visitorId, browserInfo);
   },
 
   widgetsSendTypingInfo(

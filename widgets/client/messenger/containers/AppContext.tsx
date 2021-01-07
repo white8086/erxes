@@ -183,7 +183,7 @@ export class AppProvider extends React.Component<{}, IState> {
       source: 'fromMessenger',
       callback: (browserInfo: IBrowserInfo) => {
         const variables = {
-          customerId: connection.data.customerId,
+          visitorId: connection.data.visitorId,
           browserInfo
         };
 

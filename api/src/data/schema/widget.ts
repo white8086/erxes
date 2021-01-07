@@ -5,6 +5,7 @@ export const types = `
     languageCode: String
     messengerData: JSON
     customerId: String
+    visitorId: String
     brand: Brand
   }
 
@@ -55,7 +56,7 @@ export const queries = `
   widgetsGetMessengerIntegration(brandCode: String!): Integration
   widgetsMessages(conversationId: String): [ConversationMessage]
   widgetsUnreadCount(conversationId: String): Int
-  widgetsTotalUnreadCount(integrationId: String!, customerId: String!): Int
+  widgetsTotalUnreadCount(integrationId: String!, visitorId: String!): Int
   widgetsMessengerSupporters(integrationId: String!): MessengerSupportersResponse
   widgetsKnowledgeBaseArticles(topicId: String!, searchString: String) : [KnowledgeBaseArticle]
   widgetsKnowledgeBaseTopicDetail(_id: String!): KnowledgeBaseTopic
@@ -73,12 +74,13 @@ export const mutations = `
     companyData: JSON
     data: JSON
 
+    visitorId: String
     cachedCustomerId: String
     deviceToken: String
   ): MessengerConnectResponse
 
   widgetsSaveBrowserInfo(
-    customerId: String!
+    visitorId: String!
     browserInfo: JSON!
   ): ConversationMessage
 

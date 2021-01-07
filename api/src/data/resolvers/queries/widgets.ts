@@ -10,7 +10,7 @@ import {
   Users
 } from '../../../db/models';
 import Messages from '../../../db/models/ConversationMessages';
-import { IBrowserInfo } from '../../../db/models/Customers';
+import Customers, { IBrowserInfo } from '../../../db/models/Customers';
 import { IIntegrationDocument } from '../../../db/models/definitions/integrations';
 import { registerOnboardHistory } from '../../utils';
 import { getOrCreateEngageMessage } from '../../widgetUtils';
@@ -154,12 +154,21 @@ export default {
 
   async widgetsTotalUnreadCount(
     _root,
-    args: { integrationId: string; customerId: string }
+    args: { integrationId: string; visitorId: string }
   ) {
-    const { integrationId, customerId } = args;
+    const { integrationId, visitorId } = args;
 
+    // find customer
+    const customer = await Customers.findOne({ visitorId });
+
+    if (!customer) {
+      return 0;
+    }
     // find conversations
-    const convs = await Conversations.find({ integrationId, customerId });
+    const convs = await Conversations.find({
+      integrationId,
+      customerId: customer._id
+    });
 
     // find read messages count
     return Messages.countDocuments(
