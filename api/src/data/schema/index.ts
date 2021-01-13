@@ -339,7 +339,7 @@ export let subscriptions = `
   conversationMessageInserted(_id: String!): ConversationMessage
   conversationClientMessageInserted(userId: String!): ConversationMessage
   conversationClientTypingStatusChanged(_id: String!): ConversationClientTypingStatusChangedResponse
-  conversationAdminMessageInserted(customerId: String!): ConversationAdminMessageInsertedResponse
+  conversationAdminMessageInserted(customerId: String, visitorId: String): ConversationAdminMessageInsertedResponse
   conversationExternalIntegrationMessageInserted: JSON
   conversationBotTypingStatus(_id: String!): JSON
   customerConnectionChanged(_id: String): CustomerConnectionChangedResponse

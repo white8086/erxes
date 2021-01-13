@@ -472,7 +472,6 @@ const widgetMutations = {
     if (visitorId && !customerId) {
       const customer = await createVisitorFromVisitorLog(visitorId);
       customerId = customer._id;
-      await Messages.updateVisitorEngageMessages(visitorId, customerId);
     }
 
     // customer can write a message
@@ -542,7 +541,10 @@ const widgetMutations = {
           // Mark as unread
           readUserIds: [],
 
-          customerId
+          customerId,
+
+          // clear visitorId
+          visitorId: ''
         }
       }
     );

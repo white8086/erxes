@@ -212,7 +212,7 @@ export const loadClass = () => {
           visitorId,
           engageData: { $exists: true }
         },
-        { $set: { customerId } },
+        { $set: { customerId, visitorId: '' } },
         { multi: true }
       );
     }

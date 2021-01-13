@@ -1,5 +1,6 @@
 import {
   Brands,
+  ConversationMessages,
   Conversations,
   Customers,
   EngageMessages,
@@ -70,6 +71,15 @@ export const createVisitorFromVisitorLog = async (visitorId: string) => {
   delete visitor._id;
   const doc = { state: 'visitor', ...visitor };
   const customer = await Customers.createCustomer(doc);
+
+  await Messages.updateVisitorEngageMessages(visitorId, customer._id);
+  await Conversations.updateMany(
+    {
+      visitorId
+    },
+    { $set: { customerId: customer._id, visitorId: '' } },
+    { multi: true }
+  );
 
   return customer;
 };
