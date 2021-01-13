@@ -119,11 +119,9 @@ export const setErxesProperty = (name: string, value: any) => {
 };
 
 export const getVisitorId = async () => {
-    // We recommend to call `load` at application startup.
     const fp = await FingerprintJS.load();
-
+    
     // The FingerprintJS agent is ready.
-    // Get a visitor identifier when you'd like to.
     const result = await fp.get();
   
     // This is the visitor identifier:
