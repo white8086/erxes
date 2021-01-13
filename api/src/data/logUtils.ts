@@ -4,6 +4,7 @@ import {
   putUpdateLog as putUpdateLogC
 } from 'erxes-api-utils';
 import * as _ from 'underscore';
+import { IBrowserInfo } from '../db/models/Customers';
 
 import { IPipelineDocument } from '../db/models/definitions/boards';
 import { IChannelDocument } from '../db/models/definitions/channels';
@@ -55,7 +56,7 @@ import {
   UsersGroups
 } from '../db/models/index';
 import messageBroker from '../messageBroker';
-import { MODULE_NAMES } from './constants';
+import { MODULE_NAMES, RABBITMQ_QUEUES } from './constants';
 import {
   getSubServiceDomain,
   registerOnboardHistory,
@@ -76,6 +77,12 @@ interface ILogNameParams {
 interface ILogParams extends ILogNameParams {
   collection: any;
   nameFields: string[];
+}
+
+export interface IVisitorLogParams {
+  visitorId: string;
+  integrationId?: string;
+  location?: IBrowserInfo;
 }
 
 interface IContentTypeParams {
@@ -1400,7 +1407,7 @@ export const putCreateLog = async (
 
   await sendToWebhook(LOG_ACTIONS.CREATE, params.type, params);
 
-  return putCreateLogC(messageBroker, gatherDescriptions, params, user)
+  return putCreateLogC(messageBroker, gatherDescriptions, params, user);
 };
 
 /**
@@ -1446,4 +1453,22 @@ export const fetchLogs = (params: ILogQueryParams) => {
     },
     'Failed to connect to logs api. Check whether LOGS_API_DOMAIN env is missing or logs api is not running'
   );
+};
+
+export const visitorLog = async (params: IVisitorLogParams, action) => {
+  try {
+    return messageBroker().sendMessage(RABBITMQ_QUEUES.VISITOR_LOG, {
+      action,
+      data: params
+    });
+  } catch (e) {
+    return e.message;
+  }
+};
+
+export const getVisitorLog = async visitorId => {
+  return await messageBroker().sendRPCMessage(RABBITMQ_QUEUES.RPC_VISITOR_LOG, {
+    action: 'get',
+    data: { visitorId }
+  });
 };

@@ -6,10 +6,14 @@ import {
   Segments,
   Users
 } from '../../../db/models';
+import { IBrowserInfo } from '../../../db/models/Customers';
 import { METHODS } from '../../../db/models/definitions/constants';
+import { IMessageDocument } from '../../../db/models/definitions/conversationMessages';
 import { ICustomerDocument } from '../../../db/models/definitions/customers';
 import { IEngageMessageDocument } from '../../../db/models/definitions/engages';
 import { IUserDocument } from '../../../db/models/definitions/users';
+import Engages from '../../../db/models/Engages';
+import { getNumberOfVisits } from '../../../events';
 import messageBroker from '../../../messageBroker';
 import { MESSAGE_KINDS } from '../../constants';
 import { fetchBySegments } from '../../modules/segments/queryBuilder';
@@ -20,6 +24,231 @@ interface IEngageParams {
   customersSelector: any;
   user: IUserDocument;
 }
+
+interface ICheckRulesParams {
+  rules: IRule[];
+  browserInfo: IBrowserInfo;
+  numberOfVisits?: number;
+}
+
+/*
+ * Checks individual rule
+ */
+interface IRule {
+  value?: string;
+  kind: string;
+  condition: string;
+}
+
+interface ICheckRuleParams {
+  rule: IRule;
+  browserInfo: IBrowserInfo;
+  numberOfVisits?: number;
+}
+export const getVisitorMessage = async (
+  visitor,
+  brandId,
+  browserInfo,
+  integration
+) => {
+  const messages = await EngageMessages.find({
+    'messenger.brandId': brandId,
+    method: 'messenger',
+    kind: 'visitorAuto',
+    isLive: true
+  });
+
+  if (!messages || messages.length === 0) {
+    return null;
+  }
+
+  const conversationMessages: IMessageDocument[] = [];
+
+  for (const message of messages) {
+    const messenger = message.messenger ? message.messenger.toJSON() : {};
+
+    const user = await Users.findOne({ _id: message.fromUserId });
+
+    if (!user) {
+      continue;
+    }
+    const numberOfVisits = await getNumberOfVisits({
+      url: browserInfo.url,
+      visitorId: visitor.visitorId
+    });
+
+    const isPassedAllRules = Engages.checkRules({
+      rules: messenger.rules,
+      browserInfo,
+      numberOfVisits
+    });
+
+    if (isPassedAllRules) {
+      const { replacedContent } = await replaceEditorAttributes({
+        content: messenger.content,
+        user
+      });
+
+      if (messenger.rules) {
+        messenger.rules = messenger.rules.map(r => ({
+          kind: r.kind,
+          text: r.text,
+          condition: r.condition,
+          value: r.value
+        }));
+      }
+
+      const conversationMessage = await Engages.createOrUpdateConversationAndMessages(
+        {
+          visitorId: visitor.visitorId,
+          integrationId: integration._id,
+          user,
+          replacedContent: replacedContent || '',
+          engageData: {
+            ...messenger,
+            content: replacedContent,
+            engageKind: message.kind,
+            messageId: message._id,
+            fromUserId: message.fromUserId
+          }
+        }
+      );
+
+      if (conversationMessage) {
+        // collect created messages
+        conversationMessages.push(conversationMessage);
+      }
+    }
+  }
+  return conversationMessages;
+};
+
+export const getCustomerMessage = async (
+  customer,
+  brandId,
+  browserInfo,
+  integration
+) => {
+  const messages = await EngageMessages.find({
+    'messenger.brandId': brandId,
+    method: 'messenger',
+    isLive: true
+  });
+
+  const conversationMessages: IMessageDocument[] = [];
+
+  for (const message of messages) {
+    const messenger = message.messenger ? message.messenger.toJSON() : {};
+
+    const {
+      customerIds = [],
+      segmentIds,
+      tagIds,
+      brandIds,
+      fromUserId
+    } = message;
+
+    if (
+      message.kind === 'manual' &&
+      (customerIds || []).length > 0 &&
+      !customerIds.includes(customer._id)
+    ) {
+      continue;
+    }
+
+    const customersSelector = {
+      _id: customer._id,
+      state: { $ne: 'visitor' },
+      ...(await generateCustomerSelector({
+        customerIds,
+        segmentIds,
+        tagIds,
+        brandIds
+      }))
+    };
+
+    const customerExists = await Customers.findOne(customersSelector);
+
+    if (message.kind !== 'visitorAuto' && !customerExists) {
+      continue;
+    }
+
+    if (
+      customer &&
+      message.kind === 'visitorAuto' &&
+      customer.state !== 'visitor'
+    ) {
+      continue;
+    }
+
+    const user = await Users.findOne({ _id: fromUserId });
+
+    if (!user) {
+      continue;
+    }
+
+    // check for rules ===
+    const numberOfVisits = await getNumberOfVisits({
+      url: browserInfo.url,
+      customerId: customer._id
+    });
+
+    const isPassedAllRules = Engages.checkRules({
+      rules: messenger.rules,
+      browserInfo,
+      numberOfVisits
+    });
+
+    // if given visitor is matched with given condition then create
+    // conversations
+    if (isPassedAllRules) {
+      // replace keys in content
+      const { replacedContent } = await replaceEditorAttributes({
+        content: messenger.content,
+        customer,
+        user
+      });
+
+      if (messenger.rules) {
+        messenger.rules = messenger.rules.map(r => ({
+          kind: r.kind,
+          text: r.text,
+          condition: r.condition,
+          value: r.value
+        }));
+      }
+
+      const conversationMessage = await Engages.createOrUpdateConversationAndMessages(
+        {
+          customerId: customer._id,
+          integrationId: integration._id,
+          user,
+          replacedContent: replacedContent || '',
+          engageData: {
+            ...messenger,
+            content: replacedContent,
+            engageKind: message.kind,
+            messageId: message._id,
+            fromUserId: message.fromUserId
+          }
+        }
+      );
+
+      if (conversationMessage) {
+        // collect created messages
+        conversationMessages.push(conversationMessage);
+
+        // add given customer to customerIds list
+        await EngageMessages.updateOne(
+          { _id: message._id },
+          { $push: { customerIds: customer._id } }
+        );
+      }
+    }
+  }
+
+  return conversationMessages;
+};
 
 export const generateCustomerSelector = async ({
   customerIds,
@@ -285,4 +514,111 @@ const sendEmailOrSms = async (
       resolve('done');
     });
   });
+};
+
+export const checkRules = (params: ICheckRulesParams) => {
+  const { rules, browserInfo, numberOfVisits } = params;
+
+  let passedAllRules = true;
+
+  rules.forEach(rule => {
+    // check individual rule
+    if (checkRule({ rule, browserInfo, numberOfVisits })) {
+      passedAllRules = false;
+      return;
+    }
+  });
+
+  return passedAllRules;
+};
+
+const checkRule = (params: ICheckRuleParams) => {
+  const { rule, browserInfo, numberOfVisits } = params;
+  const { language, url, city, countryCode } = browserInfo;
+  const { value, kind, condition } = rule;
+  const ruleValue: any = value;
+
+  let valueToTest: any;
+
+  if (kind === 'browserLanguage') {
+    valueToTest = language;
+  }
+
+  if (kind === 'currentPageUrl') {
+    valueToTest = url;
+  }
+
+  if (kind === 'city') {
+    valueToTest = city;
+  }
+
+  if (kind === 'country') {
+    valueToTest = countryCode;
+  }
+
+  if (kind === 'numberOfVisits') {
+    valueToTest = numberOfVisits;
+  }
+
+  // is
+  if (condition === 'is' && valueToTest !== ruleValue) {
+    return false;
+  }
+
+  // isNot
+  if (condition === 'isNot' && valueToTest === ruleValue) {
+    return false;
+  }
+
+  // isUnknown
+  if (condition === 'isUnknown' && valueToTest) {
+    return false;
+  }
+
+  // hasAnyValue
+  if (condition === 'hasAnyValue' && !valueToTest) {
+    return false;
+  }
+
+  // startsWith
+  if (
+    condition === 'startsWith' &&
+    valueToTest &&
+    !valueToTest.startsWith(ruleValue)
+  ) {
+    return false;
+  }
+
+  // endsWith
+  if (
+    condition === 'endsWith' &&
+    valueToTest &&
+    !valueToTest.endsWith(ruleValue)
+  ) {
+    return false;
+  }
+
+  // contains
+  if (
+    condition === 'contains' &&
+    valueToTest &&
+    !valueToTest.includes(ruleValue)
+  ) {
+    return false;
+  }
+
+  // greaterThan
+  if (condition === 'greaterThan' && valueToTest < parseInt(ruleValue, 10)) {
+    return false;
+  }
+
+  if (condition === 'lessThan' && valueToTest > parseInt(ruleValue, 10)) {
+    return false;
+  }
+
+  if (condition === 'doesNotContain' && valueToTest.includes(ruleValue)) {
+    return false;
+  }
+
+  return true;
 };

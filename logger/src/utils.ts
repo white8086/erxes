@@ -1,7 +1,5 @@
 import { debugBase } from './debuggers';
 import Logs from './models/Logs';
-import Visitors from './models/Visitors';
-
 /**
  * Takes 2 arrays and detect changes between them.
  * @param oldArray Old array
@@ -267,21 +265,4 @@ export const receivePutLogCommand = async params => {
     description,
     extraDesc
   });
-};
-
-export const receiveVisitorLog = async params => {
-  debugBase(params);
-  const { location, integrationId, visitorId, action } = params;
-
-  switch (action) {
-    case 'update':
-      return Visitors.updateLog({ ...location, integrationId, visitorId });
-    case 'create':
-      return Visitors.createLog({ ...location, integrationId, visitorId });
-    case 'get':
-      return Visitors.getVisitor(visitorId);
-
-    default:
-      break;
-  }
 };

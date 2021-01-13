@@ -282,7 +282,8 @@ export const RABBITMQ_QUEUES = {
   RPC_API_TO_INTEGRATIONS: 'rpc_queue:api_to_integrations',
   RPC_API_TO_WORKERS: 'rpc_queue:api_to_workers',
   WORKERS: 'workers',
-  VISITOR_LOG: 'visitorLog'
+  VISITOR_LOG: 'visitorLog',
+  RPC_VISITOR_LOG: 'rpc_queue:visitorLog'
 };
 
 export const AUTO_BOT_MESSAGES = {

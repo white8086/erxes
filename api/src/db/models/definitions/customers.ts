@@ -28,7 +28,6 @@ export interface IVisitorContactDocument extends IVisitorContact, Document {}
 export interface ICustomer {
   state?: 'visitor' | 'lead' | 'customer';
 
-  visitorId?: string;
   scopeBrandIds?: string[];
   firstName?: string;
   lastName?: string;
@@ -130,14 +129,6 @@ export const customerSchema = schemaWrapper(
       default: 'visitor',
       enum: getEnum('STATE'),
       selectOptions: CUSTOMER_SELECT_OPTIONS.STATE
-    }),
-
-    visitorId: field({
-      type: String,
-      index: true,
-      optional: true,
-      label: 'Unique visitorId from finger print',
-      esType: 'keyword'
     }),
 
     createdAt: field({ type: Date, label: 'Created at', esType: 'date' }),

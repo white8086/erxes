@@ -2,6 +2,7 @@ import { connection } from "./connection";
 
 const messageFields = `
   _id
+  customerId
   conversationId
   user {
     _id
@@ -92,8 +93,8 @@ const conversationBotTypingStatus = `
 `;
 
 const adminMessageInserted = `
-  subscription conversationAdminMessageInserted($customerId: String!) {
-    conversationAdminMessageInserted(customerId: $customerId) {
+  subscription conversationAdminMessageInserted($customerId: String $visitorId: String) {
+    conversationAdminMessageInserted(customerId: $customerId, visitorId: $visitorId) {
       unreadCount
     }
   }
@@ -148,8 +149,8 @@ const allConversations = `
 `;
 
 const getEngageMessage = `
-  query widgetsGetEngageMessage($customerId: String!  $browserInfo: JSON!) {
-    widgetsGetEngageMessage(customerId: $customerId browserInfo: $browserInfo) {
+  query widgetsGetEngageMessage($customerId: String $visitorId: String  $browserInfo: JSON!) {
+    widgetsGetEngageMessage(customerId: $customerId visitorId: $visitorId browserInfo: $browserInfo) {
       ${messageFields}
     }
   }
@@ -184,8 +185,8 @@ const connect = `
 `;
 
 const saveBrowserInfo = `
-  mutation widgetsSaveBrowserInfo($visitorId: String!  $browserInfo: JSON!) {
-    widgetsSaveBrowserInfo(visitorId: $visitorId browserInfo: $browserInfo) {
+  mutation widgetsSaveBrowserInfo($visitorId: String $customerId: String $browserInfo: JSON!) {
+    widgetsSaveBrowserInfo(visitorId: $visitorId customerId: $customerId browserInfo: $browserInfo) {
       ${messageFields}
     }
   }

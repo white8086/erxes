@@ -23,7 +23,6 @@ interface IGetCustomerParams {
   code?: string;
   integrationId?: string;
   cachedCustomerId?: string;
-  visitorId?: string;
 }
 
 interface ICustomerFieldsInput {
@@ -126,7 +125,7 @@ export interface ICustomerModel extends Model<ICustomerDocument> {
   ): Promise<ICustomerDocument>;
   updateSession(_id: string): Promise<ICustomerDocument>;
   updateLocation(
-    visitorId: string,
+    _id: string,
     browserInfo: IBrowserInfo
   ): Promise<ICustomerDocument>;
   saveVisitorContactInfo(
@@ -588,8 +587,7 @@ export const loadClass = () => {
       email,
       phone,
       code,
-      cachedCustomerId,
-      visitorId
+      cachedCustomerId
     }: IGetCustomerParams) {
       let customer: ICustomerDocument | null = null;
 
@@ -611,10 +609,6 @@ export const loadClass = () => {
 
       if (!customer && cachedCustomerId) {
         customer = await Customers.findOne({ _id: cachedCustomerId });
-      }
-
-      if (!customer && visitorId) {
-        customer = await Customers.findOne({ visitorId });
       }
 
       if (customer) {
@@ -807,18 +801,15 @@ export const loadClass = () => {
     /*
      * Update customer's location info
      */
-    public static async updateLocation(
-      visitorId: string,
-      browserInfo: IBrowserInfo
-    ) {
+    public static async updateLocation(_id: string, browserInfo: IBrowserInfo) {
       await Customers.findByIdAndUpdate(
-        { visitorId },
+        { _id },
         {
           $set: { location: browserInfo }
         }
       );
 
-      return Customers.findOne({ visitorId });
+      return Customers.findOne({ _id });
     }
 
     /*

@@ -18,6 +18,14 @@ widgetConnect({
 
     initStorage(storage);
 
+    const cachedCustomerId = getLocalStorageItem('customerId')
+
+    let visitorId;
+
+    if (!cachedCustomerId) {
+      visitorId = await getVisitorId();
+    }
+
     return client.mutate({
       mutation: gql(graphqTypes.connect),
       variables: {
@@ -26,8 +34,9 @@ widgetConnect({
         phone: setting.phone,
         code: setting.code,
 
-        cachedCustomerId: getLocalStorageItem('customerId'),
-        visitorId: await getVisitorId(),
+ 
+        cachedCustomerId,
+        visitorId,
         // if client passed email automatically then consider this as user
         isUser: Boolean(setting.email),
 

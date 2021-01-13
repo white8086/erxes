@@ -7,6 +7,7 @@ interface ISaveEventArgs {
   type?: string;
   name?: string;
   visitorId?: string;
+  customerId?: string;
   attributes?: any;
   additionalQuery?: any;
 }
@@ -30,11 +31,12 @@ export const saveEvent = async (args: ISaveEventArgs) => {
   }
 
   let visitorId = args.visitorId;
+  let customerId = args.customerId;
   let newlyCreatedId;
 
-  if (!visitorId) {
-    visitorId = await Customers.createVisitor();
-    newlyCreatedId = visitorId;
+  if (!customerId && !visitorId) {
+    customerId = await Customers.createVisitor();
+    newlyCreatedId = customerId;
   }
 
   const searchQuery = {
@@ -60,6 +62,7 @@ export const saveEvent = async (args: ISaveEventArgs) => {
           type,
           name,
           visitorId,
+          customerId,
           createdAt: new Date(),
           count: 1,
           attributes: Fields.generateTypedListFromMap(attributes || {})
@@ -81,18 +84,23 @@ export const saveEvent = async (args: ISaveEventArgs) => {
   return { visitorId };
 };
 
-export const getNumberOfVisits = async (
-  customerId: string,
-  url: string
-): Promise<number> => {
+export const getNumberOfVisits = async (params: {
+  url: string;
+  visitorId?: string;
+  customerId?: string;
+}): Promise<number> => {
+  const searchId = params.customerId
+    ? { customerId: params.customerId }
+    : { visitorId: params.visitorId };
+
   try {
     const response = await fetchElk('search', 'events', {
       query: {
         bool: {
           must: [
             { term: { name: 'viewPage' } },
-            { term: { customerId } },
-            { term: { 'attributes.url.keyword': url } }
+            { term: searchId },
+            { term: { 'attributes.url.keyword': params.url } }
           ]
         }
       }
@@ -114,15 +122,17 @@ export const getNumberOfVisits = async (
 };
 
 export const trackViewPageEvent = (args: {
-  visitorId: string;
+  visitorId?: string;
+  customerId?: string;
   attributes: any;
 }) => {
-  const { attributes, visitorId } = args;
+  const { attributes, visitorId, customerId } = args;
 
   return saveEvent({
     type: 'lifeCycle',
     name: 'viewPage',
     visitorId,
+    customerId,
     attributes,
     additionalQuery: {
       bool: {
@@ -145,13 +155,15 @@ export const trackViewPageEvent = (args: {
 
 export const trackCustomEvent = (args: {
   name: string;
-  visitorId: string;
+  visitorId?: string;
+  customerId?: string;
   attributes: any;
 }) => {
   return saveEvent({
     type: 'custom',
     name: args.name,
     visitorId: args.visitorId,
+    customerId: args.customerId,
     attributes: args.attributes
   });
 };

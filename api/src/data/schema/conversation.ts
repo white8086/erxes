@@ -152,7 +152,8 @@ export const types = `
   }
 
   type ConversationAdminMessageInsertedResponse {
-    customerId: String!
+    customerId: String
+    visitorId: String
     unreadCount: Int
   }
 

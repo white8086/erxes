@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import messageBroker from 'erxes-message-broker';
-import { receivePutLogCommand, receiveVisitorLog } from './utils';
+import Visitors from './models/Visitors';
+import { receivePutLogCommand } from './utils';
 
 dotenv.config();
 
@@ -13,15 +14,41 @@ export const initBroker = async server => {
     envs: process.env
   });
 
-  const { consumeQueue } = client;
+  const { consumeQueue, consumeRPCQueue } = client;
 
   consumeQueue('putLog', async data => {
     await receivePutLogCommand(data);
   });
 
-  consumeQueue('visitorLog', async data => {
-    console.log('DATA = ', data);
-    return await receiveVisitorLog(data);
+  consumeQueue('visitorLog', async parsedObject => {
+    const { data, action } = parsedObject;
+
+    if (action === 'update') {
+      return Visitors.updateVisitorLog(data);
+    } else if (action === 'create') {
+      return Visitors.createVisitorLog(data);
+    }
+  });
+
+  consumeRPCQueue('rpc_queue:visitorLog', async parsedObject => {
+    const { action, data } = parsedObject;
+
+    let response = null;
+
+    try {
+      if (action === 'get') {
+        response = { data: await Visitors.getVisitorLog(data.visitorId) };
+      }
+
+      response.status = 'success';
+    } catch (e) {
+      response = {
+        status: 'error',
+        errorMessage: e.message
+      };
+    }
+
+    return response;
   });
 };
 
