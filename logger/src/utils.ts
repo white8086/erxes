@@ -1,5 +1,6 @@
 import { debugBase } from './debuggers';
 import Logs from './models/Logs';
+
 /**
  * Takes 2 arrays and detect changes between them.
  * @param oldArray Old array
