@@ -127,7 +127,7 @@ export const queries = `
   engageMessageCounts(name: String!, kind: String, status: String): JSON
   engagesConfigDetail: JSON
   engageVerifiedEmails: [String]
-  engageReportsList(page: Int, perPage: Int, customerId: String, status: String): EngageDeliveryReport 
+  engageReportsList(page: Int, perPage: Int, customerId: String, status: String): EngageDeliveryReport
   engageEmailPercentages: AvgEmailStats
 `;
 
@@ -161,5 +161,5 @@ export const mutations = `
   engagesUpdateConfigs(configsMap: JSON!): JSON
   engageMessageVerifyEmail(email: String!): String
   engageMessageRemoveVerifiedEmail(email: String!): String
-  engageMessageSendTestEmail(from: String!, to: String!, content: String!): String
+  engageMessageSendTestEmail(from: String!, to: String!, content: String!, title: String!): String
 `;

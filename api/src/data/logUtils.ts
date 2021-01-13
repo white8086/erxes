@@ -57,6 +57,7 @@ import {
 } from '../db/models/index';
 import messageBroker from '../messageBroker';
 import { MODULE_NAMES, RABBITMQ_QUEUES } from './constants';
+import { callAfterMutation } from '../pluginUtils';
 import {
   getSubServiceDomain,
   registerOnboardHistory,
@@ -1407,6 +1408,8 @@ export const putCreateLog = async (
 
   await sendToWebhook(LOG_ACTIONS.CREATE, params.type, params);
 
+  await callAfterMutation({ ...params, action: LOG_ACTIONS.CREATE }, user);
+
   return putCreateLogC(messageBroker, gatherDescriptions, params, user);
 };
 
@@ -1421,6 +1424,8 @@ export const putUpdateLog = async (
 ) => {
   await sendToWebhook(LOG_ACTIONS.UPDATE, params.type, params);
 
+  await callAfterMutation({ ...params, action: LOG_ACTIONS.UPDATE }, user);
+
   return putUpdateLogC(messageBroker, gatherDescriptions, params, user);
 };
 
@@ -1434,6 +1439,8 @@ export const putDeleteLog = async (
   user: IUserDocument
 ) => {
   await sendToWebhook(LOG_ACTIONS.DELETE, params.type, params);
+
+  await callAfterMutation({ ...params, action: LOG_ACTIONS.DELETE }, user);
 
   return putDeleteLogC(messageBroker, gatherDescriptions, params, user);
 };
