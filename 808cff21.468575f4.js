@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[62],{123:function(e){e.exports=JSON.parse('{"allTagsPath":"/caseStudies/tags","slug":"telecomunications","name":"telecomunications","count":1,"permalink":"/caseStudies/tags/telecomunications"}')}}]);

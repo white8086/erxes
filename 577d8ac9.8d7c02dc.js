@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[43],{104:function(n){n.exports=JSON.parse('{"allTagsPath":"/interviews/tags","slug":"cryptocurrency","name":"cryptocurrency","count":1,"permalink":"/interviews/tags/cryptocurrency"}')}}]);
