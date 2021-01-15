@@ -17,7 +17,7 @@ export const checkCustomerIsEbarimtCompany = async (shape: IShapeDocument, data:
   let result = false;
   const re = new RegExp('(^[А-ЯЁӨҮ]{2}[0-9]{8}$)|(^\\d{7}$)', 'gui');
   if (re.test(doc.code)) {
-    const response = await sendRequest({ url: shape.config.url, method: 'GET', params: { ttd: doc.code } });
+    const response = await sendRequest({ url: shape.config.url, method: 'GET', params: { regno: doc.code } });
 
     if (response.found) {
       result = true;

@@ -23,7 +23,7 @@ const erkhetPostData = async (shape: IShapeDocument, data: any) => {
         const checkCompanyRes = await sendRequest({
           url: shape.config.checkCompanyUrl,
           method: 'GET',
-          params: { ttd: company.code },
+          params: { regno: company.code },
         });
         if (checkCompanyRes.found) {
           billType = 3;
