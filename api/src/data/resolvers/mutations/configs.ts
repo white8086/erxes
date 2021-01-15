@@ -1,10 +1,15 @@
 import { Configs } from '../../../db/models';
-import { moduleCheckPermission } from '../../permissions/wrappers';
+import {
+  moduleCheckPermission,
+  requireLogin
+} from '../../permissions/wrappers';
 import { IContext } from '../../types';
 import {
+  getErxesSaasDomain,
   initFirebase,
   registerOnboardHistory,
-  resetConfigsCache
+  resetConfigsCache,
+  sendRequest
 } from '../../utils';
 
 const configMutations = {
@@ -41,9 +46,25 @@ const configMutations = {
         registerOnboardHistory({ type: `configure.${code}`, user });
       }
     }
+  },
+
+  async configsActivateInstallation(
+    _root,
+    args: { token: string; hostname: string }
+  ) {
+    try {
+      return await sendRequest({
+        method: 'POST',
+        url: `${getErxesSaasDomain()}/activate-installation`,
+        body: args
+      });
+    } catch (e) {
+      throw new Error(e.message);
+    }
   }
 };
 
 moduleCheckPermission(configMutations, 'manageGeneralSettings');
+requireLogin(configMutations, 'configsActivateInstallation');
 
 export default configMutations;

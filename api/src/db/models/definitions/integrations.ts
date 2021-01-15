@@ -42,6 +42,7 @@ export interface IMessageDataMessages {
 
 export interface IMessengerData {
   botEndpointUrl?: string;
+  botShowInitialMessage?: boolean;
   supporterIds?: string[];
   notifyCustomer?: boolean;
   availabilityMethod?: string;
@@ -89,6 +90,7 @@ export interface ILeadData {
 export interface IWebhookData {
   script: string;
   token: string;
+  origin: string;
 }
 
 export interface ILeadDataDocument extends ILeadData, Document {
@@ -145,6 +147,7 @@ const messengerOnlineHoursSchema = new Schema(
 const messengerDataSchema = new Schema(
   {
     botEndpointUrl: field({ type: String }),
+    botShowInitialMessage: field({ type: Boolean }),
     supporterIds: field({ type: [String] }),
     notifyCustomer: field({ type: Boolean }),
     availabilityMethod: field({
@@ -302,7 +305,8 @@ const uiOptionsSchema = new Schema(
 const webhookDataSchema = new Schema(
   {
     script: field({ type: String, optional: true }),
-    token: field({ type: String })
+    token: field({ type: String }),
+    origin: field({ type: String, optional: true })
   },
   { _id: false }
 );

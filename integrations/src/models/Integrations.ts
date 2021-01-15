@@ -12,6 +12,7 @@ export interface IIntegration {
   facebookPageIds?: string[];
   facebookPageTokensMap?: { [key: string]: string };
   email: string;
+  googleAccessToken?: string;
   phoneNumber: string;
   recordUrl: string;
   expiration?: string;
@@ -51,6 +52,10 @@ export const integrationSchema = new Schema({
     optional: true
   }),
   emailScope: String,
+  googleAccessToken: field({
+    type: String,
+    optional: true
+  }),
   nylasToken: String,
   nylasAccountId: String,
   nylasBillingState: String,
@@ -82,7 +87,10 @@ export const integrationSchema = new Schema({
   whatsappinstanceId: String,
   whatsappToken: String,
   telnyxPhoneNumber: field({ type: String, label: 'Telnyx phone number' }),
-  telnyxProfileId: field({ type: String, label: 'Telnyx messaging profile id' })
+  telnyxProfileId: field({
+    type: String,
+    label: 'Telnyx messaging profile id'
+  })
 });
 
 export interface IIntegrationModel extends Model<IIntegrationDocument> {

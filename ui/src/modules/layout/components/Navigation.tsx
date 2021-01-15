@@ -2,10 +2,12 @@ import Label from 'modules/common/components/Label';
 import Tip from 'modules/common/components/Tip';
 import WithPermission from 'modules/common/components/WithPermission';
 import { colors, dimensions } from 'modules/common/styles';
-import { __, setBadge } from 'modules/common/utils';
+import { __, getEnv, setBadge } from 'modules/common/utils';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+
+const { REACT_APP_DASHBOARD_URL } = getEnv();
 
 const LeftNavigation = styled.aside`
   width: ${dimensions.headerSpacingWide}px;
@@ -166,6 +168,14 @@ class Navigation extends React.Component<{
         <NavLink to="/">
           <img src="/images/erxes.png" alt="erxes" />
         </NavLink>
+        {REACT_APP_DASHBOARD_URL !== 'undefined'
+          ? this.renderNavItem(
+              'showDashboards',
+              __('Dashboard'),
+              '/dashboard',
+              'icon-dashboard'
+            )
+          : null}
         <Nav id="navigation">
           {this.renderNavItem(
             'showConversations',

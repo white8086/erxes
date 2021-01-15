@@ -13,13 +13,14 @@ class Status extends React.PureComponent<{
   renderStatistic(type) {
     const statistic = this.props.statistics[type] || {};
 
-    const { os, process, mongo, packageVersion } = statistic;
+    const { os, process, mongo } = statistic;
+
+    if (!process) {
+      return null;
+    }
 
     return (
       <>
-        <div>
-          <b>{__('Package version')}</b> - {packageVersion}
-        </div>
         <div>
           <b>{__('Uptime')}</b> - {formatDuration(process.uptime)}
         </div>
@@ -65,14 +66,6 @@ class Status extends React.PureComponent<{
 
   renderBody(type: string) {
     switch (type) {
-      case 'erxes': {
-        return (
-          <div>
-            <b>{__('Package version')}</b> -{' '}
-            {this.props.statistics.erxes.packageVersion}
-          </div>
-        );
-      }
       case 'erxesIntegration':
       case 'erxesApi': {
         return this.renderStatistic(type);
@@ -106,10 +99,7 @@ class Status extends React.PureComponent<{
 
     const content = (
       <div>
-        {this.renderData('Erxes ui status', 'erxes')}
-
         {this.renderData('Erxes api status', 'erxesApi')}
-
         {this.renderData('Erxes integration status', 'erxesIntegration')}
       </div>
     );

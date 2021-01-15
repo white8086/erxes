@@ -7,6 +7,9 @@ import {
   ActivityLogs,
   Boards,
   Brands,
+  CalendarBoards,
+  CalendarGroups,
+  Calendars,
   Channels,
   ChecklistItems,
   Checklists,
@@ -16,6 +19,8 @@ import {
   ConversationMessages,
   Conversations,
   Customers,
+  DashboardItems,
+  Dashboards,
   Deals,
   EmailDeliveries,
   EmailTemplates,
@@ -65,7 +70,11 @@ import {
   PRODUCT_TYPES,
   WEBHOOK_ACTIONS
 } from './models/definitions/constants';
-import { IEmail, IMessenger } from './models/definitions/engages';
+import {
+  IEmail,
+  IMessenger,
+  IScheduleDate
+} from './models/definitions/engages';
 import { IMessengerAppCrendentials } from './models/definitions/messengerApps';
 import { IUserDocument } from './models/definitions/users';
 import PipelineTemplates from './models/PipelineTemplates';
@@ -76,7 +85,7 @@ export const getUniqueValue = async (
   defaultValue?: string
 ) => {
   const getRandomValue = (type: string) =>
-    type === 'email' ? faker.internet.email() : Random.id();
+    type === 'email' ? faker.internet.email().toLowerCase() : Random.id();
 
   let uniqueValue = defaultValue || getRandomValue(fieldName);
 
@@ -111,6 +120,38 @@ export const activityLogFactory = async (
   });
 
   return activity.save();
+};
+
+interface IDashboardFactoryInput {
+  name?: string;
+}
+
+export const dashboardFactory = async (params: IDashboardFactoryInput) => {
+  const dashboard = new Dashboards({
+    name: params.name || 'name'
+  });
+
+  return dashboard.save();
+};
+
+interface IDashboardFactoryInput {
+  dashboardId?: string;
+  layout?: string;
+  vizState?: string;
+  name?: string;
+  type?: string;
+}
+
+export const dashboardItemsFactory = async (params: IDashboardFactoryInput) => {
+  const dashboardItem = new DashboardItems({
+    name: params.name || 'name',
+    dashboardId: params.dashboardId || 'dashboardId',
+    layout: params.layout || 'layout',
+    vizState: params.vizState || 'vizState',
+    type: params.type || 'type'
+  });
+
+  return dashboardItem.save();
 };
 
 interface IUserFactoryInput {
@@ -201,6 +242,7 @@ interface IEngageMessageFactoryInput {
   smsContent?: string;
   fromUserId?: string;
   fromIntegrationId?: string;
+  scheduleDate?: IScheduleDate;
 }
 
 export const engageMessageFactory = (
@@ -222,6 +264,9 @@ export const engageMessageFactory = (
     smsContent: {
       content: params.smsContent || 'Sms content',
       fromIntegrationId: params.fromIntegrationId
+    },
+    scheduleDate: params.scheduleDate || {
+      type: 'day'
     }
   });
 
@@ -500,6 +545,7 @@ interface ICustomerFactoryInput {
   phoneValidationStatus?: string;
   mergedIds?: string[];
   relatedIntegrationIds?: string[];
+  state?: 'visitor' | 'lead' | 'customer';
 }
 
 export const customerFactory = async (
@@ -535,7 +581,8 @@ export const customerFactory = async (
     visitorContactInfo: params.visitorContactInfo,
     deviceTokens: params.deviceTokens || [],
     mergedIds: params.mergedIds || [],
-    relatedIntegrationIds: params.relatedIntegrationIds || []
+    relatedIntegrationIds: params.relatedIntegrationIds || [],
+    state: params.state
   };
 
   if (useModelMethod) {
@@ -1446,9 +1493,9 @@ interface IWebhookParams {
 
 export function webhookFactory(params: IWebhookParams) {
   const webhook = new Webhooks({
-    url: params.url || `https://${faker.random.word()}.com`,
+    url: params.url || `https://${faker.random.uuid()}.com`,
     actions: params.actions || WEBHOOK_ACTIONS,
-    token: params.token || faker.unique
+    token: params.token || faker.random.uuid()
   });
 
   return webhook.save();
@@ -1464,4 +1511,60 @@ export const onboardHistoryFactory = async (params: IOnboardHistoryParams) => {
   const onboard = new OnboardingHistories(params);
 
   return onboard.save();
+};
+
+interface ICalendarFactoryInput {
+  name?: string;
+  color?: string;
+  userId?: string;
+  groupId: string;
+  createdAt?: Date;
+  accountId?: string;
+}
+
+export const calendarFactory = async (params: ICalendarFactoryInput) => {
+  const calendar = new Calendars({
+    name: params.name || faker.random.word(),
+    categoryId: params.color || faker.random.word(),
+    userId: params.userId || PRODUCT_TYPES.PRODUCT,
+    groupId: params.groupId,
+    accountId: params.accountId || 'erxesApiId'
+  });
+
+  return calendar.save();
+};
+
+interface ICalendarBoardFactoryInput {
+  name?: string;
+}
+
+export const calendarBoardFactory = async (
+  params: ICalendarBoardFactoryInput = {}
+) => {
+  const calendarBoard = new CalendarBoards({
+    name: params.name || faker.random.word()
+  });
+
+  return calendarBoard.save();
+};
+interface ICalendarGroupFactoryInput {
+  name?: string;
+  isPrivate?: boolean;
+  userId?: string;
+  memberIds?: string[];
+  boardId?: string;
+}
+
+export const calendarGroupFactory = async (
+  params: ICalendarGroupFactoryInput = {}
+) => {
+  const calendarGroup = new CalendarGroups({
+    name: params.name || faker.random.word(),
+    isPrivate: params.isPrivate || false,
+    userId: params.userId || faker.random.word(),
+    memberIds: params.memberIds || [faker.random.word()],
+    boardId: params.boardId || (await calendarBoardFactory())._id
+  });
+
+  return calendarGroup.save();
 };

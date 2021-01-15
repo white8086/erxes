@@ -28,6 +28,7 @@ interface IState {
   isBrowserInfoSaved: boolean;
   headHeight: number;
   botTyping: boolean;
+  browserInfo: IBrowserInfo;
 }
 
 interface IStore extends IState {
@@ -54,6 +55,7 @@ interface IStore extends IState {
   readConversation: (conversationId: string) => void;
   readMessages: (conversationId: string) => void;
   replyAutoAnswer: (message: string, payload: string, type: string) => void;
+  getBotInitialMessage: (callback: (bodData: any) => void) => void;
   changeOperatorStatus: (
     _id: string,
     operatorStatus: string,
@@ -71,6 +73,7 @@ interface IStore extends IState {
   isLoggedIn: () => boolean;
   setBotTyping: (typing: boolean) => void;
   botTyping: boolean;
+  browserInfo: IBrowserInfo;
 }
 
 export const MESSAGE_TYPES = {
@@ -119,7 +122,8 @@ export class AppProvider extends React.Component<{}, IState> {
       isAttachingFile: false,
       isBrowserInfoSaved: false,
       headHeight: 200,
-      botTyping: false
+      botTyping: false,
+      browserInfo: {}
     };
   }
 
@@ -177,7 +181,8 @@ export class AppProvider extends React.Component<{}, IState> {
           .then(({ data: { widgetsSaveBrowserInfo } }: any) => {
             this.setState({
               lastUnreadMessage: widgetsSaveBrowserInfo,
-              isBrowserInfoSaved: true
+              isBrowserInfoSaved: true,
+              browserInfo
             });
           });
       }
@@ -396,10 +401,7 @@ export class AppProvider extends React.Component<{}, IState> {
   };
 
   readMessages = (conversationId: string) => {
-    if (this.state.unreadCount === 0) {
-      return;
-    }
-
+    
     client
       .mutate({
         mutation: gql(graphqlTypes.readConversationMessages),
@@ -466,6 +468,28 @@ export class AppProvider extends React.Component<{}, IState> {
       });
   };
 
+  getBotInitialMessage = (callback: (botData: any) => void) => {
+    return client.mutate({
+      mutation: gql`
+        mutation widgetGetBotInitialMessage(
+          $integrationId: String
+        ) {
+            widgetGetBotInitialMessage(
+            integrationId: $integrationId
+          )
+        }
+      `,
+      variables: {
+        integrationId: connection.data.integrationId,
+      }
+    })
+      .then(({ data }) => {
+        if (data.widgetGetBotInitialMessage) {
+          callback(data.widgetGetBotInitialMessage);
+        }
+      })
+  };
+
   replyAutoAnswer = (message: string, payload: string, type: string) => {
     this.setState({ sendingMessage: true });
 
@@ -476,7 +500,7 @@ export class AppProvider extends React.Component<{}, IState> {
             $message: String!
             $payload: String!
             $type: String!
-            $conversationId: String!
+            $conversationId: String
             $customerId: String!
             $integrationId: String!
           ) {
@@ -499,8 +523,13 @@ export class AppProvider extends React.Component<{}, IState> {
           payload
         }
       })
-      .then(() => {
-        this.setState({ sendingMessage: false });
+      .then(({ data }) => {
+        const { conversationId } = data.widgetBotRequest;
+
+        this.setState({
+          sendingMessage: false,
+          activeConversation: conversationId
+        });
       })
       .catch(() => {
         this.setState({ sendingMessage: false });
@@ -685,6 +714,7 @@ export class AppProvider extends React.Component<{}, IState> {
           readConversation: this.readConversation,
           readMessages: this.readMessages,
           replyAutoAnswer: this.replyAutoAnswer,
+          getBotInitialMessage: this.getBotInitialMessage,
           changeOperatorStatus: this.changeOperatorStatus,
           sendMessage: this.sendMessage,
           sendTypingInfo: this.sendTypingInfo,
@@ -692,7 +722,8 @@ export class AppProvider extends React.Component<{}, IState> {
           sendFile: this.sendFile,
           setHeadHeight: this.setHeadHeight,
           setUnreadCount: this.setUnreadCount,
-          isLoggedIn: this.isLoggedIn
+          isLoggedIn: this.isLoggedIn,
+          browserInfo: this.state.browserInfo,
         }}
       >
         {this.props.children}

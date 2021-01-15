@@ -61,6 +61,10 @@ export default class IntegrationsAPI extends RESTDataSource {
     return this.post('/daily/room', params);
   }
 
+  public async saveDailyRecordingInfo(params) {
+    return this.post('/daily/saveRecordingInfo', params);
+  }
+
   public async fetchApi(path, params) {
     return this.get(path, params);
   }
@@ -87,5 +91,29 @@ export default class IntegrationsAPI extends RESTDataSource {
 
   public async sendSms(params) {
     return this.post('/telnyx/send-sms', params);
+  }
+
+  public async createCalendarEvent(params) {
+    return this.post('/nylas/create-calendar-event', params);
+  }
+
+  public async editCalendarEvent(params) {
+    return this.post('/nylas/edit-calendar-event', params);
+  }
+
+  public async editCalendar(params) {
+    return this.post('/nylas/edit-calendar', params);
+  }
+
+  public async deleteCalendarEvent(params) {
+    return this.post('/nylas/delete-calendar-event', params);
+  }
+
+  public async connectCalendars(params) {
+    return this.post('/nylas/connect-calendars', params);
+  }
+
+  public async deleteCalendars(params) {
+    return this.post('/nylas/remove-calendars', params);
   }
 }

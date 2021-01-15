@@ -8,10 +8,10 @@ import ModalTrigger from 'modules/common/components/ModalTrigger';
 import Pagination from 'modules/common/components/pagination/Pagination';
 import SortHandler from 'modules/common/components/SortHandler';
 import Table from 'modules/common/components/table';
+import withTableWrapper from 'modules/common/components/table/withTableWrapper';
 import { __, Alert, confirm, router } from 'modules/common/utils';
 import { menuContacts } from 'modules/common/utils/menus';
 import { queries } from 'modules/companies/graphql';
-import { CompaniesTableWrapper } from 'modules/companies/styles';
 import Wrapper from 'modules/layout/components/Wrapper';
 import { BarItems } from 'modules/layout/styles';
 import ManageColumns from 'modules/settings/properties/containers/ManageColumns';
@@ -48,6 +48,8 @@ interface IProps extends IRouterProps {
   queryParams: any;
   exportCompanies: (bulk: string[]) => void;
   refetch?: () => void;
+  renderExpandButton?: any;
+  isExpand?: boolean;
 }
 
 type State = {
@@ -122,11 +124,13 @@ class CompaniesList extends React.Component<IProps, State> {
       totalCount,
       mergeCompanies,
       queryParams,
-      exportCompanies
+      exportCompanies,
+      isExpand,
+      renderExpandButton
     } = this.props;
 
     const mainContent = (
-      <CompaniesTableWrapper>
+      <withTableWrapper.Wrapper>
         <Table whiteSpace="nowrap" bordered={true} hover={true}>
           <thead>
             <tr>
@@ -145,7 +149,7 @@ class CompaniesList extends React.Component<IProps, State> {
               <th>{__('Tags')}</th>
             </tr>
           </thead>
-          <tbody id="companies">
+          <tbody id="companies" className={isExpand ? 'expand' : ''}>
             {companies.map(company => (
               <CompanyRow
                 company={company}
@@ -158,7 +162,7 @@ class CompaniesList extends React.Component<IProps, State> {
             ))}
           </tbody>
         </Table>
-      </CompaniesTableWrapper>
+      </withTableWrapper.Wrapper>
     );
 
     const addTrigger = (
@@ -216,6 +220,7 @@ class CompaniesList extends React.Component<IProps, State> {
             <ModalTrigger
               title="Merge Companies"
               size="lg"
+              dialogClassName="modal-1000w"
               trigger={mergeButton}
               content={companiesMerge}
             />
@@ -258,6 +263,8 @@ class CompaniesList extends React.Component<IProps, State> {
           autoFocus={true}
           onFocus={this.moveCursorAtTheEnd}
         />
+
+        {renderExpandButton()}
 
         <Dropdown className="dropdown-btn" alignRight={true}>
           <Dropdown.Toggle as={DropdownToggle} id="dropdown-customize">
@@ -331,4 +338,7 @@ class CompaniesList extends React.Component<IProps, State> {
   }
 }
 
-export default withRouter<IRouterProps>(CompaniesList);
+export default withTableWrapper(
+  'Company',
+  withRouter<IRouterProps>(CompaniesList)
+);

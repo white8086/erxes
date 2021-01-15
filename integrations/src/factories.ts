@@ -5,15 +5,16 @@ import {
   Customers,
   Posts
 } from './facebook/models';
+import { Accounts } from './models';
+import Configs from './models/Configs';
+import Integrations from './models/Integrations';
 import {
+  NylasCalendars,
+  NylasEvents,
   NylasGmailConversationMessages,
   NylasGmailConversations,
   NylasGmailCustomers
 } from './nylas/models';
-
-import { Accounts } from './models';
-import Configs from './models/Configs';
-import Integrations from './models/Integrations';
 
 export const configFactory = (params: { code?: string; value?: string }) => {
   const config = new Configs({
@@ -41,6 +42,8 @@ export const accountFactory = (params: {
   smtpPort?: number;
   uid?: string;
   nylasToken?: string;
+  nylasAccountId?: string;
+  nylasBillingState?: string;
 }) => {
   const account = new Accounts({
     kind: params.kind || '',
@@ -58,7 +61,9 @@ export const accountFactory = (params: {
     smtpHost: params.smtpHost || '',
     imapPort: params.imapPort || 0,
     smtpPort: params.smtpPort || 0,
-    uid: params.uid || ''
+    uid: params.uid || '',
+    nylasAccountId: params.nylasAccountId || '',
+    nylasBillingState: params.nylasBillingState || ''
   });
 
   return account.save();
@@ -66,6 +71,7 @@ export const accountFactory = (params: {
 
 export const integrationFactory = (params: {
   kind?: string;
+  googleAccessToken?: string;
   accountId?: string;
   erxesApiId?: string;
   email?: string;
@@ -82,6 +88,7 @@ export const integrationFactory = (params: {
   const integration = new Integrations({
     kind: params.kind || 'facebook',
     accountId: params.accountId || '_id',
+    googleAccessToken: params.googleAccessToken || '',
     email: params.email || 'user@mail.com',
     erxesApiId: params.erxesApiId || '_id',
     gmailHistoryId: params.gmailHistoryId || '',
@@ -187,6 +194,43 @@ export const nylasGmailConversationMessageFactory = (params: {
   const message = new NylasGmailConversationMessages({
     conversationId: params.conversationId || '',
     messageId: params.messageId || ''
+  });
+
+  return message.save();
+};
+
+// Nylas calendar
+export const nylasCalendarFactory = (params: {
+  title?: string;
+  description?: string;
+  providerCalendarId?: string;
+  accountUid?: string;
+}) => {
+  const message = new NylasCalendars({
+    title: params.title || '',
+    description: params.description || '',
+    providerCalendarId: params.providerCalendarId || 'id',
+    accountUid: params.accountUid || ''
+  });
+
+  return message.save();
+};
+
+// Nylas event
+export const nylasEventFactory = (params: {
+  title?: string;
+  providerCalendarId?: string;
+  providerEventId?: string;
+  when?: {
+    start_time?: number;
+    end_time?: number;
+  };
+}) => {
+  const message = new NylasEvents({
+    title: params.title || '',
+    providerCalendarId: params.providerCalendarId || 'id',
+    providerEventId: params.providerEventId || 'eventId',
+    when: params.when || {}
   });
 
   return message.save();

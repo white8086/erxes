@@ -80,13 +80,9 @@ class Row extends React.Component<Props> {
   }
 
   renderRemoveButton = (message, onClick) => {
-    if (!message.kind.toLowerCase().includes('auto')) {
-      return null;
-    }
-
     return (
       <Tip text={__('Delete')} placement="top">
-        <Button btnStyle="link" onClick={onClick} icon="times-cirlce" />
+        <Button btnStyle="link" onClick={onClick} icon="times-circle" />
       </Tip>
     );
   };
@@ -134,7 +130,8 @@ class Row extends React.Component<Props> {
       stats = { send: '' },
       kind,
       validCustomersCount,
-      smsStats = { total: 0 }
+      smsStats = { total: 0 },
+      scheduleDate
     } = message;
     const totalCount = stats.total || 0;
 
@@ -154,6 +151,19 @@ class Row extends React.Component<Props> {
       if (message.method === METHODS.SMS && smsStats.total === 0) {
         return <Label lblStyle="warning">Not sent</Label>;
       }
+    }
+
+    if (scheduleDate && scheduleDate.type === 'pre') {
+      const scheduledDate = new Date(scheduleDate.dateTime);
+      const now = new Date();
+
+      if (scheduledDate.getTime() > now.getTime()) {
+        return <Label>scheduled</Label>;
+      } else {
+        return <Label lblStyle="warning">Not sent</Label>;
+      }
+    } else if (scheduleDate && scheduleDate.type === 'sent') {
+      return <Label lblStyle="success">Sent</Label>;
     }
 
     return <Label>Sending</Label>;
@@ -192,8 +202,21 @@ class Row extends React.Component<Props> {
 
   render() {
     const { isChecked, message, remove } = this.props;
-    const { stats = { send: '' }, brand = { name: '' } } = message;
-    const totalCount = stats.total || 0;
+    const {
+      stats = { send: '' },
+      brand = { name: '' },
+      smsStats = { total: 0 },
+      method,
+      scheduleDate
+    } = message;
+    let totalCount = 0;
+
+    if (method === METHODS.SMS) {
+      totalCount = smsStats.total;
+    }
+    if (method === METHODS.EMAIL || method === METHODS.MESSENGER) {
+      totalCount = stats.total;
+    }
 
     return (
       <tr key={message._id}>
@@ -226,6 +249,13 @@ class Row extends React.Component<Props> {
         <td>
           <Icon icon="calender" />{' '}
           {dayjs(message.createdAt).format('DD MMM YYYY')}
+        </td>
+
+        <td>
+          <Icon icon="clock" />{' '}
+          {scheduleDate && scheduleDate.dateTime
+            ? dayjs(scheduleDate.dateTime).format('DD MMM YYYY HH:mm')
+            : '-- --- ---- --:--'}
         </td>
 
         <td>

@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import { debugNylas } from '../debuggers';
 import memoryStorage from '../inmemoryStorage';
-import { Integrations } from '../models';
+import { Accounts, Integrations } from '../models';
 import { getConfig, sendRequest } from '../utils';
 import { checkEmailDuplication, enableOrDisableAccount } from './api';
 import {
@@ -20,25 +20,34 @@ dotenv.config();
  * @param {String} kind
  * @param {Object} account
  */
-const connectProviderToNylas = async (
-  kind: string,
-  integrationId: string,
-  uid: string
-) => {
+const connectProviderToNylas = async (uid: string, integrationId?: string) => {
   const crendentialKey = `${uid}-credential`;
 
   const providerCredential = await memoryStorage().get(crendentialKey, false);
 
   if (!providerCredential) {
-    throw new Error(`Refresh token not found ${kind}`);
+    throw new Error(`Refresh token not found ${uid}`);
   }
 
-  const [email, refreshToken] = providerCredential.split(',');
+  const [
+    email,
+    refreshToken,
+    kind,
+    googleAccessToken
+  ] = providerCredential.split(',');
 
-  const isEmailDuplicated = await checkEmailDuplication(email, kind);
+  if (integrationId) {
+    const isEmailDuplicated = await checkEmailDuplication(email, kind);
 
-  if (isEmailDuplicated) {
-    throw new Error(`${email} is already exists`);
+    if (isEmailDuplicated) {
+      throw new Error(`${email} is already exists`);
+    }
+  } else {
+    const account = await Accounts.findOne({ email, kind });
+
+    if (account) {
+      return { account, isAlreadyExists: true };
+    }
   }
 
   const settings = await getProviderSettings(kind, refreshToken);
@@ -53,20 +62,44 @@ const connectProviderToNylas = async (
       kind,
       settings,
       ...(kind === 'gmail'
-        ? { scopes: 'email.read_only,email.drafts,email.send,email.modify' }
+        ? {
+            scopes:
+              'contacts,calendar,email.read_only,email.drafts,email.send,email.modify'
+          }
         : {})
     });
 
     await memoryStorage().removeKey(crendentialKey);
 
-    await createIntegration({
-      kind,
-      email,
-      integrationId,
-      nylasToken: access_token,
-      nylasAccountId: account_id,
-      status: billing_state
-    });
+    const nylasAccountId = account_id;
+    const status = 'paid';
+
+    if (billing_state === 'cancelled') {
+      await enableOrDisableAccount(nylasAccountId, true);
+    }
+
+    if (integrationId) {
+      await createIntegration({
+        kind,
+        email,
+        integrationId,
+        nylasToken: access_token,
+        nylasAccountId,
+        status,
+        googleAccessToken
+      });
+    } else {
+      const newAccount = await Accounts.create({
+        kind,
+        email,
+        googleAccessToken,
+        nylasToken: access_token,
+        nylasAccountId,
+        nylasBillingState: status
+      });
+
+      return { account: newAccount };
+    }
   } catch (e) {
     throw e;
   }
@@ -302,7 +335,8 @@ const createIntegration = async ({
   nylasAccountId,
   nylasToken,
   status,
-  kind
+  kind,
+  googleAccessToken
 }: {
   email?: string;
   integrationId: string;
@@ -310,6 +344,7 @@ const createIntegration = async ({
   nylasToken: string;
   status: string;
   kind: string;
+  googleAccessToken?: string;
 }) => {
   if (status === 'cancelled') {
     await enableOrDisableAccount(nylasAccountId, true);
@@ -319,6 +354,7 @@ const createIntegration = async ({
     ...(email ? { email } : {}),
     kind,
     erxesApiId: integrationId,
+    googleAccessToken,
     nylasToken,
     nylasAccountId,
     nylasBillingState: 'paid'

@@ -1,3 +1,4 @@
+import { getConfig, setConfig } from 'erxes-ui/lib/utils/core';
 import gql from 'graphql-tag';
 import queryString from 'query-string';
 import { queries } from './graphql';
@@ -31,17 +32,8 @@ export const refetchSidebarConversationsOptions = () => {
   };
 };
 
-export const getConfig = (key: string) => {
-  const sidebarConfig = localStorage.getItem(key);
-
-  if (sidebarConfig) {
-    return JSON.parse(sidebarConfig);
-  }
-};
-
-export const setConfig = (key, params) => {
-  localStorage.setItem(key, JSON.stringify(params));
-};
+export { getConfig };
+export { setConfig };
 
 export const isConversationMailKind = (conversation: IConversation) => {
   // const integration = conversation.integration ? conversation.integration || {};
@@ -73,6 +65,10 @@ export const extractEmail = (str?: string) => {
   }
 
   return emails.join(' ');
+};
+
+export const linkify = (url: string) => {
+  return url.startsWith('http') ? url : `http://${url}`;
 };
 
 export const urlify = (text: string) => {

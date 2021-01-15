@@ -8,6 +8,7 @@ import {
   StepWrapper
 } from 'modules/common/components/step/styles';
 import { __, Alert } from 'modules/common/utils';
+import { linkify } from 'modules/inbox/utils';
 import Wrapper from 'modules/layout/components/Wrapper';
 import { IBrand } from 'modules/settings/brands/types';
 import { LANGUAGES } from 'modules/settings/general/constants';
@@ -48,6 +49,7 @@ type Props = {
 type State = {
   title: string;
   botEndpointUrl?: string;
+  botShowInitialMessage?: boolean;
   brandId: string;
   channelIds: string[];
   languageCode: string;
@@ -89,7 +91,8 @@ class CreateMessenger extends React.Component<Props, State> {
       showLauncher: true,
       forceLogoutWhenResolve: false,
       showVideoCallRequest: false,
-      botEndpointUrl: ''
+      botEndpointUrl: '',
+      botShowInitialMessage: false
     };
     const links = configData.links || {};
     const messages = configData.messages || {};
@@ -100,6 +103,7 @@ class CreateMessenger extends React.Component<Props, State> {
     this.state = {
       title: integration.name,
       botEndpointUrl: configData.botEndpointUrl,
+      botShowInitialMessage: configData.botShowInitialMessage,
       brandId: integration.brandId || '',
       languageCode,
       channelIds: channels.map(item => item._id) || [],
@@ -167,6 +171,7 @@ class CreateMessenger extends React.Component<Props, State> {
     const {
       title,
       botEndpointUrl,
+      botShowInitialMessage,
       brandId,
       languageCode,
       channelIds,
@@ -194,7 +199,11 @@ class CreateMessenger extends React.Component<Props, State> {
       return Alert.error('Choose a brand');
     }
 
-    const links = { facebook, twitter, youtube };
+    const links = {
+      facebook: linkify(facebook),
+      twitter: linkify(twitter),
+      youtube: linkify(youtube)
+    };
 
     this.props.save({
       name: title,
@@ -203,6 +212,7 @@ class CreateMessenger extends React.Component<Props, State> {
       languageCode: this.state.languageCode,
       messengerData: {
         botEndpointUrl,
+        botShowInitialMessage,
         notifyCustomer: this.state.notifyCustomer,
         availabilityMethod: this.state.availabilityMethod,
         isOnline: this.state.isOnline,
@@ -267,6 +277,7 @@ class CreateMessenger extends React.Component<Props, State> {
     const {
       title,
       botEndpointUrl,
+      botShowInitialMessage,
       supporterIds,
       isOnline,
       availabilityMethod,
@@ -390,6 +401,7 @@ class CreateMessenger extends React.Component<Props, State> {
                 <Connection
                   title={title}
                   botEndpointUrl={botEndpointUrl}
+                  botShowInitialMessage={botShowInitialMessage}
                   channelIds={channelIds}
                   brandId={brandId}
                   onChange={this.onChange}

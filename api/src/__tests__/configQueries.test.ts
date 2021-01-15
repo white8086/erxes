@@ -38,18 +38,35 @@ describe('configQueries', () => {
     expect(response.USE_BRAND_RESTRICTIONS).toBe('true');
   });
 
+  test('configsGetVersion', async () => {
+    const qry = `
+      query configsGetVersion($releaseNotes: Boolean) {
+        configsGetVersion(releaseNotes: $releaseNotes)
+      }
+    `;
+
+    const mock = sinon.stub(utils, 'sendRequest').callsFake(() => {
+      return Promise.resolve({});
+    });
+
+    await graphqlRequest(qry, 'configsGetVersion', { releaseNotes: true });
+
+    mock.restore();
+  });
+
   test('configsStatus', async () => {
     const qry = `
       query configsStatus {
         configsStatus {
-          erxes {
-            packageVersion
-          }
           erxesApi {
-            packageVersion
+            os {
+              type
+            }
           }
           erxesIntegration {
-            packageVersion
+            os {
+              type
+            }
           }
         }
       }
@@ -57,17 +74,11 @@ describe('configQueries', () => {
 
     let config = await graphqlRequest(qry, 'configsStatus');
 
-    expect(config.erxes.packageVersion).toBe('-');
-    expect(config.erxesIntegration.packageVersion).toBeDefined();
-
     const mock = sinon.stub(utils, 'sendRequest').callsFake(() => {
       return Promise.resolve({ packageVersion: '-' });
     });
 
     config = await graphqlRequest(qry, 'configsStatus');
-
-    expect(config.erxes.packageVersion).toBe('-');
-    expect(config.erxesIntegration.packageVersion).toBe('-');
 
     mock.restore();
   });
@@ -80,5 +91,37 @@ describe('configQueries', () => {
     `;
 
     await graphqlRequest(qry, 'configsConstants');
+  });
+
+  test('Check activate installation', async () => {
+    const qry = `
+      query configsCheckActivateInstallation($hostname: String!) {
+        configsCheckActivateInstallation(hostname: $hostname)
+      }
+    `;
+
+    try {
+      await graphqlRequest(qry, 'configsCheckActivateInstallation', {
+        hostname: 'localhost'
+      });
+    } catch (e) {
+      expect(e[0].message).toBe('');
+    }
+
+    const mock = sinon.stub(utils, 'sendRequest').callsFake(() => {
+      return Promise.resolve('ok');
+    });
+
+    const response = await graphqlRequest(
+      qry,
+      'configsCheckActivateInstallation',
+      {
+        hostname: 'localhost'
+      }
+    );
+
+    expect(response).toBe('ok');
+
+    mock.restore();
   });
 });

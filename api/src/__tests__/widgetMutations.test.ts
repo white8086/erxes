@@ -37,6 +37,7 @@ import {
 } from '../db/models/definitions/constants';
 import { ICustomerDocument } from '../db/models/definitions/customers';
 import { IIntegrationDocument } from '../db/models/definitions/integrations';
+import memoryStorage from '../inmemoryStorage';
 import './setup.ts';
 
 describe('messenger connect', () => {
@@ -290,6 +291,10 @@ describe('insertMessage()', () => {
       operatorStatus: CONVERSATION_OPERATOR_STATUS.BOT
     });
 
+    const conversation2 = await conversationFactory({
+      operatorStatus: CONVERSATION_OPERATOR_STATUS.OPERATOR
+    });
+
     const sendRequestMock = sinon.stub(utils, 'sendRequest').callsFake(() => {
       return Promise.resolve({
         responses: [
@@ -329,6 +334,19 @@ describe('insertMessage()', () => {
     } else {
       fail('Bot message not found');
     }
+
+    const message2 = await widgetMutations.widgetsInsertMessage(
+      {},
+      {
+        contentType: MESSAGE_TYPES.TEXT,
+        integrationId: _integrationBot._id,
+        message: 'User message 2',
+        customerId: _customer._id,
+        conversationId: conversation2._id
+      }
+    );
+
+    expect(message2.content).toBe('User message 2');
 
     sendRequestMock.restore();
   });
@@ -374,6 +392,30 @@ describe('insertMessage()', () => {
     }
 
     sendRequestMock.restore();
+  });
+
+  test('Bot show initial message', async () => {
+    const mock = sinon.stub(utils, 'sendRequest').returns(
+      Promise.resolve({
+        responses: [
+          {
+            type: 'text',
+            text: 'Greeting bot message'
+          }
+        ]
+      })
+    );
+
+    const message = await widgetMutations.widgetGetBotInitialMessage(
+      {},
+      {
+        integrationId: _integrationBot._id
+      }
+    );
+
+    expect(message.botData[0].text).toBe('Greeting bot message');
+
+    mock.restore();
   });
 
   test('Bot widget post request', async () => {
@@ -454,6 +496,33 @@ describe('insertMessage()', () => {
         text: 'Response of reply'
       }
     ]);
+
+    await memoryStorage().set(
+      `bot_initial_message_${_integrationBot._id}`,
+      JSON.stringify({ text: 'Hi there' })
+    );
+
+    const botMessage3 = await widgetMutations.widgetBotRequest(
+      {},
+      {
+        integrationId: _integrationBot._id,
+        customerId: _customer._id,
+        message: 'Reply message',
+        payload: 'Response of reply',
+        type: 'postback'
+      }
+    );
+
+    expect(botMessage3.botData).toEqual([
+      {
+        type: 'text',
+        text: 'Response of quick reply'
+      }
+    ]);
+
+    await memoryStorage().removeKey(
+      `bot_initial_message_${_integrationBot._id}`
+    );
 
     sendRequestMock.restore();
   });

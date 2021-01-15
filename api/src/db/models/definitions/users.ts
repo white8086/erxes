@@ -1,6 +1,7 @@
 import { Document, Schema } from 'mongoose';
 
 import { ILink } from './common';
+import { IPermissionDocument } from './permissions';
 import { field } from './utils';
 
 export interface IEmailSignature {
@@ -49,6 +50,7 @@ export interface IUserDocument extends IUser, Document {
   _id: string;
   emailSignatures?: IEmailSignatureDocument[];
   details?: IDetailDocument;
+  customPermissions?: IPermissionDocument[];
 }
 
 // Mongoose schemas ===============================

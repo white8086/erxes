@@ -284,7 +284,7 @@ class ProductItem extends React.Component<Props, State> {
                       value: '',
                       label: '-----------'
                     }}
-                    value={productData.assignUserId}
+                    initialValue={productData.assignUserId}
                     onSelect={this.assignUserOnChange}
                   />
                 </ContentColumn>

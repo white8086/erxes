@@ -10,7 +10,7 @@ type Props = {
 };
 
 type State = {
-  dateValue: Date | string;
+  dateValue?: Date | string;
   dateTimeValue: Date | string;
   isAttachingFile?: boolean;
 };
@@ -174,8 +174,8 @@ export default class Field extends React.Component<Props, State> {
     return (
       <Datetime
         value={this.state.dateValue}
-        defaultValue={new Date()}
         viewDate={new Date()}
+        defaultValue={new Date()}
         onChange={this.onDateChange}
         dateFormat="YYYY/MM/DD"
         timeFormat={false}
@@ -187,8 +187,8 @@ export default class Field extends React.Component<Props, State> {
     return (
       <Datetime
         value={this.state.dateTimeValue}
-        defaultValue={new Date()}
         viewDate={new Date()}
+        defaultValue={new Date()}
         onChange={this.onDateTimeChange}
         timeFormat="HH:mm"
         dateFormat="YYYY/MM/DD"

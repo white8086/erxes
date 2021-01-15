@@ -1,4 +1,5 @@
 import '@nateradebaugh/react-datetime/css/react-datetime.css';
+import * as Sentry from '@sentry/browser';
 import 'abortcontroller-polyfill/dist/polyfill-patch-fetch';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -9,11 +10,12 @@ import { OwnerDescription } from 'modules/auth/components/OwnerSetup';
 import OwnerSetup from 'modules/auth/containers/OwnerSetup';
 // global style
 import 'modules/common/styles/global-styles.ts';
+import { getEnv } from 'modules/common/utils';
 import AuthLayout from 'modules/layout/components/AuthLayout';
 import React from 'react';
 import { ApolloProvider } from 'react-apollo';
 import { render } from 'react-dom';
-import apolloClient, { getEnv } from './apolloClient';
+import apolloClient from './apolloClient';
 import Routes from './routes';
 
 dayjs.extend(localizedFormat);
@@ -23,6 +25,12 @@ dayjs.extend(utc, { parseLocal: true });
 const target = document.querySelector('#root');
 
 const envs = getEnv();
+
+if (envs.REACT_APP_SENTRY_DSN) {
+  Sentry.init({
+    dsn: envs.REACT_APP_SENTRY_DSN
+  });
+}
 
 fetch(`${envs.REACT_APP_API_URL}/initial-setup?envs=${JSON.stringify(envs)}`, {
   credentials: 'include'
