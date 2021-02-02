@@ -1,3 +1,4 @@
+import CollapseContent from 'modules/common/components/CollapseContent';
 import { __ } from 'modules/common/utils';
 import LeftSidebar from 'modules/layout/components/Sidebar';
 import { SidebarList as List } from 'modules/layout/styles';
@@ -41,7 +42,57 @@ class Sidebar extends React.Component<Props> {
   render() {
     return (
       <LeftSidebar header={this.renderSidebarHeader()}>
-        <LeftSidebar.Section>
+        <CollapseContent title={__('Team Inbox')} compact={true}>
+
+          <List>
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
+              'Customers'
+            )}
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.COMPANY,
+              'Companies'
+            )}
+          </List>
+
+        </CollapseContent>
+        <CollapseContent title={__('Tickets')} compact={true}>
+
+          <List>
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
+              'Ticket'
+            )}
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.PRODUCT,
+              'Product & Service'
+            )}
+          </List>
+        </CollapseContent>
+        <CollapseContent title={__('Tasks')} compact={true}>
+
+          <List>
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
+              'Task'
+            )}
+          </List>
+        </CollapseContent>
+        <CollapseContent title={__('Sales pipeline')} compact={true}>
+
+          <List>
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
+              'Deal'
+            )}
+            {this.renderListItem(
+              FIELDS_GROUPS_CONTENT_TYPES.PRODUCT,
+              'Product & Service'
+            )}
+          </List>
+        </CollapseContent>
+        <CollapseContent title={__('Contacts')} compact={true}>
+
           <List>
             {this.renderListItem(
               FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
@@ -56,7 +107,7 @@ class Sidebar extends React.Component<Props> {
               'Product & Service'
             )}
           </List>
-        </LeftSidebar.Section>
+        </CollapseContent>
       </LeftSidebar>
     );
   }
