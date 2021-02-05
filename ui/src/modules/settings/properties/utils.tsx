@@ -19,7 +19,7 @@ const generateFields = (infos: any[], type: string) => {
       options: [],
       groupId: `basicInfosGroup${type}`,
       description: info.label,
-      isDefinedByErxes: true
+      isDefinedByErxes: false
     });
   });
 
@@ -44,7 +44,7 @@ const generateGroup = (infos: any[], type: string) => {
       }
     },
     lastUpdatedUserId: '123',
-    isDefinedByErxes: true,
+    isDefinedByErxes: false,
     fields: generateFields(infos, type)
   };
 };

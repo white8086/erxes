@@ -60,6 +60,7 @@ export interface IFieldModel extends Model<IFieldDocument> {
     isVisible: boolean,
     lastUpdatedUserId: string
   ): Promise<IFieldDocument>;
+  createSystemFields():Promise<IFieldDocument[]>;
 }
 
 export const loadFieldClass = () => {
@@ -330,6 +331,7 @@ export interface IFieldGroupModel extends Model<IFieldGroupDocument> {
     isVisible: boolean,
     lastUpdatedUserId: string
   ): Promise<IFieldGroupDocument>;
+  createSystemGroups():Promise<IFieldGroupDocument[]>;
 }
 
 export const loadGroupClass = () => {
@@ -429,6 +431,13 @@ export const loadGroupClass = () => {
       );
 
       return FieldsGroups.findOne({ _id });
+    }
+
+    /**
+     * Create system fields & groups
+     */
+    public static async createSystemGroups() {
+      
     }
   }
 

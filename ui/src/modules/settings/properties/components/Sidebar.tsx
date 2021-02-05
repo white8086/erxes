@@ -4,7 +4,7 @@ import LeftSidebar from 'modules/layout/components/Sidebar';
 import { SidebarList as List } from 'modules/layout/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FIELDS_GROUPS_CONTENT_TYPES } from '../constants';
+import { PROPERTY_GROUPS } from '../constants';
 
 type Props = {
   currentType: string;
@@ -19,6 +19,27 @@ class Sidebar extends React.Component<Props> {
     return <Header uppercase={true}>{__(title)}</Header>;
   };
 
+
+  renderSideBar() {
+
+    return PROPERTY_GROUPS.map(group => (
+      <CollapseContent key={group.value} title={__(group.label)} compact={true}>
+
+      <List key={`list_${group.value}`}>
+        {group.types.map(type => {
+          return this.renderListItem(
+            group.value,
+            type.value,
+            type.label
+          )
+        })}
+      </List>
+
+    </CollapseContent>
+    ));
+  }
+
+
   getClassName(type) {
     const { currentType } = this.props;
 
@@ -29,9 +50,9 @@ class Sidebar extends React.Component<Props> {
     return '';
   }
 
-  renderListItem(type: string, text: string) {
+  renderListItem(group: string, type: string, text: string) {
     return (
-      <li>
+      <li key={`${group}_${type}`}>
         <Link to={`?type=${type}`} className={this.getClassName(type)}>
           {__(text)}
         </Link>
@@ -42,72 +63,7 @@ class Sidebar extends React.Component<Props> {
   render() {
     return (
       <LeftSidebar header={this.renderSidebarHeader()}>
-        <CollapseContent title={__('Team Inbox')} compact={true}>
-
-          <List>
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
-              'Customers'
-            )}
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.COMPANY,
-              'Companies'
-            )}
-          </List>
-
-        </CollapseContent>
-        <CollapseContent title={__('Tickets')} compact={true}>
-
-          <List>
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
-              'Ticket'
-            )}
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.PRODUCT,
-              'Product & Service'
-            )}
-          </List>
-        </CollapseContent>
-        <CollapseContent title={__('Tasks')} compact={true}>
-
-          <List>
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
-              'Task'
-            )}
-          </List>
-        </CollapseContent>
-        <CollapseContent title={__('Sales pipeline')} compact={true}>
-
-          <List>
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
-              'Deal'
-            )}
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.PRODUCT,
-              'Product & Service'
-            )}
-          </List>
-        </CollapseContent>
-        <CollapseContent title={__('Contacts')} compact={true}>
-
-          <List>
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER,
-              'Customers'
-            )}
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.COMPANY,
-              'Companies'
-            )}
-            {this.renderListItem(
-              FIELDS_GROUPS_CONTENT_TYPES.PRODUCT,
-              'Product & Service'
-            )}
-          </List>
-        </CollapseContent>
+        {this.renderSideBar()}
       </LeftSidebar>
     );
   }

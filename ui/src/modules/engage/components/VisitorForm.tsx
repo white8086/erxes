@@ -192,7 +192,6 @@ class VisitorForm extends React.Component<Props, State> {
             <ConditionsRule
               rules={this.state.rules}
               onChange={this.changeState}
-              closeModal={this.onclose}
             />
           </Step>
 
