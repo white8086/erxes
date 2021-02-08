@@ -193,7 +193,6 @@ class UserList extends React.Component<FinalProps, States> {
             <ActionButtons>
               {this.renderResendInvitation(object)}
               {this.renderEditAction(object)}
-              {this.renderResetPassword(object)}
             </ActionButtons>
           </td>
         </tr>
