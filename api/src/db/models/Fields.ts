@@ -5,7 +5,15 @@
 import { Model, model } from 'mongoose';
 import * as validator from 'validator';
 import { Customers, Forms } from '.';
-import { FIELD_CONTENT_TYPES } from '../../data/constants';
+import {
+  CUSTOMER_BASIC_INFO,
+  FIELD_CONTENT_TYPES,
+  PROPERTY_GROUPS
+} from '../../data/constants';
+import {
+  FIELDS_GROUPS_CONTENT_TYPES,
+  FIELDS_GROUPS_MAIN_TYPES
+} from './definitions/constants';
 import {
   fieldGroupSchema,
   fieldSchema,
@@ -60,7 +68,10 @@ export interface IFieldModel extends Model<IFieldDocument> {
     isVisible: boolean,
     lastUpdatedUserId: string
   ): Promise<IFieldDocument>;
-  createSystemFields():Promise<IFieldDocument[]>;
+  createSystemFields(
+    groupId: string,
+    contentType: string
+  ): Promise<IFieldDocument[]>;
 }
 
 export const loadFieldClass = () => {
@@ -313,6 +324,29 @@ export const loadFieldClass = () => {
 
       return Fields.findOne({ _id });
     }
+
+    public static async createSystemFields(
+      groupId: string,
+      contentType: string
+    ) {
+      switch (contentType) {
+        case FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER:
+          const fields = CUSTOMER_BASIC_INFO.ALL.map(e => {
+            return {
+              text: e.label,
+              canHide: e.canHide,
+              validation: e.validation,
+              groupId,
+              contentType
+            };
+          });
+          await Fields.insertMany(fields);
+          break;
+
+        default:
+          break;
+      }
+    }
   }
 
   fieldSchema.loadClass(Field);
@@ -331,7 +365,7 @@ export interface IFieldGroupModel extends Model<IFieldGroupDocument> {
     isVisible: boolean,
     lastUpdatedUserId: string
   ): Promise<IFieldGroupDocument>;
-  createSystemGroups():Promise<IFieldGroupDocument[]>;
+  createSystemGroupsFields(): Promise<IFieldGroupDocument[]>;
 }
 
 export const loadGroupClass = () => {
@@ -436,8 +470,46 @@ export const loadGroupClass = () => {
     /**
      * Create system fields & groups
      */
-    public static async createSystemGroups() {
-      
+    public static async createSystemGroupsFields() {
+      for (const group of PROPERTY_GROUPS) {
+        for (const subType of group.types) {
+          console.log('group:', group, ' - ', subType);
+          const doc = {
+            name: 'Basic information',
+            mainType: FIELDS_GROUPS_MAIN_TYPES[group.value.toUpperCase()],
+            contentType:
+              FIELDS_GROUPS_CONTENT_TYPES[subType.value.toUpperCase()],
+            order: 0,
+            isDefinedByErxes: true,
+            description: `Basic information of a ${subType.value}`,
+            isVisible: true
+          };
+
+          const { contentType } = doc;
+
+          // Automatically setting order of group to the bottom
+          let order = 0;
+
+          const lastGroup = await FieldsGroups.findOne({ contentType }).sort({
+            order: -1
+          });
+
+          if (lastGroup) {
+            order = (lastGroup.order || 0) + 1;
+          }
+
+          const fieldGroup = await FieldsGroups.create({
+            ...doc,
+            order
+          });
+
+          const fields = await Fields.createSystemFields(
+            fieldGroup._id,
+            subType.value
+          );
+          console.log(fields);
+        }
+      }
     }
   }
 

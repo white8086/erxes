@@ -19,26 +19,17 @@ class Sidebar extends React.Component<Props> {
     return <Header uppercase={true}>{__(title)}</Header>;
   };
 
-
   renderSideBar() {
-
     return PROPERTY_GROUPS.map(group => (
       <CollapseContent key={group.value} title={__(group.label)} compact={true}>
-
-      <List key={`list_${group.value}`}>
-        {group.types.map(type => {
-          return this.renderListItem(
-            group.value,
-            type.value,
-            type.label
-          )
-        })}
-      </List>
-
-    </CollapseContent>
+        <List key={`list_${group.value}`}>
+          {group.types.map(type => {
+            return this.renderListItem(group.value, type.value, type.label);
+          })}
+        </List>
+      </CollapseContent>
     ));
   }
-
 
   getClassName(type) {
     const { currentType } = this.props;
@@ -53,7 +44,10 @@ class Sidebar extends React.Component<Props> {
   renderListItem(group: string, type: string, text: string) {
     return (
       <li key={`${group}_${type}`}>
-        <Link to={`?type=${type}`} className={this.getClassName(type)}>
+        <Link
+          to={`?type=${type}&?mainType=${group}`}
+          className={this.getClassName(type)}
+        >
           {__(text)}
         </Link>
       </li>

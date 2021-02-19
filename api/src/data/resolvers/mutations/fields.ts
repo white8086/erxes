@@ -1,7 +1,11 @@
 import { Fields, FieldsGroups } from '../../../db/models';
+import {
+  FIELDS_GROUPS_CONTENT_TYPES,
+  FIELDS_GROUPS_MAIN_TYPES
+} from '../../../db/models/definitions/constants';
 import { IField, IFieldGroup } from '../../../db/models/definitions/fields';
 import { IOrderInput } from '../../../db/models/Fields';
-import { MODULE_NAMES } from '../../constants';
+import { CUSTOMER_BASIC_INFO, MODULE_NAMES } from '../../constants';
 import { putCreateLog } from '../../logUtils';
 import { moduleCheckPermission } from '../../permissions/wrappers';
 import { IContext } from '../../types';
@@ -109,6 +113,10 @@ const fieldsGroupsMutations = {
     { user }: IContext
   ) {
     return FieldsGroups.updateGroupVisible(_id, isVisible, user._id);
+  },
+
+  fieldsGroupsLoadInitialData(_root) {
+    return FieldsGroups.createSystemGroupsFields();
   }
 };
 

@@ -15,6 +15,7 @@ export interface IField {
   order?: number;
   groupId?: string;
   isVisible?: boolean;
+  canHide?: boolean;
   lastUpdatedUserId?: string;
 }
 
@@ -24,6 +25,7 @@ export interface IFieldDocument extends IField, Document {
 
 export interface IFieldGroup {
   name?: string;
+  mainType: string;
   contentType?: string;
   order?: number;
   isDefinedByErxes?: boolean;
@@ -68,6 +70,11 @@ export const fieldSchema = new Schema({
   order: field({ type: Number, label: 'Order' }),
   groupId: field({ type: String, label: 'Field group' }),
   isVisible: field({ type: Boolean, default: true, label: 'Is visible' }),
+  canHide: field({
+    type: Boolean,
+    default: true,
+    label: 'Can toggle isVisible'
+  }),
   lastUpdatedUserId: field({ type: String, label: 'Last updated by' })
 });
 
@@ -75,6 +82,10 @@ export const fieldGroupSchema = schemaWrapper(
   new Schema({
     _id: field({ pkey: true }),
     name: field({ type: String, label: 'Name' }),
+
+    // inbox, ticket, task, deal, contact
+    mainType: field({ type: String, label: 'Main type' }),
+
     // customer, company
     contentType: field({
       type: String,

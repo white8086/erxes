@@ -96,20 +96,20 @@ export const PROPERTY_GROUPS = [
     description: 'description',
     types: [
       { value: 'customer', label: 'Customers' },
-      { value: 'company', label: 'Companies' },
-    ],
+      { value: 'company', label: 'Companies' }
+    ]
   },
   {
     label: 'Tickets',
     value: 'ticket',
     description: 'description',
-    types: [{ value: 'ticket', label: 'Tickets' }],
+    types: [{ value: 'ticket', label: 'Tickets' }]
   },
   {
     label: 'Tasks',
     value: 'task',
     description: 'description',
-    types: [{ value: 'task', label: 'Tasks' }],
+    types: [{ value: 'task', label: 'Tasks' }]
   },
   {
     label: 'Sales pipeline',
@@ -117,8 +117,8 @@ export const PROPERTY_GROUPS = [
     description: 'description',
     types: [
       { value: 'deal', label: 'Sales pipeline' },
-      { value: 'product', label: 'Products & services' },
-    ],
+      { value: 'product', label: 'Products & services' }
+    ]
   },
   {
     label: 'Contacts',
@@ -128,10 +128,88 @@ export const PROPERTY_GROUPS = [
       { value: 'visitor', label: 'Visitors' },
       { value: 'lead', label: 'Leads' },
       { value: 'customer', label: 'Customers' },
-      { value: 'company', label: 'Companies' },
-    ],
-  },
+      { value: 'company', label: 'Companies' }
+    ]
+  }
 ];
+
+export const CUSTOMER_BASIC_INFO = {
+  avatar: 'Avatar',
+  firstName: 'First Name',
+  lastName: 'Last Name',
+  primaryEmail: 'Primary E-mail',
+  primaryPhone: 'Primary Phone',
+  position: 'Position',
+  department: 'Department',
+  hasAuthority: 'Has Authority',
+  description: 'Description',
+  doNotDisturb: 'Do not disturb',
+
+  ALL: [
+    { field: 'avatar', label: 'Avatar', canHide: false },
+    { field: 'firstName', label: 'First Name', canHide: false },
+    { field: 'lastName', label: 'Last Name', canHide: false },
+    {
+      field: 'primaryEmail',
+      label: 'Primary E-mail',
+      validation: 'email',
+      canHide: false
+    },
+    {
+      field: 'primaryPhone',
+      label: 'Primary Phone',
+      validation: 'phone',
+      canHide: false
+    },
+    { field: 'position', label: 'Position', canHide: true },
+    { field: 'department', label: 'Department', canHide: true },
+    { field: 'hasAuthority', label: 'Has Authority', canHide: true },
+    { field: 'description', label: 'Description', canHide: true },
+    { field: 'doNotDisturb', label: 'Do not disturb', canHide: true }
+  ]
+};
+
+export const COMPANY_INFO = {
+  avatar: 'Logo',
+  primaryName: 'Primary Name',
+  size: 'Size',
+  industry: 'Industry',
+  plan: 'Plan',
+  primaryEmail: 'Primary Email',
+  primaryPhone: 'Primary Phone',
+  businessType: 'Business Type',
+  description: 'Description',
+  doNotDisturb: 'Do not disturb',
+
+  ALL: [
+    { field: 'avatar', label: 'Logo' },
+    { field: 'primaryName', label: 'Primary Name' },
+    { field: 'size', label: 'Size' },
+    { field: 'industry', label: 'Industry' },
+    { field: 'plan', label: 'Plan' },
+    { field: 'primaryEmail', label: 'Primary Email' },
+    { field: 'primaryPhone', label: 'Primary Phone' },
+    { field: 'businessType', label: 'Business Type' },
+    { field: 'description', label: 'Description' },
+    { field: 'doNotDisturb', label: 'Do not disturb' }
+  ]
+};
+
+export const PRODUCT_INFO = {
+  name: 'Name',
+  type: 'Type',
+  category: 'Category',
+  description: 'Description',
+  sku: 'Sku',
+
+  ALL: [
+    { field: 'name', label: 'Name' },
+    { field: 'type', label: 'Type' },
+    { field: 'category', label: 'Category' },
+    { field: 'description', label: 'Description' },
+    { field: 'sku', label: 'Sku' }
+  ]
+};
 
 export const NOTIFICATION_MODULES = [
   {

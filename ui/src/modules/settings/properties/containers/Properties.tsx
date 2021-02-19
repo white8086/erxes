@@ -47,6 +47,8 @@ const PropertiesContainer = (props: FinalProps) => {
     queryParams
   } = props;
 
+  console.log(queryParams);
+
   if (!router.getParam(history, 'type')) {
     router.setParams(
       history,
@@ -140,7 +142,10 @@ const options = ({ queryParams }) => ({
       query: gql`
         ${queries.fieldsGroups}
       `,
-      variables: { contentType: queryParams.type }
+      variables: {
+        mainType: queryParams.mainType,
+        contentType: queryParams.type
+      }
     }
   ]
 });
@@ -151,6 +156,7 @@ export default withProps<Props>(
       name: 'fieldsGroupsQuery',
       options: ({ queryParams }) => ({
         variables: {
+          mainType: queryParams.mainType,
           contentType: queryParams.type || ''
         }
       })

@@ -1,6 +1,6 @@
 const fieldsGroups = `
-  query fieldsGroups($contentType: String!) {
-    fieldsGroups(contentType: $contentType) {
+  query fieldsGroups($mainType: String, $contentType: String!) {
+    fieldsGroups(maintType: $mainType, contentType: $contentType) {
       _id
       name
       description
