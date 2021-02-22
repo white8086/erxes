@@ -15,6 +15,7 @@ export interface IField {
   order?: number;
   groupId?: string;
   isVisible?: boolean;
+  isVisibleInDetail?: boolean;
   canHide?: boolean;
   lastUpdatedUserId?: string;
 }
@@ -32,6 +33,7 @@ export interface IFieldGroup {
   description?: string;
   lastUpdatedUserId?: string;
   isVisible?: boolean;
+  isVisibleInDetail?: boolean;
 }
 
 export interface IFieldGroupDocument extends IFieldGroup, Document {
@@ -70,6 +72,11 @@ export const fieldSchema = new Schema({
   order: field({ type: Number, label: 'Order' }),
   groupId: field({ type: String, label: 'Field group' }),
   isVisible: field({ type: Boolean, default: true, label: 'Is visible' }),
+  isVisibleInDetail: field({
+    type: Boolean,
+    default: true,
+    label: 'Is field visible in detail'
+  }),
   canHide: field({
     type: Boolean,
     default: true,
@@ -101,6 +108,11 @@ export const fieldGroupSchema = schemaWrapper(
     description: field({ type: String, label: 'Description' }),
     // Id of user who updated the group
     lastUpdatedUserId: field({ type: String, label: 'Last updated by' }),
-    isVisible: field({ type: Boolean, default: true, label: 'Is visible' })
+    isVisible: field({ type: Boolean, default: true, label: 'Is visible' }),
+    isVisibleInDetail: field({
+      type: Boolean,
+      default: true,
+      label: 'Is group visible in detail'
+    })
   })
 );
