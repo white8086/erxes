@@ -21,7 +21,6 @@ const PropertyGroupFormContainer = (props: Props) => {
     callback,
     object
   }: IButtonMutateProps) => {
-    console.log('values = ', values);
     return (
       <ButtonMutate
         mutation={
