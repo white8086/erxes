@@ -152,10 +152,15 @@ export const loadFieldClass = () => {
       await this.checkIsDefinedByErxes(_id);
 
       // Removing field value from customer
-      const index = `customFieldsData.${_id}`;
       await Customers.updateMany(
-        { [index]: { $exists: true } },
-        { $unset: { [index]: 1 } }
+        { customFieldsData: { $elemMatch: { field: _id } } },
+        { $pull: { customFieldsData: { field: _id } } }
+      );
+
+      // Removing form assiocated field
+      await Fields.updateMany(
+        { associatedFieldId: _id },
+        { $unset: { associatedFieldId: '' } }
       );
 
       return fieldObj.remove();
@@ -246,7 +251,7 @@ export const loadFieldClass = () => {
 
     public static generateTypedItem(
       field: string,
-      value: string
+      value: string | number
     ): ITypedListItem {
       let stringValue;
       let numberValue;
@@ -259,6 +264,7 @@ export const loadFieldClass = () => {
         if (validator.isFloat(value.toString())) {
           numberValue = value;
           stringValue = null;
+          value = Number(value);
         }
 
         if (isValidDate(value)) {

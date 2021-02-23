@@ -8,6 +8,7 @@ import {
   Customers as ChatfuelCustomers
 } from './chatfuel/models';
 import {
+  debugBase,
   debugCallPro,
   debugFacebook,
   debugGmail,
@@ -24,7 +25,12 @@ import {
   Customers as FacebookCustomers,
   Posts as FacebookPosts
 } from './facebook/models';
-import { getPageAccessToken, unsubscribePage } from './facebook/utils';
+import {
+  getPageAccessToken,
+  refreshPageAccesToken,
+  subscribePage,
+  unsubscribePage
+} from './facebook/utils';
 import { revokeToken, unsubscribeUser } from './gmail/api';
 import {
   ConversationMessages as GmailConversationMessages,
@@ -538,6 +544,31 @@ export const removeAccount = async (
   return { erxesApiIds };
 };
 
+export const repairIntegrations = async (
+  integrationId: string
+): Promise<true | Error> => {
+  const integration = await Integrations.findOne({ erxesApiId: integrationId });
+
+  for (const pageId of integration.facebookPageIds) {
+    const pageTokens = await refreshPageAccesToken(pageId, integration);
+
+    await subscribePage(pageId, pageTokens[pageId]);
+
+    await Integrations.remove({
+      erxesApiId: { $ne: integrationId },
+      facebookPageIds: pageId,
+      kind: integration.kind
+    });
+  }
+
+  await Integrations.updateOne(
+    { erxesApiId: integrationId },
+    { $set: { healthStatus: 'healthy', error: '' } }
+  );
+
+  return true;
+};
+
 export const removeCustomers = async params => {
   const { customerIds } = params;
   const selector = { erxesApiId: { $in: customerIds } };
@@ -685,4 +716,20 @@ export const updateIntegrationConfigs = async (configsMap): Promise<void> => {
       debugWhatsapp(e);
     }
   }
+};
+
+export const routeErrorHandling = (fn, callback?: any) => {
+  return async (req, res, next) => {
+    try {
+      await fn(req, res, next);
+    } catch (e) {
+      debugBase(e.message);
+
+      if (callback) {
+        return callback(res, e);
+      }
+
+      return next(e);
+    }
+  };
 };

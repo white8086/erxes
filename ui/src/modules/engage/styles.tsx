@@ -27,6 +27,7 @@ const RowTitle = styled.div`
 const HelperText = styled.div`
   color: ${colors.colorCoreGray};
   font-size: 12px;
+  line-height: 16px;
 `;
 
 const FlexContainer = styledTS<{ direction?: string }>(styled.div)`
@@ -475,6 +476,25 @@ const MobilePreviewContent = styledTS<{ templateId?: string }>(styled.div)`
   overflow-x: hidden;
 `;
 
+const TestEmailWrapper = styled.div`
+  margin: 20px 0;
+  padding: 20px 0;
+  border-top: 1px dashed #ddd;
+
+  button {
+    margin-top: 10px;
+  }
+`;
+
+const Disabled = styled.div`
+  display: inline-block;
+  opacity: 0.7;
+
+  > button:hover {
+    cursor: not-allowed;
+  }
+`;
+
 export {
   RowTitle,
   HelperText,
@@ -511,5 +531,7 @@ export {
   RightSection,
   DesktopPreviewContent,
   MobilePreviewContent,
-  Shell
+  Shell,
+  TestEmailWrapper,
+  Disabled
 };

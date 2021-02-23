@@ -1,12 +1,19 @@
 import * as telemetry from 'erxes-telemetry';
 import { getUniqueValue } from '../../../db/factories';
 import {
+  ActivityLogs,
   Channels,
   Customers,
   EmailDeliveries,
+  Fields,
+  Forms,
   Integrations
 } from '../../../db/models';
-import { KIND_CHOICES } from '../../../db/models/definitions/constants';
+import {
+  ACTIVITY_ACTIONS,
+  ACTIVITY_CONTENT_TYPES,
+  KIND_CHOICES
+} from '../../../db/models/definitions/constants';
 import {
   IIntegration,
   IMessengerData,
@@ -20,6 +27,7 @@ import { putCreateLog, putDeleteLog, putUpdateLog } from '../../logUtils';
 import { checkPermission } from '../../permissions/wrappers';
 import { IContext } from '../../types';
 import { registerOnboardHistory, replaceEditorAttributes } from '../../utils';
+import { caches } from './widgets';
 
 interface IEditIntegration extends IIntegration {
   _id: string;
@@ -106,27 +114,42 @@ const integrationMutations = {
       user
     );
 
+    caches.remove(`integration_messenger_${integration.brandId}`);
+
+    await caches.update(`integration_messenger_${updated.brandId}`, updated);
+
     return updated;
   },
 
   /**
    * Update/save messenger appearance data
    */
-  integrationsSaveMessengerAppearanceData(
+  async integrationsSaveMessengerAppearanceData(
     _root,
     { _id, uiOptions }: { _id: string; uiOptions: IUiOptions }
   ) {
-    return Integrations.saveMessengerAppearanceData(_id, uiOptions);
+    const updated = await Integrations.saveMessengerAppearanceData(
+      _id,
+      uiOptions
+    );
+
+    await caches.update(`integration_messenger_${updated.brandId}`, updated);
+
+    return updated;
   },
 
   /**
    * Update/save messenger data
    */
-  integrationsSaveMessengerConfigs(
+  async integrationsSaveMessengerConfigs(
     _root,
     { _id, messengerData }: { _id: string; messengerData: IMessengerData }
   ) {
-    return Integrations.saveMessengerConfigs(_id, messengerData);
+    const updated = await Integrations.saveMessengerConfigs(_id, messengerData);
+
+    await caches.update(`integration_messenger_${updated.brandId}`, updated);
+
+    return updated;
   },
 
   /**
@@ -138,6 +161,13 @@ const integrationMutations = {
     { user }: IContext
   ) {
     const integration = await Integrations.createLeadIntegration(doc, user._id);
+
+    if (doc.channelIds) {
+      await Channels.updateMany(
+        { _id: { $in: doc.channelIds } },
+        { $push: { integrationIds: integration._id } }
+      );
+    }
 
     await putCreateLog(
       {
@@ -158,8 +188,32 @@ const integrationMutations = {
   /**
    * Edit a lead integration
    */
-  integrationsEditLeadIntegration(_root, { _id, ...doc }: IEditIntegration) {
-    return Integrations.updateLeadIntegration(_id, doc);
+  async integrationsEditLeadIntegration(
+    _root,
+    { _id, ...doc }: IEditIntegration
+  ) {
+    const integration = await Integrations.getIntegration(_id);
+
+    const updated = await Integrations.updateLeadIntegration(_id, doc);
+
+    await Channels.updateMany(
+      { integrationIds: integration._id },
+      { $pull: { integrationIds: integration._id } }
+    );
+
+    if (doc.channelIds) {
+      await Channels.updateMany(
+        { _id: { $in: doc.channelIds } },
+        { $push: { integrationIds: integration._id } }
+      );
+    }
+
+    await caches.update(
+      `integration_lead_${updated.brandId}_${updated.formId}`,
+      updated
+    );
+
+    return updated;
   },
 
   /**
@@ -262,7 +316,20 @@ const integrationMutations = {
     }
 
     await Integrations.update({ _id }, { $set: doc });
+
     const updated = await Integrations.getIntegration(_id);
+
+    if (
+      [KIND_CHOICES.LEAD, KIND_CHOICES.MESSENGER].includes(integration.kind)
+    ) {
+      let key = `integration_${integration.kind}_${integration.brandId}`;
+
+      if (integration.kind === KIND_CHOICES.LEAD) {
+        key += `_${updated.formId}`;
+      }
+
+      caches.remove(key);
+    }
 
     await Channels.updateMany(
       { integrationIds: integration._id },
@@ -332,6 +399,12 @@ const integrationMutations = {
         { type: MODULE_NAMES.INTEGRATION, object: integration },
         user
       );
+
+      if (
+        [KIND_CHOICES.LEAD, KIND_CHOICES.MESSENGER].includes(integration.kind)
+      ) {
+        caches.remove(`integration_${integration.kind}_${integration.brandId}`);
+      }
 
       return Integrations.removeIntegration(_id);
     } catch (e) {
@@ -431,10 +504,22 @@ const integrationMutations = {
   ) {
     const integration = await Integrations.getIntegration(_id);
 
-    const updated = await Integrations.updateOne(
-      { _id },
-      { $set: { isActive: !status } }
-    );
+    await Integrations.updateOne({ _id }, { $set: { isActive: !status } });
+
+    const updated = await Integrations.findOne({ _id });
+
+    if (
+      [KIND_CHOICES.LEAD, KIND_CHOICES.MESSENGER].includes(integration.kind) &&
+      updated
+    ) {
+      let key = `integration_${integration.kind}_${updated.brandId}`;
+
+      if (integration.kind === KIND_CHOICES.LEAD) {
+        key += `_${updated.formId}`;
+      }
+
+      caches.remove(key);
+    }
 
     await putUpdateLog(
       {
@@ -449,7 +534,19 @@ const integrationMutations = {
       user
     );
 
-    return Integrations.findOne({ _id });
+    return updated;
+  },
+
+  async integrationsRepair(_root, { _id }: { _id: string }) {
+    await messageBroker().sendRPCMessage(
+      RABBITMQ_QUEUES.RPC_API_TO_INTEGRATIONS,
+      {
+        action: 'repair-integrations',
+        data: { _id }
+      }
+    );
+
+    return 'success';
   },
 
   async integrationsUpdateConfigs(
@@ -463,9 +560,105 @@ const integrationMutations = {
   async integrationsSendSms(
     _root,
     args: ISmsParams,
-    { dataSources }: IContext
+    { dataSources, user }: IContext
   ) {
-    return dataSources.IntegrationsAPI.sendSms(args);
+    const customer = await Customers.findOne({ primaryPhone: args.to });
+
+    if (!customer) {
+      throw new Error(`Customer not found with primary phone "${args.to}"`);
+    }
+    if (customer.phoneValidationStatus !== 'valid') {
+      throw new Error(`Customer's primary phone ${args.to} is not valid`);
+    }
+
+    const response = await dataSources.IntegrationsAPI.sendSms(args);
+
+    await ActivityLogs.addActivityLog({
+      action: ACTIVITY_ACTIONS.SEND,
+      contentType: ACTIVITY_CONTENT_TYPES.SMS,
+      createdBy: user._id,
+      contentId: customer._id,
+      content: { to: args.to, text: args.content }
+    });
+
+    return response;
+  },
+
+  async integrationsCopyLeadIntegration(
+    _root,
+    { _id }: { _id },
+    { docModifier, user }: IContext
+  ) {
+    const sourceIntegration = await Integrations.getIntegration(_id);
+
+    if (!sourceIntegration.formId) {
+      throw new Error('Integration kind is not form');
+    }
+
+    const sourceForm = await Forms.getForm(sourceIntegration.formId);
+
+    const sourceFields = await Fields.find({ contentTypeId: sourceForm._id });
+
+    const formDoc = docModifier({
+      ...sourceForm.toObject(),
+      title: `${sourceForm.title}-copied`
+    });
+
+    delete formDoc._id;
+    delete formDoc.code;
+
+    const copiedForm = await Forms.createForm(formDoc, user._id);
+
+    const leadData = sourceIntegration.leadData;
+
+    const doc = docModifier({
+      ...sourceIntegration.toObject(),
+      name: `${sourceIntegration.name}-copied`,
+      formId: copiedForm._id,
+      leadData: leadData && {
+        ...leadData.toObject(),
+        viewCount: 0,
+        contactsGathered: 0
+      }
+    });
+
+    delete doc._id;
+
+    const copiedIntegration = await Integrations.createLeadIntegration(
+      doc,
+      user._id
+    );
+
+    const fields = sourceFields.map(e => ({
+      options: e.options,
+      isVisible: e.isVisible,
+      contentType: e.contentType,
+      contentTypeId: copiedForm._id,
+      order: e.order,
+      type: e.type,
+      text: e.text,
+      lastUpdatedUserId: user._id,
+      isRequired: e.isRequired,
+      isDefinedByErxes: false,
+      associatedFieldId: e.associatedFieldId
+    }));
+
+    await Fields.insertMany(fields);
+
+    await putCreateLog(
+      {
+        type: MODULE_NAMES.INTEGRATION,
+        newData: { ...doc, createdUserId: user._id, isActive: true },
+        object: copiedIntegration
+      },
+      user
+    );
+
+    telemetry.trackCli('integration_created', { type: 'lead' });
+
+    await registerOnboardHistory({ type: 'leadIntegrationCreate', user });
+
+    return copiedIntegration;
   }
 };
 
@@ -513,6 +706,11 @@ checkPermission(
   integrationMutations,
   'integrationsUpdateConfigs',
   'integrationsEdit'
+);
+checkPermission(
+  integrationMutations,
+  'integrationsCopyLeadIntegration',
+  'integrationsCreateLeadIntegration'
 );
 
 export default integrationMutations;

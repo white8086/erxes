@@ -37,6 +37,11 @@ const commonFields = `
   messenger
   email
   smsStats
+  createdUser
+  brand {
+    _id
+    name
+  }
 
   totalCustomersCount
   validCustomersCount
@@ -68,6 +73,7 @@ const engageMessages = `
       ${commonFields}
 
       brands {
+        _id
         name
       }
       segments {
@@ -205,19 +211,6 @@ const segments = `
   }
 `;
 
-const tags = `
-  query tagsQuery($type: String) {
-    tags(type: $type) {
-      _id
-      name
-      type
-      colorCode
-      createdAt
-      objectCount
-    }
-  }
-`;
-
 const brands = `
   query brands {
     brands {
@@ -310,7 +303,6 @@ export default {
   kindCounts,
   statusCounts,
   tagCounts,
-  tags,
   verifiedEmails,
   engageEmailPercentages
 };

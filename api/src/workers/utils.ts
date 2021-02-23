@@ -58,7 +58,7 @@ export const generatePronoun = value => {
 };
 
 const getS3FileInfo = async ({ s3, query, params }): Promise<string> => {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     s3.selectObjectContent(
       {
         ...params,
@@ -66,16 +66,28 @@ const getS3FileInfo = async ({ s3, query, params }): Promise<string> => {
         Expression: query,
         InputSerialization: {
           CSV: {
-            FileHeaderInfo: 'None',
+            FileHeaderInfo: 'NONE',
             RecordDelimiter: '\n',
-            FieldDelimiter: ','
+            FieldDelimiter: ',',
+            AllowQuotedRecordDelimiter: true
           }
         },
         OutputSerialization: {
-          CSV: {}
+          CSV: {
+            RecordDelimiter: '\n',
+            FieldDelimiter: ','
+          }
         }
       },
-      (_, data) => {
+      (error, data) => {
+        if (error) {
+          return reject(error);
+        }
+
+        if (!data) {
+          return reject('Failed to get file info');
+        }
+
         // data.Payload is a Readable Stream
         const eventStream: any = data.Payload;
 
@@ -119,6 +131,8 @@ const getCsvInfo = (fileName: string, uploadType: string) => {
         // exclude column
         total--;
 
+        debugWorkers(`Get CSV Info type: local, totalRow: ${total}`);
+
         resolve({ total, columns });
       });
     } else {
@@ -143,6 +157,8 @@ const getCsvInfo = (fileName: string, uploadType: string) => {
         params,
         query: 'SELECT * FROM S3Object LIMIT 1'
       });
+
+      debugWorkers(`Get CSV Info type: AWS, totalRow: ${total}`);
 
       return resolve({ total, columns });
     }
@@ -248,6 +264,8 @@ export const updateDuplicatedValue = async (
 // csv file import, cancel, removal
 export const receiveImportRemove = async (content: any) => {
   try {
+    debugWorkers(`Remove import called`);
+
     const { contentType, importHistoryId } = content;
 
     const handleOnEndWorker = async () => {
@@ -258,6 +276,8 @@ export const receiveImportRemove = async (content: any) => {
       if (updatedImportHistory && updatedImportHistory.status === 'Removed') {
         await ImportHistory.deleteOne({ _id: importHistoryId });
       }
+
+      debugWorkers(`Remove import ended`);
     };
 
     myWorker.setHandleEnd(handleOnEndWorker);
@@ -267,6 +287,11 @@ export const receiveImportRemove = async (content: any) => {
     );
 
     const ids = importHistory.ids || [];
+
+    if (ids.length === 0) {
+      await ImportHistory.deleteOne({ _id: importHistoryId });
+      return { status: 'ok' };
+    }
 
     const workerPath = path.resolve(getWorkerFile('importHistoryRemove'));
 
@@ -291,7 +316,7 @@ export const receiveImportRemove = async (content: any) => {
 
     return { status: 'ok' };
   } catch (e) {
-    debugWorkers('Failed to remove import: ', e.message);
+    debugWorkers(`Failed to remove import: ${e.message}`);
     throw e;
   }
 };
@@ -305,15 +330,21 @@ export const receiveImportCancel = () => {
 export const receiveImportCreate = async (content: any) => {
   const { fileName, type, scopeBrandIds, user, uploadType, fileType } = content;
 
+  debugWorkers(`Import created called`);
+
   let importHistory;
 
-  const useElkSyncer = ELK_SYNCER === 'true';
+  const useElkSyncer = ELK_SYNCER === 'false' ? false : true;
 
   if (fileType !== 'csv') {
     throw new Error('Invalid file type');
   }
 
   const { total, columns }: any = await getCsvInfo(fileName, uploadType);
+
+  if (total === 0) {
+    throw new Error('Please import at least one row of data');
+  }
 
   const updatedColumns = (columns || '').replace(/\n|\r/g, '').split(',');
 
@@ -349,6 +380,8 @@ export const receiveImportCreate = async (content: any) => {
     }
 
     await deleteFile(fileName);
+
+    debugWorkers(`Import create ended`);
   };
 
   const handleBulkOperation = async (rows: any) => {
