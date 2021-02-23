@@ -1,29 +1,35 @@
 import gql from 'graphql-tag';
 import * as compose from 'lodash.flowright';
+import {
+  IItem,
+  IItemParams,
+  IOptions,
+  SaveMutation
+} from 'modules/boards/types';
 import Spinner from 'modules/common/components/Spinner';
 import Sidebar from 'modules/layout/components/Sidebar';
 import GenerateCustomFields from 'modules/settings/properties/components/GenerateCustomFields';
-import { FIELDS_GROUPS_CONTENT_TYPES } from 'modules/settings/properties/constants';
 import { queries as fieldQueries } from 'modules/settings/properties/graphql';
 import React from 'react';
 import { graphql } from 'react-apollo';
-import { withProps } from '../../../common/utils';
+import { renderWithProps } from '../../../common/utils';
 import { FieldsGroupsQueryResponse } from '../../../settings/properties/types';
-import { mutations } from '../../graphql';
-import { EditMutationResponse, ICompany } from '../../types';
+// import { mutations } from '../../graphql';
+// import { EditMutationResponse, ICompany } from '../../types';
 
 type Props = {
-  company: ICompany;
+  item: IItem;
+  options: IOptions;
   loading?: boolean;
 };
 
 type FinalProps = {
   fieldsGroupsQuery: FieldsGroupsQueryResponse;
-} & Props &
-  EditMutationResponse;
+  editMutation: SaveMutation;
+} & Props;
 
 const CustomFieldsSection = (props: FinalProps) => {
-  const { loading, company, companiesEdit, fieldsGroupsQuery } = props;
+  const { loading, item, fieldsGroupsQuery, editMutation } = props;
 
   if (fieldsGroupsQuery.loading) {
     return (
@@ -33,10 +39,10 @@ const CustomFieldsSection = (props: FinalProps) => {
     );
   }
 
-  const { _id } = company;
+  const { _id } = item;
 
   const save = (data, callback) => {
-    companiesEdit({
+    editMutation({
       variables: { _id, ...data }
     })
       .then(() => {
@@ -51,36 +57,36 @@ const CustomFieldsSection = (props: FinalProps) => {
     save,
     loading,
     isDetail: false,
-    customFieldsData: company.customFieldsData,
+    customFieldsData: item.customFieldsData,
     fieldsGroups: fieldsGroupsQuery.fieldsGroups || []
   };
 
   return <GenerateCustomFields {...updatedProps} />;
 };
 
-const options = () => ({
-  refetchQueries: ['companDetail']
-});
+export default (props: Props) => {
+  const { options } = props;
 
-export default withProps<Props>(
-  compose(
-    graphql<Props, FieldsGroupsQueryResponse, { contentType: string }>(
-      gql(fieldQueries.fieldsGroups),
-      {
-        name: 'fieldsGroupsQuery',
-        options: () => ({
-          variables: {
-            contentType: FIELDS_GROUPS_CONTENT_TYPES.COMPANY
-          }
-        })
-      }
-    ),
-    graphql<Props, EditMutationResponse, ICompany>(
-      gql(mutations.companiesEdit),
-      {
-        name: 'companiesEdit',
-        options
-      }
-    )
-  )(CustomFieldsSection)
-);
+  return renderWithProps<Props>(
+    props,
+    compose(
+      graphql<Props, FieldsGroupsQueryResponse, { contentType: string }>(
+        gql(fieldQueries.fieldsGroups),
+        {
+          name: 'fieldsGroupsQuery',
+          options: () => ({
+            variables: {
+              contentType: options.type
+            }
+          })
+        }
+      ),
+      graphql<Props, SaveMutation, IItemParams>(
+        gql(options.mutations.editMutation),
+        {
+          name: 'editMutation'
+        }
+      )
+    )(CustomFieldsSection)
+  );
+};

@@ -1,12 +1,11 @@
-const fieldsGroups = `
-  query fieldsGroups($contentType: String!) {
-    fieldsGroups(contentType: $contentType) {
+const commonFields = `
       _id
       name
       description
       order
       isVisible
       isVisibleInDetail
+      contentType
       lastUpdatedUser {
         details {
           fullName
@@ -34,9 +33,23 @@ const fieldsGroups = `
         }
       }
     }
+`;
+
+const fieldsGroups = `
+  query fieldsGroups($contentType: String!) {
+    fieldsGroups(contentType: $contentType) {
+      ${commonFields}
+  }
+`;
+
+const getDefaulFieldsGroup = `
+  query getDefaulFieldsGroup($contentType: String!) {
+    getDefaulFieldsGroup(contentType: $contentType) {
+      ${commonFields}
   }
 `;
 
 export default {
-  fieldsGroups
+  fieldsGroups,
+  getDefaulFieldsGroup
 };

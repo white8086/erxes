@@ -102,6 +102,20 @@ const fieldsGroupQueries = {
     query.contentType = contentType || FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER;
 
     return FieldsGroups.find(query).sort({ order: 1 });
+  },
+
+  getDefaulFieldsGroup(
+    _root,
+    { contentType }: { contentType: string },
+    { commonQuerySelector }: IContext
+  ) {
+    const query: any = commonQuerySelector;
+
+    // querying by content type
+    query.contentType = contentType || FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER;
+    query.isDefinedByErxes = true;
+
+    return FieldsGroups.findOne(query);
   }
 };
 

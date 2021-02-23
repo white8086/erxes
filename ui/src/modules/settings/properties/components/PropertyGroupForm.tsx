@@ -147,7 +147,12 @@ class PropertyGroupForm extends React.Component<Props, State> {
         </FormGroup>
 
         {this.renderFieldVisible()}
-        {this.renderFieldVisibleInDetail()}
+
+        {['visitor', 'lead', 'customer'].includes(object.contentType) ? (
+          this.renderFieldVisibleInDetail()
+        ) : (
+          <></>
+        )}
 
         <ModalFooter>
           <Button

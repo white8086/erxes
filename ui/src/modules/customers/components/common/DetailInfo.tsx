@@ -8,6 +8,7 @@ import {
   SidebarFlexRow,
   SidebarList
 } from 'modules/layout/styles';
+import { IField } from 'modules/settings/properties/types';
 import React from 'react';
 import PrimaryEmail from './PrimaryEmail';
 import PrimaryPhone from './PrimaryPhone';
@@ -15,10 +16,22 @@ import PrimaryPhone from './PrimaryPhone';
 type Props = {
   customer: ICustomer;
   hasPosition?: boolean;
+  fields: IField[];
+  isDetail: boolean;
 };
 
 class DetailInfo extends React.PureComponent<Props> {
   renderRow(label, value) {
+    const { fields, isDetail } = this.props;
+
+    const field = fields.find(e => e.text === label);
+
+    const isVisibleKey = isDetail ? 'isVisibleInDetail' : 'isVisible';
+
+    if (field && !field[isVisibleKey]) {
+      return;
+    }
+
     return (
       <li>
         <FieldStyle>{__(`${label}`)}:</FieldStyle>
@@ -60,7 +73,7 @@ class DetailInfo extends React.PureComponent<Props> {
   }
 
   render() {
-    const { customer } = this.props;
+    const { customer, fields } = this.props;
 
     return (
       <SidebarList className="no-link">

@@ -549,8 +549,7 @@ export const loadGroupClass = () => {
         for (const subType of group.types) {
           const doc = {
             name: 'Basic information',
-            contentType:
-              FIELDS_GROUPS_CONTENT_TYPES[subType.value.toUpperCase()],
+            contentType: subType.value,
             order: 0,
             isDefinedByErxes: true,
             description: `Basic information of a ${subType.value}`,
@@ -579,11 +578,7 @@ export const loadGroupClass = () => {
             order
           });
 
-          const fields = await Fields.createSystemFields(
-            fieldGroup._id,
-            subType.value
-          );
-          console.log(fields);
+          await Fields.createSystemFields(fieldGroup._id, subType.value);
         }
       }
     }

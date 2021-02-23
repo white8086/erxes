@@ -315,10 +315,6 @@ class AutoAndManualForm extends React.Component<Props, State> {
     );
   }
 
-  onclose = () => {
-    console.log('close')
-  }
-
   renderPreviewContent() {
     const { content, email, method } = this.state;
 

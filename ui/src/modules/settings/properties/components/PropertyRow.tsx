@@ -48,7 +48,7 @@ class PropertyRow extends React.Component<Props, State> {
 
     if (e.target.id === 'visibleDetailToggle') {
       const isVisibleInDetail = e.target.checked;
-      console.log('asd: ', isVisibleInDetail);
+
       return this.props.updatePropertyDetailVisible({
         _id: property._id,
         isVisibleInDetail
@@ -106,18 +106,6 @@ class PropertyRow extends React.Component<Props, State> {
         <td>
           <Toggle
             id="visibleToggle"
-            defaultChecked={field.isVisible}
-            disabled={!field.canHide}
-            icons={{
-              checked: <span>Yes</span>,
-              unchecked: <span>No</span>
-            }}
-            onChange={onChange}
-          />
-        </td>
-        <td>
-          <Toggle
-            id="visibleDetailToggle"
             defaultChecked={field.isVisibleInDetail}
             disabled={!field.canHide}
             icons={{
@@ -127,6 +115,22 @@ class PropertyRow extends React.Component<Props, State> {
             onChange={onChange}
           />
         </td>
+        {['visitor', 'lead', 'customer'].includes(field.contentType) ? (
+          <td>
+            <Toggle
+              id="visibleDetailToggle"
+              defaultChecked={field.isVisible}
+              disabled={!field.canHide}
+              icons={{
+                checked: <span>Yes</span>,
+                unchecked: <span>No</span>
+              }}
+              onChange={onChange}
+            />
+          </td>
+        ) : (
+          <></>
+        )}
         <td>
           {this.renderActionButtons(field, removeProperty, props => (
             <PropertyForm {...props} field={field} queryParams={queryParams} />
@@ -136,13 +140,30 @@ class PropertyRow extends React.Component<Props, State> {
     );
   };
 
-  renderTable = fields => {
+  renderTable = (fields, contentType) => {
     if (fields.length === 0) {
       return (
         <EmptyState
           icon="circular"
           text="There arent't any fields in this group"
         />
+      );
+    }
+
+    if (['visitor', 'lead', 'customer'].includes(contentType)) {
+      return (
+        <Table hover={true}>
+          <thead>
+            <tr>
+              <th>{__('Name')}</th>
+              <th>{__('Last Updated By')}</th>
+              <th>{__('Visible in Team Inbox')}</th>
+              <th>{__('Visible in detail')}</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>{fields.map(field => this.renderTableRow(field))}</tbody>
+        </Table>
       );
     }
 
@@ -153,7 +174,6 @@ class PropertyRow extends React.Component<Props, State> {
             <th>{__('Name')}</th>
             <th>{__('Last Updated By')}</th>
             <th>{__('Visible')}</th>
-            <th>{__('Visible in detail')}</th>
             <th />
           </tr>
         </thead>
@@ -183,7 +203,7 @@ class PropertyRow extends React.Component<Props, State> {
             ))}
           </CollapseRow>
           <Collapse in={this.state.collapse}>
-            <div>{this.renderTable(fields)}</div>
+            <div>{this.renderTable(fields, group.contentType)}</div>
           </Collapse>
         </PropertyTable>
       </li>

@@ -5,6 +5,10 @@ import withCurrentUser from 'modules/auth/containers/withCurrentUser';
 import { IUser } from 'modules/auth/types';
 import DumbSidebar from 'modules/inbox/components/conversationDetail/sidebar/Sidebar';
 import { queries } from 'modules/inbox/graphql';
+// import { FIELDS_GROUPS_CONTENT_TYPES } from 'modules/settings/properties/constants';
+import { queries as fieldQueries } from 'modules/settings/properties/graphql';
+import { IField } from 'modules/settings/properties/types';
+// import { FieldsGroupsQueryResponse } from 'modules/settings/properties/types';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { withProps } from '../../../common/utils';
@@ -27,6 +31,7 @@ type FinalProps = {
 type State = {
   customer: ICustomer;
   loading: boolean;
+  fields: IField[];
 };
 
 const STORAGE_KEY = `erxes_sidebar_section_config`;
@@ -35,7 +40,11 @@ class Sidebar extends React.Component<FinalProps, State> {
   constructor(props) {
     super(props);
 
-    this.state = { customer: {} as ICustomer, loading: false };
+    this.state = {
+      customer: {} as ICustomer,
+      loading: false,
+      fields: [] as IField[]
+    };
   }
 
   componentDidMount() {
@@ -72,6 +81,21 @@ class Sidebar extends React.Component<FinalProps, State> {
       .then(({ data }: { data: any }) => {
         if (data && data.customerDetail) {
           this.setState({ customer: data.customerDetail, loading: false });
+
+          client
+            .query({
+              query: gql(fieldQueries.getDefaulFieldsGroup),
+              fetchPolicy: 'network-only',
+              variables: { contentType: data.customerDetail.state }
+            })
+            .then(fieldsGroups => {
+              const fieldsGroupsData = fieldsGroups.data;
+
+              if (fieldsGroupsData && fieldsGroupsData.getDefaulFieldsGroup) {
+                const { fields } = fieldsGroupsData.getDefaulFieldsGroup;
+                this.setState({ fields, loading: false });
+              }
+            });
         }
       })
       .catch(error => {
@@ -88,7 +112,7 @@ class Sidebar extends React.Component<FinalProps, State> {
   };
 
   render() {
-    const { customer, loading } = this.state;
+    const { customer, loading, fields } = this.state;
 
     const taggerRefetchQueries = [
       {
@@ -102,7 +126,8 @@ class Sidebar extends React.Component<FinalProps, State> {
       customer,
       loading,
       toggleSection: this.toggleSection,
-      taggerRefetchQueries
+      taggerRefetchQueries,
+      fields
     };
 
     return <DumbSidebar {...updatedProps} />;

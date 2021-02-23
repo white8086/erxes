@@ -170,11 +170,6 @@ class Lead extends React.Component<Props, State> {
     this.props.save(doc);
   };
 
-  onclose = () => {
-    console.log('close')
-  }
-
-
   renderSaveButton = () => {
     const { isActionLoading } = this.props;
 
@@ -301,7 +296,7 @@ class Lead extends React.Component<Props, State> {
               />
             </Step>
             <Step img="/images/icons/erxes-02.svg" title="Rule">
-              <ConditionsRule rules={rules || []} onChange={this.onChange}/>
+              <ConditionsRule rules={rules || []} onChange={this.onChange} />
             </Step>
             <Step img="/images/icons/erxes-06.svg" title="Options">
               <OptionStep

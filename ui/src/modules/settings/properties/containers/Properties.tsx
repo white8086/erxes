@@ -77,7 +77,6 @@ const PropertiesContainer = (props: FinalProps) => {
   };
 
   const updatePropertyVisible = ({ _id, isVisible }) => {
-    console.log('isVisible: ', isVisible);
     fieldsUpdateVisible({
       variables: { _id, isVisible }
     })
@@ -90,7 +89,6 @@ const PropertiesContainer = (props: FinalProps) => {
   };
 
   const updatePropertyDetailVisible = ({ _id, isVisibleInDetail }) => {
-    console.log('isVisibleInDetail: ', isVisibleInDetail);
     fieldsUpdateVisible({
       variables: { _id, isVisibleInDetail }
     })

@@ -148,11 +148,6 @@ class VisitorForm extends React.Component<Props, State> {
     );
   };
 
-  onclose = () => {
-    console.log('close')
-  }
-
-
   render() {
     const {
       activeStep,
@@ -168,7 +163,6 @@ class VisitorForm extends React.Component<Props, State> {
     const onChange = e =>
       this.changeState('title', (e.target as HTMLInputElement).value);
 
-     
     return (
       <StepWrapper>
         <Wrapper.Header title={renderTitle()} breadcrumb={breadcrumbs} />

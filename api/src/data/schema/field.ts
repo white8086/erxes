@@ -87,6 +87,7 @@ const fieldsGroupsCommonFields = `
 
 export const fieldsGroupsQueries = `
   fieldsGroups(contentType: String): [FieldsGroup]
+  getDefaulFieldsGroup(contentType: String): FieldsGroup
 `;
 
 export const fieldsGroupsMutations = `

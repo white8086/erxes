@@ -12,6 +12,7 @@ export const commonMutationVariables = `
   $status: String,
   $priority: String,
   $sourceConversationId: String,
+  $customFieldsData: JSON
 `;
 
 export const commonMutationParams = `
@@ -28,6 +29,7 @@ export const commonMutationParams = `
   status: $status,
   priority: $priority,
   sourceConversationId: $sourceConversationId,
+  customFieldsData: $customFieldsData,
 `;
 
 export const commonDragVariables = `
@@ -109,6 +111,7 @@ export const commonFields = `
     }
   }
   order
+  customFieldsData
 `;
 
 const stagesUpdateOrder = `

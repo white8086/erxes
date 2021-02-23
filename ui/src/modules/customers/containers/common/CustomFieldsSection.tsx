@@ -14,6 +14,7 @@ import { EditMutationResponse, ICustomer } from '../../types';
 
 type Props = {
   customer: ICustomer;
+  isDetail: boolean;
   loading?: boolean;
 };
 
@@ -23,7 +24,13 @@ type FinalProps = {
   EditMutationResponse;
 
 const CustomFieldsSection = (props: FinalProps) => {
-  const { customer, customersEdit, fieldsGroupsQuery, loading } = props;
+  const {
+    customer,
+    customersEdit,
+    fieldsGroupsQuery,
+    loading,
+    isDetail
+  } = props;
 
   if (fieldsGroupsQuery.loading) {
     return (
@@ -47,11 +54,14 @@ const CustomFieldsSection = (props: FinalProps) => {
       });
   };
 
+  const groups = fieldsGroupsQuery.fieldsGroups || [];
+
   const updatedProps = {
     save,
     loading,
     customFieldsData: customer.customFieldsData,
-    fieldsGroups: fieldsGroupsQuery.fieldsGroups || []
+    fieldsGroups: groups.filter(e => !e.isDefinedByErxes),
+    isDetail
   };
 
   return <GenerateCustomFields {...updatedProps} />;
@@ -63,9 +73,9 @@ export default withProps<Props>(
       gql(fieldQueries.fieldsGroups),
       {
         name: 'fieldsGroupsQuery',
-        options: () => ({
+        options: ({ customer }) => ({
           variables: {
-            contentType: FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER
+            contentType: customer.state || FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER
           }
         })
       }
