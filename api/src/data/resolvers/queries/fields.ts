@@ -93,14 +93,13 @@ const fieldsGroupQueries = {
    */
   fieldsGroups(
     _root,
-    { mainType, contentType }: { mainType: string; contentType: string },
+    { contentType }: { contentType: string },
     { commonQuerySelector }: IContext
   ) {
     const query: any = commonQuerySelector;
 
     // querying by content type
     query.contentType = contentType || FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER;
-    query.mainType = mainType;
 
     return FieldsGroups.find(query).sort({ order: 1 });
   }

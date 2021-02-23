@@ -44,10 +44,7 @@ class Sidebar extends React.Component<Props> {
   renderListItem(group: string, type: string, text: string) {
     return (
       <li key={`${group}_${type}`}>
-        <Link
-          to={`?type=${type}&?mainType=${group}`}
-          className={this.getClassName(type)}
-        >
+        <Link to={`?type=${type}`} className={this.getClassName(type)}>
           {__(text)}
         </Link>
       </li>

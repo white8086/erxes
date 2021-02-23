@@ -1,11 +1,7 @@
 import { Fields, FieldsGroups } from '../../../db/models';
-import {
-  FIELDS_GROUPS_CONTENT_TYPES,
-  FIELDS_GROUPS_MAIN_TYPES
-} from '../../../db/models/definitions/constants';
 import { IField, IFieldGroup } from '../../../db/models/definitions/fields';
 import { IOrderInput } from '../../../db/models/Fields';
-import { CUSTOMER_BASIC_INFO, MODULE_NAMES } from '../../constants';
+import { MODULE_NAMES } from '../../constants';
 import { putCreateLog } from '../../logUtils';
 import { moduleCheckPermission } from '../../permissions/wrappers';
 import { IContext } from '../../types';
@@ -66,10 +62,19 @@ const fieldMutations = {
    */
   fieldsUpdateVisible(
     _root,
-    { _id, isVisible }: { _id: string; isVisible: boolean },
+    {
+      _id,
+      isVisible,
+      isVisibleInDetail
+    }: { _id: string; isVisible?: boolean; isVisibleInDetail?: boolean },
     { user }: IContext
   ) {
-    return Fields.updateFieldsVisible(_id, isVisible, user._id);
+    return Fields.updateFieldsVisible(
+      _id,
+      user._id,
+      isVisible,
+      isVisibleInDetail
+    );
   }
 };
 
@@ -109,10 +114,19 @@ const fieldsGroupsMutations = {
    */
   fieldsGroupsUpdateVisible(
     _root,
-    { _id, isVisible }: { _id: string; isVisible: boolean },
+    {
+      _id,
+      isVisible,
+      isVisibleInDetail
+    }: { _id: string; isVisible?: boolean; isVisibleInDetail?: boolean },
     { user }: IContext
   ) {
-    return FieldsGroups.updateGroupVisible(_id, isVisible, user._id);
+    return FieldsGroups.updateGroupVisible(
+      _id,
+      user._id,
+      isVisible,
+      isVisibleInDetail
+    );
   },
 
   fieldsGroupsLoadInitialData(_root) {

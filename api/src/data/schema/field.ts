@@ -12,6 +12,8 @@ export const fieldsTypes = `
     isRequired: Boolean
     order: Int
     isVisible: Boolean
+    isVisibleInDetail: Boolean
+    canHide: Boolean
     isDefinedByErxes: Boolean
     groupId: String
     lastUpdatedUser: User
@@ -46,6 +48,7 @@ const fieldsCommonFields = `
   order: Int
   groupId: String
   isVisible: Boolean
+  canHide: Boolean
 `;
 
 export const fieldsMutations = `
@@ -53,7 +56,8 @@ export const fieldsMutations = `
   fieldsEdit(_id: String!, ${fieldsCommonFields}): Field
   fieldsRemove(_id: String!): Field
   fieldsUpdateOrder(orders: [OrderItem]): [Field]
-  fieldsUpdateVisible(_id: String!, isVisible: Boolean) : Field
+  fieldsUpdateVisible(_id: String!, isVisible: Boolean, isVisibleInDetail: Boolean) : Field
+
 `;
 
 export const fieldsGroupsTypes = `
@@ -64,6 +68,7 @@ export const fieldsGroupsTypes = `
     order: Int
     description: String
     isVisible: Boolean
+    isVisibleInDetail: Boolean
     isDefinedByErxes: Boolean
     fields: [Field]
     lastUpdatedUserId: String
@@ -77,16 +82,17 @@ const fieldsGroupsCommonFields = `
   order: Int
   description: String
   isVisible: Boolean
+  isVisibleInDetail: Boolean
 `;
 
 export const fieldsGroupsQueries = `
-  fieldsGroups(mainType: String, contentType: String): [FieldsGroup]
+  fieldsGroups(contentType: String): [FieldsGroup]
 `;
 
 export const fieldsGroupsMutations = `
   fieldsGroupsAdd(${fieldsGroupsCommonFields}): FieldsGroup
   fieldsGroupsEdit(_id: String!, ${fieldsGroupsCommonFields}): FieldsGroup
   fieldsGroupsRemove(_id: String!): JSON
-  fieldsGroupsUpdateVisible(_id: String, isVisible: Boolean) : FieldsGroup
+  fieldsGroupsUpdateVisible(_id: String, isVisible: Boolean, isVisibleInDetail: Boolean) : FieldsGroup
   fieldsGroupsLoadInitialData: JSON
 `;

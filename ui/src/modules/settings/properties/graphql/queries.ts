@@ -1,11 +1,12 @@
 const fieldsGroups = `
-  query fieldsGroups($mainType: String, $contentType: String!) {
-    fieldsGroups(mainType: $mainType, contentType: $contentType) {
+  query fieldsGroups($contentType: String!) {
+    fieldsGroups(contentType: $contentType) {
       _id
       name
       description
       order
       isVisible
+      isVisibleInDetail
       lastUpdatedUser {
         details {
           fullName
@@ -18,6 +19,8 @@ const fieldsGroups = `
         type
         text
         isVisible
+        isVisibleInDetail
+        canHide
         validation
         order
         options

@@ -6,8 +6,10 @@ import { Model, model } from 'mongoose';
 import * as validator from 'validator';
 import { Customers, Forms } from '.';
 import {
+  COMPANY_INFO,
   CUSTOMER_BASIC_INFO,
   FIELD_CONTENT_TYPES,
+  PRODUCT_INFO,
   PROPERTY_GROUPS
 } from '../../data/constants';
 import {
@@ -65,8 +67,9 @@ export interface IFieldModel extends Model<IFieldDocument> {
   ): Promise<ITypedListItem[]>;
   updateFieldsVisible(
     _id: string,
-    isVisible: boolean,
-    lastUpdatedUserId: string
+    lastUpdatedUserId: string,
+    isVisible?: boolean,
+    isVisibleInDetail?: boolean
   ): Promise<IFieldDocument>;
   createSystemFields(
     groupId: string,
@@ -84,6 +87,15 @@ export const loadFieldClass = () => {
 
       // Checking if the field is defined by the erxes
       if (fieldObj && fieldObj.isDefinedByErxes) {
+        throw new Error('Cant update this field');
+      }
+    }
+
+    public static async checkCanToggleVisible(_id: string) {
+      const fieldObj = await Fields.findOne({ _id });
+
+      // Checking if the field is defined by the erxes
+      if (fieldObj && !fieldObj.canHide) {
         throw new Error('Cant update this field');
       }
     }
@@ -311,16 +323,19 @@ export const loadFieldClass = () => {
      */
     public static async updateFieldsVisible(
       _id: string,
-      isVisible: boolean,
-      lastUpdatedUserId: string
+      lastUpdatedUserId: string,
+      isVisible?: boolean,
+      isVisibleInDetail?: boolean
     ) {
-      await this.checkIsDefinedByErxes(_id);
+      await this.checkCanToggleVisible(_id);
 
       // Updating visible
-      await Fields.updateOne(
-        { _id },
-        { $set: { isVisible, lastUpdatedUserId } }
-      );
+      const set =
+        isVisible !== undefined
+          ? { isVisible, lastUpdatedUserId }
+          : { isVisibleInDetail, lastUpdatedUserId };
+
+      await Fields.updateOne({ _id }, { $set: set });
 
       return Fields.findOne({ _id });
     }
@@ -331,16 +346,67 @@ export const loadFieldClass = () => {
     ) {
       switch (contentType) {
         case FIELDS_GROUPS_CONTENT_TYPES.CUSTOMER:
-          const fields = CUSTOMER_BASIC_INFO.ALL.map(e => {
+          const customerFields = CUSTOMER_BASIC_INFO.ALL.map(e => {
             return {
               text: e.label,
               canHide: e.canHide,
               validation: e.validation,
               groupId,
-              contentType
+              contentType,
+              isDefinedByErxes: true
             };
           });
-          await Fields.insertMany(fields);
+          await Fields.insertMany(customerFields);
+          break;
+        case FIELDS_GROUPS_CONTENT_TYPES.VISITOR:
+          const visitorFields = CUSTOMER_BASIC_INFO.ALL.map(e => {
+            return {
+              text: e.label,
+              canHide: e.canHide,
+              validation: e.validation,
+              groupId,
+              contentType,
+              isDefinedByErxes: true
+            };
+          });
+          await Fields.insertMany(visitorFields);
+          break;
+        case FIELDS_GROUPS_CONTENT_TYPES.LEAD:
+          const leadFields = CUSTOMER_BASIC_INFO.ALL.map(e => {
+            return {
+              text: e.label,
+              canHide: e.canHide,
+              validation: e.validation,
+              groupId,
+              contentType,
+              isDefinedByErxes: true
+            };
+          });
+          await Fields.insertMany(leadFields);
+          break;
+        case FIELDS_GROUPS_CONTENT_TYPES.COMPANY:
+          const companyFields = COMPANY_INFO.ALL.map(e => {
+            return {
+              text: e.label,
+              validation: e.validation,
+              groupId,
+              contentType,
+              isDefinedByErxes: true
+            };
+          });
+          await Fields.insertMany(companyFields);
+          break;
+        case FIELDS_GROUPS_CONTENT_TYPES.PRODUCT:
+          const productFields = PRODUCT_INFO.ALL.map(e => {
+            return {
+              text: e.label,
+              groupId,
+              contentType,
+              canHide: false,
+              isDefinedByErxes: true
+            };
+          });
+          await Fields.insertMany(productFields);
           break;
 
         default:
@@ -362,8 +428,9 @@ export interface IFieldGroupModel extends Model<IFieldGroupDocument> {
 
   updateGroupVisible(
     _id: string,
-    isVisible: boolean,
-    lastUpdatedUserId: string
+    lastUpdatedUserId: string,
+    isVisible?: boolean,
+    isVisibleInDetail?: boolean
   ): Promise<IFieldGroupDocument>;
   createSystemGroupsFields(): Promise<IFieldGroupDocument[]>;
 }
@@ -452,17 +519,20 @@ export const loadGroupClass = () => {
      */
     public static async updateGroupVisible(
       _id: string,
-      isVisible: boolean,
-      lastUpdatedUserId: string
+      lastUpdatedUserId: string,
+      isVisible?: boolean,
+      isVisibleInDetail?: boolean
     ) {
       // Can not update group that is defined by erxes
       await this.checkIsDefinedByErxes(_id);
 
       // Updating visible
-      await FieldsGroups.updateOne(
-        { _id },
-        { $set: { isVisible, lastUpdatedUserId } }
-      );
+      const set =
+        isVisible !== undefined
+          ? { isVisible, lastUpdatedUserId }
+          : { isVisibleInDetail, lastUpdatedUserId };
+
+      await FieldsGroups.updateOne({ _id }, { $set: set });
 
       return FieldsGroups.findOne({ _id });
     }
@@ -472,11 +542,13 @@ export const loadGroupClass = () => {
      */
     public static async createSystemGroupsFields() {
       for (const group of PROPERTY_GROUPS) {
+        if (group.value === 'ticket' || group.value === 'task') {
+          continue;
+        }
+
         for (const subType of group.types) {
-          console.log('group:', group, ' - ', subType);
           const doc = {
             name: 'Basic information',
-            mainType: FIELDS_GROUPS_MAIN_TYPES[group.value.toUpperCase()],
             contentType:
               FIELDS_GROUPS_CONTENT_TYPES[subType.value.toUpperCase()],
             order: 0,
@@ -496,6 +568,10 @@ export const loadGroupClass = () => {
 
           if (lastGroup) {
             order = (lastGroup.order || 0) + 1;
+          }
+
+          if (doc.contentType === FIELDS_GROUPS_CONTENT_TYPES.DEAL) {
+            continue;
           }
 
           const fieldGroup = await FieldsGroups.create({

@@ -91,10 +91,12 @@ export const FIELDS_GROUPS_CONTENT_TYPES = {
 
 export const PROPERTY_GROUPS = [
   {
-    label: 'Team inbox',
-    value: 'inbox',
+    label: 'Contacts',
+    value: 'contact',
     description: 'description',
     types: [
+      { value: 'visitor', label: 'Visitors' },
+      { value: 'lead', label: 'Leads' },
       { value: 'customer', label: 'Customers' },
       { value: 'company', label: 'Companies' }
     ]
@@ -118,17 +120,6 @@ export const PROPERTY_GROUPS = [
     types: [
       { value: 'deal', label: 'Sales pipeline' },
       { value: 'product', label: 'Products & services' }
-    ]
-  },
-  {
-    label: 'Contacts',
-    value: 'contact',
-    description: 'description',
-    types: [
-      { value: 'visitor', label: 'Visitors' },
-      { value: 'lead', label: 'Leads' },
-      { value: 'customer', label: 'Customers' },
-      { value: 'company', label: 'Companies' }
     ]
   }
 ];
@@ -187,8 +178,16 @@ export const COMPANY_INFO = {
     { field: 'size', label: 'Size' },
     { field: 'industry', label: 'Industry' },
     { field: 'plan', label: 'Plan' },
-    { field: 'primaryEmail', label: 'Primary Email' },
-    { field: 'primaryPhone', label: 'Primary Phone' },
+    {
+      field: 'primaryEmail',
+      label: 'Primary E-mail',
+      validation: 'email'
+    },
+    {
+      field: 'primaryPhone',
+      label: 'Primary Phone',
+      validation: 'phone'
+    },
     { field: 'businessType', label: 'Business Type' },
     { field: 'description', label: 'Description' },
     { field: 'doNotDisturb', label: 'Do not disturb' }

@@ -13,7 +13,9 @@ export interface IField {
   options?: string[];
   isRequired?: boolean;
   order?: React.ReactNode;
+  canHide?: boolean;
   isVisible?: boolean;
+  isVisibleInDetail?: boolean;
   isDefinedByErxes?: boolean;
   groupId?: string;
   lastUpdatedUser?: IUser;
@@ -27,6 +29,7 @@ export interface IFieldGroup {
   order: React.ReactNode;
   description: string;
   isVisible: boolean;
+  isVisibleInDetail: boolean;
   isDefinedByErxes: boolean;
   fields: IField[];
   lastUpdatedUserId: string;
@@ -102,6 +105,7 @@ export type FieldsGroupsMutationVariables = {
   name: string;
   description: string;
   isVisible: boolean;
+  isVisibleInDetail: boolean;
 };
 
 export type FieldsGroupsRemoveMutationResponse = {
@@ -120,7 +124,11 @@ export type FieldsGroupsUpdateVisibleMutationResponse = {
 
 export type FieldsUpdateVisibleMutationResponse = {
   fieldsUpdateVisible: (params: {
-    variables: { _id: string; isVisible: boolean };
+    variables: {
+      _id: string;
+      isVisible?: boolean;
+      isVisibleInDetail?: boolean;
+    };
   }) => Promise<any>;
 };
 

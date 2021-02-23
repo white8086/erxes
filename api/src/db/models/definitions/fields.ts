@@ -75,7 +75,7 @@ export const fieldSchema = new Schema({
   isVisibleInDetail: field({
     type: Boolean,
     default: true,
-    label: 'Is field visible in detail'
+    label: 'Is group visible in detail'
   }),
   canHide: field({
     type: Boolean,
