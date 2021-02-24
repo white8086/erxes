@@ -132,9 +132,13 @@ export const CUSTOMER_BASIC_INFO = {
   primaryPhone: 'Primary Phone',
   position: 'Position',
   department: 'Department',
+  owner: 'Owner',
+  pronoun: 'Pronoun',
+  birthDay: 'Birthday',
   hasAuthority: 'Has Authority',
   description: 'Description',
   doNotDisturb: 'Do not disturb',
+  code: 'Code',
 
   ALL: [
     { field: 'avatar', label: 'Avatar', canHide: false },
@@ -156,7 +160,11 @@ export const CUSTOMER_BASIC_INFO = {
     { field: 'department', label: 'Department', canHide: true },
     { field: 'hasAuthority', label: 'Has Authority', canHide: true },
     { field: 'description', label: 'Description', canHide: true },
-    { field: 'doNotDisturb', label: 'Do not disturb', canHide: true }
+    { field: 'doNotDisturb', label: 'Do not disturb', canHide: true },
+    { field: 'owner', label: 'Owner', canHide: true },
+    { field: 'pronoun', label: 'Pronoun', canHide: true },
+    { field: 'birthDay', label: 'Birthday', canHide: true },
+    { field: 'code', label: 'Code', canHide: true }
   ]
 };
 

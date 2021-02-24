@@ -64,6 +64,25 @@ class DetailInfo extends React.PureComponent<Props> {
     );
   }
 
+  renderDescription(description?: string) {
+    const { fields, isDetail } = this.props;
+
+    const descriptionField = fields.find(e => e.text === 'Description');
+
+    const isVisibleKey = isDetail ? 'isVisibleInDetail' : 'isVisible';
+
+    if (descriptionField && !descriptionField[isVisibleKey]) {
+      return;
+    }
+
+    return (
+      <SidebarFlexRow>
+        {descriptionField && descriptionField[isVisibleKey]}
+        {__(`Description`)}:<span>{description || '-'}</span>
+      </SidebarFlexRow>
+    );
+  }
+
   renderPosition(customer) {
     if (!this.props.hasPosition) {
       return null;
@@ -73,7 +92,7 @@ class DetailInfo extends React.PureComponent<Props> {
   }
 
   render() {
-    const { customer, fields } = this.props;
+    const { customer } = this.props;
 
     return (
       <SidebarList className="no-link">
@@ -100,9 +119,7 @@ class DetailInfo extends React.PureComponent<Props> {
           customer.birthDate && dayjs(customer.birthDate).format('MMM,DD YYYY')
         )}
         {this.renderRow('Do not disturb', customer.doNotDisturb)}
-        <SidebarFlexRow>
-          {__(`Description`)}:<span>{customer.description || '-'}</span>
-        </SidebarFlexRow>
+        {this.renderDescription(customer.description)}
       </SidebarList>
     );
   }
