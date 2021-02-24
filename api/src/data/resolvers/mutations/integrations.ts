@@ -1,12 +1,19 @@
 import * as telemetry from 'erxes-telemetry';
 import { getUniqueValue } from '../../../db/factories';
 import {
+  ActivityLogs,
   Channels,
   Customers,
   EmailDeliveries,
+  Fields,
+  Forms,
   Integrations
 } from '../../../db/models';
-import { KIND_CHOICES } from '../../../db/models/definitions/constants';
+import {
+  ACTIVITY_ACTIONS,
+  ACTIVITY_CONTENT_TYPES,
+  KIND_CHOICES
+} from '../../../db/models/definitions/constants';
 import {
   IIntegration,
   IMessengerData,
@@ -517,9 +524,105 @@ const integrationMutations = {
   async integrationsSendSms(
     _root,
     args: ISmsParams,
-    { dataSources }: IContext
+    { dataSources, user }: IContext
   ) {
-    return dataSources.IntegrationsAPI.sendSms(args);
+    const customer = await Customers.findOne({ primaryPhone: args.to });
+
+    if (!customer) {
+      throw new Error(`Customer not found with primary phone "${args.to}"`);
+    }
+    if (customer.phoneValidationStatus !== 'valid') {
+      throw new Error(`Customer's primary phone ${args.to} is not valid`);
+    }
+
+    const response = await dataSources.IntegrationsAPI.sendSms(args);
+
+    await ActivityLogs.addActivityLog({
+      action: ACTIVITY_ACTIONS.SEND,
+      contentType: ACTIVITY_CONTENT_TYPES.SMS,
+      createdBy: user._id,
+      contentId: customer._id,
+      content: { to: args.to, text: args.content }
+    });
+
+    return response;
+  },
+
+  async integrationsCopyLeadIntegration(
+    _root,
+    { _id }: { _id },
+    { docModifier, user }: IContext
+  ) {
+    const sourceIntegration = await Integrations.getIntegration(_id);
+
+    if (!sourceIntegration.formId) {
+      throw new Error('Integration kind is not form');
+    }
+
+    const sourceForm = await Forms.getForm(sourceIntegration.formId);
+
+    const sourceFields = await Fields.find({ contentTypeId: sourceForm._id });
+
+    const formDoc = docModifier({
+      ...sourceForm.toObject(),
+      title: `${sourceForm.title}-copied`
+    });
+
+    delete formDoc._id;
+    delete formDoc.code;
+
+    const copiedForm = await Forms.createForm(formDoc, user._id);
+
+    const leadData = sourceIntegration.leadData;
+
+    const doc = docModifier({
+      ...sourceIntegration.toObject(),
+      name: `${sourceIntegration.name}-copied`,
+      formId: copiedForm._id,
+      leadData: leadData && {
+        ...leadData.toObject(),
+        viewCount: 0,
+        contactsGathered: 0
+      }
+    });
+
+    delete doc._id;
+
+    const copiedIntegration = await Integrations.createLeadIntegration(
+      doc,
+      user._id
+    );
+
+    const fields = sourceFields.map(e => ({
+      options: e.options,
+      isVisible: e.isVisible,
+      contentType: e.contentType,
+      contentTypeId: copiedForm._id,
+      order: e.order,
+      type: e.type,
+      text: e.text,
+      lastUpdatedUserId: user._id,
+      isRequired: e.isRequired,
+      isDefinedByErxes: false,
+      associatedFieldId: e.associatedFieldId
+    }));
+
+    await Fields.insertMany(fields);
+
+    await putCreateLog(
+      {
+        type: MODULE_NAMES.INTEGRATION,
+        newData: { ...doc, createdUserId: user._id, isActive: true },
+        object: copiedIntegration
+      },
+      user
+    );
+
+    telemetry.trackCli('integration_created', { type: 'lead' });
+
+    await registerOnboardHistory({ type: 'leadIntegrationCreate', user });
+
+    return copiedIntegration;
   }
 };
 
