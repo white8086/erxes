@@ -24,7 +24,7 @@ const generateReport = async (req, res) => {
   try {
     resultSet = await cubejsApi.load(dashboardQuery);
   } catch (e) {
-    console.log(e);
+    console.log('ERRORR!!:', e);
     if (!e.message.includes('Values required for filter')) {
       res.send('No data');
     }
