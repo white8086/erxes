@@ -5,15 +5,19 @@ import { InboxManagementActionConsumer } from './Inbox';
 
 const Tagger = props => {
   const { refetchQueries } = refetchSidebarConversationsOptions();
+  const { emptyBulk, ...otherProps } = props;
 
   return (
     <InboxManagementActionConsumer>
       {({ notifyConsumersOfManagementAction }) => (
         <TaggerPopover
-          {...props}
+          {...otherProps}
           type="conversation"
           refetchQueries={refetchQueries}
-          successCallback={notifyConsumersOfManagementAction}
+          successCallback={() => {
+            notifyConsumersOfManagementAction();
+            emptyBulk();
+          }}
         />
       )}
     </InboxManagementActionConsumer>

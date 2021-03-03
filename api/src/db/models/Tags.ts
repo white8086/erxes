@@ -162,19 +162,33 @@ export const loadClass = () => {
         { tagIds: 1 }
       );
 
-      let removeIds: string[] = [];
+      const removeIds: { [key: string]: number } = {};
 
       objects.forEach(obj => {
-        removeIds.push(obj.tagIds);
+        obj.tagIds.forEach(tagId => {
+          removeIds[tagId] = (removeIds[tagId] || 0) - 1;
+        });
       });
 
-      removeIds = _.uniq(_.flatten(removeIds));
+      if (removeIds.length > 0) {
+        const bulkDoc: Array<{
+          updateOne: {
+            filter: { _id: string };
+            update: { $inc: { objectCount: number } };
+          };
+        }> = [];
 
-      await Tags.updateMany(
-        { _id: { $in: removeIds } },
-        { $inc: { objectCount: -1 } },
-        { multi: true }
-      );
+        Object.keys(removeIds).forEach(tagId => {
+          bulkDoc.push({
+            updateOne: {
+              filter: { _id: tagId },
+              update: { $inc: { objectCount: removeIds[tagId] } }
+            }
+          });
+        });
+
+        await Tags.bulkWrite(bulkDoc);
+      }
 
       await collection.updateMany(
         { _id: { $in: objectIds } },
@@ -184,7 +198,7 @@ export const loadClass = () => {
 
       await Tags.updateMany(
         { _id: { $in: tagIds } },
-        { $inc: { objectCount: 1 } },
+        { $inc: { objectCount: objects.length } },
         { multi: true }
       );
     }

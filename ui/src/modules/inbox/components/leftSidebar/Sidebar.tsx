@@ -110,7 +110,11 @@ class LeftSidebar extends React.Component<Props, State> {
               trigger={this.renderTrigger('Assign')}
             />
 
-            <Tagger targets={bulk} trigger={this.renderTrigger('Tag')} />
+            <Tagger
+              targets={bulk}
+              trigger={this.renderTrigger('Tag')}
+              emptyBulk={emptyBulk}
+            />
           </RightItems>
         </Sidebar.Header>
       );
