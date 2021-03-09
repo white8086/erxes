@@ -18,6 +18,7 @@ on:
       - demo
     paths:
       - 'ui/**'
+      - '.github/workflows/ui.yaml'
       - '!ui/nginx/**'
       - '!ui/docker-entrypoint.sh'
       - '!ui/base.Dockerfile'
@@ -26,6 +27,12 @@ on:
 jobs:
   ui:
     runs-on: ubuntu-18.04
+
+    services:
+      mongodb:
+        image: mongo:4.0
+        ports:
+          - 27017:27017
 
     steps:
       - uses: actions/checkout@v2

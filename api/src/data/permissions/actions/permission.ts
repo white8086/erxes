@@ -6,7 +6,7 @@ export const moduleObjects = {
       {
         name: 'brandsAll',
         description: 'All',
-        use: ['showBrands', 'manageBrands']
+        use: ['showBrands', 'manageBrands', 'exportBrands']
       },
       {
         name: 'manageBrands',
@@ -29,7 +29,7 @@ export const moduleObjects = {
       {
         name: 'channelsAll',
         description: 'All',
-        use: ['showChannels', 'manageChannels']
+        use: ['showChannels', 'manageChannels', 'exportChannels']
       },
       {
         name: 'manageChannels',
@@ -325,6 +325,10 @@ export const moduleObjects = {
       {
         name: 'ticketBoardsAdd',
         description: 'Add ticket board'
+      },
+      {
+        name: 'ticketBoardsEdit',
+        description: 'Edit ticket board'
       },
       {
         name: 'ticketBoardsRemove',
@@ -625,7 +629,7 @@ export const moduleObjects = {
   },
   engages: {
     name: 'engages',
-    description: 'Engages',
+    description: 'Campaigns',
     actions: [
       {
         name: 'engagesAll',
@@ -642,50 +646,31 @@ export const moduleObjects = {
       },
       {
         name: 'engageMessageSetLive',
-        description: 'Set live engage message'
+        description: 'Set an auto campaign live'
       },
       {
         name: 'engageMessageSetPause',
-        description: 'Set pause engage message'
+        description: 'Pause a campaign'
       },
       {
         name: 'engageMessageSetLiveManual',
-        description: 'Set live engage message manual'
+        description: 'Set a manual campaign live'
       },
       {
         name: 'engageMessageRemove',
-        description: 'Remove engage message'
+        description: 'Remove a campaign'
       },
       {
         name: 'engageMessageEdit',
-        description: 'Edit engage message'
+        description: 'Edit a campaign'
       },
       {
         name: 'engageMessageAdd',
-        description: 'Add engage message'
+        description: 'Add a campaign'
       },
       {
         name: 'showEngagesMessages',
-        description: 'Show engages messages list'
-      }
-    ]
-  },
-  insights: {
-    name: 'insights',
-    description: 'Insights',
-    actions: [
-      {
-        name: 'insightsAll',
-        description: 'All',
-        use: ['manageExportInsights', 'showInsights']
-      },
-      {
-        name: 'manageExportInsights',
-        description: 'Manage export insights'
-      },
-      {
-        name: 'showInsights',
-        description: 'Show insights'
+        description: 'See campaign list'
       }
     ]
   },
@@ -790,7 +775,7 @@ export const moduleObjects = {
       {
         name: 'productsAll',
         description: 'All',
-        use: ['showProducts', 'manageProducts']
+        use: ['showProducts', 'manageProducts', 'productsMerge']
       },
       {
         name: 'manageProducts',
@@ -800,6 +785,10 @@ export const moduleObjects = {
       {
         name: 'showProducts',
         description: 'Show products'
+      },
+      {
+        name: 'productsMerge',
+        description: 'Merge products'
       }
     ]
   },
@@ -1031,7 +1020,8 @@ export const moduleObjects = {
           'showConversations',
           'changeConversationStatus',
           'assignConversation',
-          'conversationMessageAdd'
+          'conversationMessageAdd',
+          'conversationResolveAll'
         ]
       },
       {
@@ -1075,25 +1065,6 @@ export const moduleObjects = {
       }
     ]
   },
-  emailAppearance: {
-    name: 'emailAppearance',
-    description: 'Email appearance',
-    actions: [
-      {
-        name: 'emailAppearanceAll',
-        description: 'All',
-        use: ['manageEmailAppearance', 'showEmailappearance']
-      },
-      {
-        name: 'showEmailappearance',
-        description: 'Show email appearance'
-      },
-      {
-        name: 'manageEmailAppearance',
-        description: 'Manage email appearance'
-      }
-    ]
-  },
   logs: {
     name: 'logs',
     description: 'Logs',
@@ -1120,6 +1091,76 @@ export const moduleObjects = {
       {
         name: 'manageWebhooks',
         description: 'Manage webhooks'
+      }
+    ]
+  },
+  skillTypes: {
+    name: 'skillTypes',
+    description: 'Skill Types',
+    actions: [
+      {
+        name: 'skillTypesAll',
+        description: 'All',
+        use: [
+          'getSkillTypes',
+          'createSkillType',
+          'updateSkillType',
+          'removeSkillType',
+          'manageSkillTypes'
+        ]
+      },
+      {
+        name: 'getSkillTypes',
+        description: 'Get skill types'
+      },
+      {
+        name: 'createSkillType',
+        description: 'Create skill type'
+      },
+      {
+        name: 'updateSkillType',
+        description: 'Update skill type'
+      },
+      {
+        name: 'removeSkillType',
+        description: 'Remove skill type'
+      }
+    ]
+  },
+  skills: {
+    name: 'skills',
+    description: 'Skills',
+    actions: [
+      {
+        name: 'skillsAll',
+        description: 'All',
+        use: [
+          'getSkill',
+          'getSkills',
+          'createSkill',
+          'updateSkill',
+          'removeSkill'
+        ]
+      },
+      {
+        name: 'getSkill',
+        description: 'Get skill'
+      },
+      {
+        name: 'getSkills',
+        description: 'Get skills'
+      },
+      {
+        name: 'createSkill',
+        description: 'Create skill'
+      },
+      {
+        name: 'updateSkill',
+        description: 'Update skill'
+      },
+      {
+        name: 'removeSkill',
+        description: 'Remove skill'
       }
     ]
   },

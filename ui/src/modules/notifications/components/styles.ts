@@ -40,6 +40,7 @@ const Content = styled.div`
   border-radius: 3px;
   margin: ${dimensions.unitSpacing - 5}px 0;
   display: inline-block;
+  max-width: 270px;
 
   > p {
     margin: 0;
@@ -89,10 +90,7 @@ const NotifButton = styled.div`
   width: 100%;
   position: relative;
   transition: all 0.3s ease;
-
-  i {
-    font-size: 20px;
-  }
+  color: ${colors.textSecondary};
 
   span {
     position: absolute;

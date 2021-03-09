@@ -137,7 +137,8 @@ const PERMISSION_MAP = {
     pipelinesEdit: 'dealPipelinesEdit',
     pipelinesRemove: 'dealPipelinesRemove',
     pipelinesWatch: 'dealPipelinesWatch',
-    stagesEdit: 'dealStagesEdit'
+    stagesEdit: 'dealStagesEdit',
+    stagesRemove: 'dealStagesRemove'
   },
   ticket: {
     boardsAdd: 'ticketBoardsAdd',
@@ -147,7 +148,8 @@ const PERMISSION_MAP = {
     pipelinesEdit: 'ticketPipelinesEdit',
     pipelinesRemove: 'ticketPipelinesRemove',
     pipelinesWatch: 'ticketPipelinesWatch',
-    stagesEdit: 'ticketStagesEdit'
+    stagesEdit: 'ticketStagesEdit',
+    stagesRemove: 'ticketStagesRemove'
   },
   task: {
     boardsAdd: 'taskBoardsAdd',
@@ -157,7 +159,8 @@ const PERMISSION_MAP = {
     pipelinesEdit: 'taskPipelinesEdit',
     pipelinesRemove: 'taskPipelinesRemove',
     pipelinesWatch: 'taskPipelinesWatch',
-    stagesEdit: 'taskStagesEdit'
+    stagesEdit: 'taskStagesEdit',
+    stagesRemove: 'taskStagesRemove'
   },
   growthHack: {
     boardsAdd: 'growthHackBoardsAdd',
@@ -172,7 +175,8 @@ const PERMISSION_MAP = {
     templatesEdit: 'growthHackTemplatesEdit',
     templatesRemove: 'growthHackTemplatesRemove',
     templatesDuplicate: 'growthHackTemplatesDuplicate',
-    showTemplates: 'showGrowthHackTemplates'
+    showTemplates: 'showGrowthHackTemplates',
+    stagesRemove: 'growthHackStagesRemove'
   }
 };
 
@@ -328,7 +332,7 @@ export const prepareBoardItemDoc = async (
   type: string,
   userId: string
 ) => {
-  const collection = await getCollection(type);
+  const { collection } = await getCollection(type);
   const item = await collection.findOne({ _id });
 
   const doc = {

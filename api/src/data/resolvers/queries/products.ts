@@ -1,14 +1,17 @@
 import { ProductCategories, Products, Tags } from '../../../db/models';
-import { TAG_TYPES } from '../../../db/models/definitions/constants';
+import {
+  PRODUCT_STATUSES,
+  TAG_TYPES
+} from '../../../db/models/definitions/constants';
 import { checkPermission, requireLogin } from '../../permissions/wrappers';
 import { IContext } from '../../types';
-import { paginate } from '../../utils';
+import { escapeRegExp, paginate } from '../../utils';
 
 const productQueries = {
   /**
    * Products list
    */
-  products(
+  async products(
     _root,
     {
       type,
@@ -16,9 +19,11 @@ const productQueries = {
       searchValue,
       tag,
       ids,
+      excludeIds,
       ...pagintationArgs
     }: {
       ids: string[];
+      excludeIds: boolean;
       type: string;
       categoryId: string;
       searchValue: string;
@@ -30,16 +35,25 @@ const productQueries = {
   ) {
     const filter: any = commonQuerySelector;
 
+    filter.status = { $ne: PRODUCT_STATUSES.DELETED };
+
     if (type) {
       filter.type = type;
     }
 
     if (categoryId) {
-      filter.categoryId = categoryId;
+      const category = await ProductCategories.getProductCatogery({
+        _id: categoryId
+      });
+      const product_category_ids = await ProductCategories.find(
+        { order: { $regex: new RegExp(category.order) } },
+        { _id: 1 }
+      );
+      filter.categoryId = { $in: product_category_ids };
     }
 
-    if (ids) {
-      filter._id = { $in: ids };
+    if (ids && ids.length > 0) {
+      filter._id = { [excludeIds ? '$nin' : '$in']: ids };
     }
 
     if (tag) {
@@ -49,14 +63,16 @@ const productQueries = {
     // search =========
     if (searchValue) {
       const fields = [
-        { name: { $in: [new RegExp(`.*${searchValue}.*`, 'i')] } },
-        { code: { $in: [new RegExp(`.*${searchValue}.*`, 'i')] } }
+        {
+          name: { $in: [new RegExp(`.*${escapeRegExp(searchValue)}.*`, 'i')] }
+        },
+        { code: { $in: [new RegExp(`.*${escapeRegExp(searchValue)}.*`, 'i')] } }
       ];
 
       filter.$or = fields;
     }
 
-    return paginate(Products.find(filter), pagintationArgs);
+    return paginate(Products.find(filter).sort('code'), pagintationArgs);
   },
 
   /**
@@ -68,6 +84,8 @@ const productQueries = {
     { commonQuerySelector }: IContext
   ) {
     const filter: any = commonQuerySelector;
+
+    filter.status = { $ne: PRODUCT_STATUSES.DELETED };
 
     if (type) {
       filter.type = type;
@@ -114,7 +132,8 @@ const productQueries = {
 
     for (const tag of tags) {
       counts[tag._id] = await Products.find({
-        tagIds: tag._id
+        tagIds: tag._id,
+        status: { $ne: PRODUCT_STATUSES.DELETED }
       }).countDocuments();
     }
 

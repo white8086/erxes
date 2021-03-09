@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { AppConsumer } from '../../messenger/containers/AppContext';
 import { IEmailParams, IIntegration } from '../../types';
-import { __, fixErrorMessage } from '../../utils';
+import { fixErrorMessage, __ } from '../../utils';
+import { connection } from '../connection';
 import {
   FieldValue,
   ICurrentStatus,
@@ -67,14 +68,20 @@ class Form extends React.Component<Props, State> {
   // after any field value change, save it's value to state
   onFieldValueChange = ({
     fieldId,
-    value
+    value,
+    associatedFieldId
   }: {
     fieldId: string;
     value: FieldValue;
+    associatedFieldId?: string;
   }) => {
     const doc = this.state.doc;
 
     doc[fieldId].value = value;
+
+    if(associatedFieldId) {
+      doc[fieldId].associatedFieldId = associatedFieldId;
+    }
 
     this.setState({ doc });
   };
@@ -171,12 +178,12 @@ class Form extends React.Component<Props, State> {
     );
   }
 
-  renderSuccessForm(thankContent?: string) {
+  renderSuccessForm(thankTitle?: string, thankContent?: string) {
     const { integration, form } = this.props;
 
     return (
       <div className="erxes-form">
-        {this.renderHead(form.title || integration.name)}
+        {this.renderHead(thankTitle || form.title)}
         <div className="erxes-form-content">
           <div className="erxes-result">
             <p>
@@ -193,6 +200,7 @@ class Form extends React.Component<Props, State> {
 
   render() {
     const { form, currentStatus, sendEmail, integration } = this.props;
+    const doc = this.state.doc;
 
     if (currentStatus.status === 'SUCCESS') {
       const {
@@ -204,6 +212,7 @@ class Form extends React.Component<Props, State> {
         adminEmails,
         adminEmailTitle,
         adminEmailContent,
+        thankTitle,
         thankContent
       } = integration.leadData;
 
@@ -227,7 +236,8 @@ class Form extends React.Component<Props, State> {
               toEmails: [email],
               fromEmail,
               title: userEmailTitle,
-              content: userEmailContent
+              content: userEmailContent,
+              formId: connection.data.form._id,
             });
           }
         }
@@ -238,12 +248,13 @@ class Form extends React.Component<Props, State> {
             toEmails: adminEmails,
             fromEmail,
             title: adminEmailTitle,
-            content: adminEmailContent
+            content: adminEmailContent,
+            formId: connection.data.form._id,
           });
         }
       } // end successAction = "email"
 
-      return this.renderSuccessForm(thankContent);
+      return this.renderSuccessForm(thankTitle, thankContent);
     }
 
     return this.renderForm();

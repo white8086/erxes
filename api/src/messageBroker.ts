@@ -5,6 +5,7 @@ import {
   receiveIntegrationsNotification,
   receiveRpcMessage
 } from './data/modules/integrations/receiveMessage';
+import { pluginsConsume } from './pluginUtils';
 import { graphqlPubsub } from './pubsub';
 
 dotenv.config();
@@ -21,8 +22,9 @@ export const initBroker = async (server?) => {
   const { consumeQueue, consumeRPCQueue } = client;
 
   // listen for rpc queue =========
-  consumeRPCQueue('rpc_queue:integrations_to_api', async data =>
-    receiveRpcMessage(data)
+  consumeRPCQueue(
+    'rpc_queue:integrations_to_api',
+    async data => await receiveRpcMessage(data)
   );
 
   // graphql subscriptions call =========
@@ -37,6 +39,8 @@ export const initBroker = async (server?) => {
   consumeQueue('engagesNotification', async data => {
     await receiveEngagesNotification(data);
   });
+
+  pluginsConsume(client);
 };
 
 export default function() {

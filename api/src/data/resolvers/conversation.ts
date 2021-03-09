@@ -7,7 +7,7 @@ import {
 } from '../../db/models';
 import { MESSAGE_TYPES } from '../../db/models/definitions/constants';
 import { IConversationDocument } from '../../db/models/definitions/conversations';
-import { debugExternalApi } from '../../debuggers';
+import { debugError } from '../../debuggers';
 import { IContext } from '../types';
 
 export default {
@@ -76,7 +76,7 @@ export default {
 
       return response;
     } catch (e) {
-      debugExternalApi(e);
+      debugError(e);
       return null;
     }
   },
@@ -106,7 +106,7 @@ export default {
 
         return response ? response.audioSrc : '';
       } catch (e) {
-        debugExternalApi(e);
+        debugError(e);
         return null;
       }
     }
@@ -142,7 +142,7 @@ export default {
 
       return response;
     } catch (e) {
-      debugExternalApi(e);
+      debugError(e);
       return null;
     }
   },
@@ -161,8 +161,30 @@ export default {
       );
       return response;
     } catch (e) {
-      debugExternalApi(e);
+      debugError(e);
       return null;
     }
+  },
+
+  async isFacebookTaggedMessage(conversation: IConversationDocument) {
+    const integration = await Integrations.findOne({
+      _id: conversation.integrationId
+    }).lean();
+
+    if (integration && integration.kind !== 'facebook-messenger') {
+      return false;
+    }
+
+    const message = await ConversationMessages.find({
+      conversationId: conversation._id,
+      customerId: { $exists: true },
+      createdAt: { $gt: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    }).limit(1);
+
+    if (message.length && message.length >= 1) {
+      return false;
+    }
+
+    return true;
   }
 };

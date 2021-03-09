@@ -4,8 +4,8 @@ import HeaderDescription from 'modules/common/components/HeaderDescription';
 import Table from 'modules/common/components/table';
 import { IButtonMutateProps, IRouterProps } from 'modules/common/types';
 import { __, router } from 'modules/common/utils';
-import { FlexItem, FlexRow } from 'modules/insights/styles';
 import SelectBrands from 'modules/settings/brands/containers/SelectBrands';
+import { FlexItem, FlexRow } from 'modules/settings/styles';
 import { FilterContainer } from 'modules/settings/team/styles';
 import * as React from 'react';
 import { withRouter } from 'react-router-dom';
@@ -102,7 +102,7 @@ class ResponseTemplateList extends React.Component<FinalProps, States> {
             <ControlLabel>Brand</ControlLabel>
             <SelectBrands
               label="Brand"
-              value={brandId}
+              initialValue={brandId}
               onSelect={this.onSelect}
               name="brandId"
               multi={false}

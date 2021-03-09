@@ -12,6 +12,7 @@ export interface IScheduleDate {
   type?: string;
   month?: string | number;
   day?: string | number;
+  dateTime?: string | Date;
 }
 
 interface IScheduleDateDocument extends IScheduleDate, Document {}
@@ -44,14 +45,17 @@ interface IShortMessage {
 }
 
 export interface IEngageMessage {
-  kind?: string;
+  kind: string;
   segmentIds?: string[];
   brandIds?: string[];
+  // normal tagging
   tagIds?: string[];
+  // customer selection tags
+  customerTagIds?: string[];
   customerIds?: string[];
-  title?: string;
+  title: string;
   fromUserId?: string;
-  method?: string;
+  method: string;
   isDraft?: boolean;
   isLive?: boolean;
   stopDate?: Date;
@@ -68,6 +72,8 @@ export interface IEngageMessage {
 
 export interface IEngageMessageDocument extends IEngageMessage, Document {
   scheduleDate?: IScheduleDateDocument;
+  createdBy: string;
+  createdAt: Date;
 
   email?: IEmailDocument;
   messenger?: IMessengerDocument;
@@ -80,7 +86,13 @@ export const scheduleDateSchema = new Schema(
   {
     type: field({ type: String, optional: true, label: 'Type' }),
     month: field({ type: String, optional: true, label: 'Month' }),
-    day: field({ type: String, optional: true, label: 'Day' })
+    day: field({ type: String, optional: true, label: 'Day' }),
+    dateTime: field({
+      type: Date,
+      optional: true,
+      label: 'DateTime',
+      min: [Date.now, `Date time value must be greather than today`]
+    })
   },
   { _id: false }
 );
@@ -153,6 +165,11 @@ export const engageMessageSchema = schemaWrapper(
     stopDate: field({ type: Date, label: 'Stop date' }),
     createdAt: field({ type: Date, default: Date.now, label: 'Created at' }),
     tagIds: field({ type: [String], optional: true, label: 'Tags' }),
+    customerTagIds: field({
+      type: [String],
+      optional: true,
+      label: 'Chosen customer tag ids'
+    }),
     messengerReceivedCustomerIds: field({
       type: [String],
       label: 'Received customers'
@@ -166,6 +183,7 @@ export const engageMessageSchema = schemaWrapper(
     totalCustomersCount: field({ type: Number, optional: true }),
     validCustomersCount: field({ type: Number, optional: true }),
 
-    shortMessage: field({ type: smsSchema, label: 'Short message' })
+    shortMessage: field({ type: smsSchema, label: 'Short message' }),
+    createdBy: field({ type: String, label: 'Created user id' })
   })
 );

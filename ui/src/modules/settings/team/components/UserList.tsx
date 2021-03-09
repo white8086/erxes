@@ -15,9 +15,9 @@ import Toggle from 'modules/common/components/Toggle';
 import { IButtonMutateProps } from 'modules/common/types';
 import { router } from 'modules/common/utils';
 import { __ } from 'modules/common/utils';
-import { FlexItem, FlexRow } from 'modules/insights/styles';
 import SelectBrands from 'modules/settings/brands/containers/SelectBrands';
 import { IUserGroup } from 'modules/settings/permissions/types';
+import { FlexItem, FlexRow } from 'modules/settings/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Select from 'react-select-plus';
@@ -243,7 +243,7 @@ class UserList extends React.Component<FinalProps, States> {
         <SelectBrands
           label={__('Choose brands')}
           onSelect={onSelect}
-          value={queryParams.brandIds}
+          initialValue={queryParams.brandIds}
           name="selectedBrands"
         />
       </FlexItem>

@@ -27,14 +27,15 @@ export const message = {
     return Brands.find({ _id: { $in: engageMessage.brandIds } });
   },
 
-  tags(engageMessage: IEngageMessageDocument) {
-    return Tags.find({ _id: { $in: engageMessage.tagIds } });
+  customerTags(engageMessage: IEngageMessageDocument) {
+    return Tags.find({ _id: { $in: engageMessage.customerTagIds || [] } });
   },
 
   fromUser(engageMessage: IEngageMessageDocument) {
     return Users.findOne({ _id: engageMessage.fromUserId });
   },
 
+  // common tags
   getTags(engageMessage: IEngageMessageDocument) {
     return Tags.find({ _id: { $in: engageMessage.tagIds || [] } });
   },
@@ -82,5 +83,15 @@ export const message = {
     }
 
     return null;
+  },
+
+  async createdUser(engageMessage: IEngageMessageDocument): Promise<string> {
+    const user = await Users.findOne({ _id: engageMessage.createdBy });
+
+    if (!user) {
+      return '';
+    }
+
+    return user.username || user.email || user._id;
   }
 };

@@ -272,8 +272,6 @@ a:hover {
   color: ${colors.textPrimary};
   min-width: 100%;
   box-shadow: 0 5px 15px 1px rgba(0, 0, 0, 0.15);
-  max-height: 100vh;
-  overflow: auto;
 }
 
 .dropdown-menu > span {
@@ -293,6 +291,10 @@ a:hover {
 .dropdown-menu > li > a {
   color: ${colors.textPrimary};
   font-weight: normal;
+}
+
+.dropdown-menu > li.active > a {
+  background: ${colors.bgActive};
 }
 
 .dropdown-menu > li > a:focus,
@@ -349,6 +351,10 @@ a:hover {
 }
 
 /* popover */
+
+#calendar-popover {
+  z-index: 1040;
+}
 
 .popover {
   font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",sans-serif;

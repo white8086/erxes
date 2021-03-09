@@ -1,15 +1,66 @@
 import * as mongoose from 'mongoose';
 import * as os from 'os';
-import * as path from 'path';
-import { Configs } from '../../../db/models';
+import { Configs, Pipelines, Stages } from '../../../db/models';
 import { DEFAULT_CONSTANT_VALUES } from '../../../db/models/definitions/constants';
+import { fetchElk } from '../../../elasticsearch';
 import { moduleRequireLogin } from '../../permissions/wrappers';
-import {
-  getEnv,
-  getErxesSaasDomain,
-  getSubServiceDomain,
-  sendRequest
-} from '../../utils';
+import { getEnv, getErxesSaasDomain, readFile, sendRequest } from '../../utils';
+
+const doSearch = async (index, value, fields) => {
+  const highlightFields = {};
+
+  fields.forEach(field => {
+    highlightFields[field] = {};
+  });
+
+  const match = {
+    multi_match: {
+      query: value,
+      fields
+    }
+  };
+
+  let query: any = match;
+
+  if (index === 'customers') {
+    query = {
+      bool: {
+        must: [match],
+        must_not: [
+          {
+            term: { status: 'deleted' }
+          }
+        ]
+      }
+    };
+  }
+
+  const fetchResults = await fetchElk(
+    'search',
+    index,
+    {
+      query,
+      size: 10,
+      highlight: {
+        fields: highlightFields
+      }
+    },
+    '',
+    { hits: { hits: [] } }
+  );
+
+  const results = fetchResults.hits.hits.map(result => {
+    return {
+      source: {
+        _id: result._id,
+        ...result._source
+      },
+      highlight: result.highlight
+    };
+  });
+
+  return results;
+};
 
 const configQueries = {
   /**
@@ -19,11 +70,43 @@ const configQueries = {
     return Configs.find({});
   },
 
+  async configsGetVersion(_root, { releaseNotes }) {
+    const result = {
+      version: '-',
+      isUsingRedis: Boolean(process.env.REDIS_HOST),
+      isUsingRabbitMQ: Boolean(process.env.RABBITMQ_HOST),
+      isUsingElkSyncer: Boolean(process.env.ELK_SYNCER !== 'false'),
+      isLatest: false,
+      releaseInfo: {}
+    };
+
+    const erxesDomain = getEnv({ name: 'MAIN_APP_DOMAIN' });
+
+    const erxesVersion = await sendRequest({
+      url: `${erxesDomain}/version.json`,
+      method: 'GET'
+    });
+
+    result.version = erxesVersion.packageVersion || '-';
+
+    const response = await sendRequest({
+      url: `${process.env.CORE_URL || 'https://erxes.io'}/git-release-info`,
+      method: 'GET'
+    });
+
+    result.isLatest = result.version === response.tag_name;
+
+    if (releaseNotes) {
+      result.releaseInfo = response;
+    }
+
+    return result;
+  },
+
   async configsStatus(_root, _args) {
     const status: any = {
       erxesApi: {},
-      erxesIntegration: {},
-      erxes: {}
+      erxesIntegration: {}
     };
 
     const { version, storageEngine } = await mongoose.connection.db.command({
@@ -53,40 +136,6 @@ const configQueries = {
       storageEngine: storageEngine.name
     };
 
-    const projectPath = process.cwd();
-    status.erxesApi.packageVersion = require(path.join(
-      projectPath,
-      'package.json'
-    )).version;
-
-    try {
-      const erxesDomain = getEnv({ name: 'MAIN_APP_DOMAIN' });
-      const erxesVersion = await sendRequest({
-        url: `${erxesDomain}/version.json`,
-        method: 'GET'
-      });
-
-      status.erxes.packageVersion = erxesVersion.packageVersion || '-';
-    } catch (e) {
-      status.erxes.packageVersion = '-';
-    }
-
-    try {
-      const erxesIntegrationDomain = getSubServiceDomain({
-        name: 'INTEGRATIONS_API_DOMAIN'
-      });
-      const erxesIntegration = await sendRequest({
-        url: `${erxesIntegrationDomain}/system-status`,
-        method: 'GET'
-      });
-
-      status.erxesIntegration = erxesIntegration || '-';
-    } catch (e) {
-      status.erxesIntegration = {
-        packageVersion: '-'
-      };
-    }
-
     return status;
   },
 
@@ -113,6 +162,91 @@ const configQueries = {
     } catch (e) {
       throw new Error(e.message);
     }
+  },
+
+  configsGetEmailTemplate(_root, { name }: { name?: string }) {
+    return readFile(name || 'base');
+  },
+
+  async search(_root, { value }: { value: string }) {
+    const searchBoardItems = async index => {
+      const items = await doSearch(index, value, ['name', 'description']);
+
+      const updatedItems: any = [];
+
+      for (const item of items) {
+        const stage = (await Stages.findOne({ _id: item.source.stageId })) || {
+          pipelineId: ''
+        };
+        const pipeline = (await Pipelines.findOne({
+          _id: stage.pipelineId
+        })) || { boardId: '' };
+
+        item.source.pipelineId = stage.pipelineId;
+        item.source.boardId = pipeline.boardId;
+
+        updatedItems.push(item);
+      }
+
+      return updatedItems;
+    };
+
+    const results = [
+      {
+        module: 'conversationMessages',
+        items: await doSearch('conversation_messages', value, ['content'])
+      },
+      {
+        module: 'contacts',
+        items: await doSearch('customers', value, [
+          'code',
+          'firstName',
+          'lastName',
+          'primaryPhone',
+          'primaryEmail'
+        ])
+      },
+      {
+        module: 'companies',
+        items: await doSearch('companies', value, [
+          'primaryName',
+          'industry',
+          'plan',
+          'primaryEmail',
+          'primaryPhone',
+          'businessType',
+          'description',
+          'website',
+          'code'
+        ])
+      },
+      {
+        module: 'tasks',
+        items: await searchBoardItems('tasks')
+      },
+      {
+        module: 'tickets',
+        items: await searchBoardItems('tickets')
+      },
+      {
+        module: 'deals',
+        items: await searchBoardItems('deals')
+      },
+      {
+        module: 'stages',
+        items: await doSearch('stages', value, ['name'])
+      },
+      {
+        module: 'pipelines',
+        items: await doSearch('pipelines', value, ['name'])
+      },
+      {
+        module: 'engageMessages',
+        items: await doSearch('engage_messages', value, ['title'])
+      }
+    ];
+
+    return results;
   }
 };
 

@@ -83,7 +83,7 @@ const moduleOptions = [
   { value: 'growthHack', label: 'Growth hacks' },
   { value: 'integration', label: 'Integrations' },
   { value: 'segment', label: 'Segments' },
-  { value: 'engage', label: 'Engages' },
+  { value: 'engage', label: 'Campaigns' },
   { value: 'script', label: 'Scripts' }
 ];
 
@@ -243,7 +243,7 @@ class LogList extends React.Component<Props, State> {
           <SelectTeamMembers
             label="Choose users"
             name="userId"
-            value={userId || ''}
+            initialValue={userId || ''}
             onSelect={onUserChange}
             multi={false}
           />

@@ -15,6 +15,9 @@ export const GOOGLE_OAUTH_ACCESS_TOKEN_URL =
 
 // Nylas
 export const NYLAS_API_URL = 'https://api.nylas.com';
+export const NYLAS_SCHEDULE_API_URL = 'https://schedule.api.nylas.com';
+export const NYLAS_SCHEDULE_MANAGE_PAGES =
+  NYLAS_SCHEDULE_API_URL + '/manage/pages';
 export const AUTHORIZED_REDIRECT_URL = `${MAIN_APP_DOMAIN}/settings/integrations`;
 export const AUTHORIZED_CALENDAR_REDIRECT_URL = `${MAIN_APP_DOMAIN}/settings/calendars`;
 export const CONNECT_AUTHORIZE_URL = NYLAS_API_URL + '/connect/authorize';
@@ -51,13 +54,19 @@ export const MICROSOFT_SCOPES = [
   'profile'
 ].join(' ');
 
-export const GOOGLE_SCOPES = [
+export const GOOGLE_GMAIL_SCOPES = [
+  'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/gmail.modify',
+  'https://www.googleapis.com/auth/userinfo.email',
+  'https://www.googleapis.com/auth/userinfo.profile'
+].join(' ');
+
+export const NYLAS_GMAIL_SCOPES = 'email.modify, email.send';
+export const NYLAS_CALENDAR_SCOPES = 'contacts, calendar';
+
+export const GOOGLE_CALENDAR_SCOPES = [
   'https://www.googleapis.com/auth/calendar',
   'https://www.googleapis.com/auth/contacts',
-  'https://www.googleapis.com/auth/gmail.compose',
-  'https://www.googleapis.com/auth/gmail.send',
-  'https://www.googleapis.com/auth/gmail.readonly',
-  'https://www.googleapis.com/auth/gmail.modify',
   'https://www.googleapis.com/auth/userinfo.email',
   'https://www.googleapis.com/auth/userinfo.profile'
 ].join(' ');

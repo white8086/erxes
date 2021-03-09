@@ -88,6 +88,8 @@ const log = (msg, color = 'green') => {
   console.log(chalk[color](msg));
 };
 
+module.exports.execCommand = execCommand;
+
 module.exports.log = log;
 
 module.exports.filePath = filePath;
@@ -126,9 +128,9 @@ module.exports.downloadLatesVersion = async configs => {
     await execCommand(`mv build-local build`);
   }
 
-  log('Removing temp files ...');
+  log('Backing up build tar ...');
 
-  await fse.remove(filePath('build.tar.gz'));
+  await fse.copy(filePath('build.tar.gz'), filePath('build-backup.tar.gz'));
 };
 
 const runCommand = (command, args, pipe) => {
@@ -188,7 +190,7 @@ module.exports.startServices = async configs => {
   let WIDGETS_DOMAIN = `http://localhost:${PORT_WIDGETS}`;
   let DASHBOARD_UI_DOMAIN = `http://localhost:${PORT_DASHBOARD_UI}`;
   let DASHBOARD_API_DOMAIN = `http://localhost:${PORT_DASHBOARD_API}`;
-  let dasbhoardSchemaPath = '/build/dashboard-api/schema';
+  const dasbhoardSchemaPath = 'build/dashboard-api/schema';
 
   const HELPERS_DOMAIN = `https://helper.erxes.io/`;
 
@@ -198,7 +200,6 @@ module.exports.startServices = async configs => {
     WIDGETS_DOMAIN = `${DOMAIN}/widgets`;
     DASHBOARD_UI_DOMAIN = `${DOMAIN}/dashboard/front`;
     DASHBOARD_API_DOMAIN = `${DOMAIN}/dashboard/api`;
-    dasbhoardSchemaPath = '/schema';
   }
 
   const API_MONGO_URL = generateMongoUrl('erxes');
@@ -316,13 +317,14 @@ module.exports.startServices = async configs => {
       );
     }
 
-    const jwt = require('jsonwebtoken');
+    if (!REDIS_HOST || !REDIS_PORT) {
+      return log(
+        'Dashboard is not started "If you want to use dashboard you need to start redis"',
+        'red'
+      );
+    }
 
     const CUBE_API_SECRET = Math.random().toString();
-
-    const cubejsToken = await jwt.sign({}, CUBE_API_SECRET, {
-      expiresIn: '10year'
-    });
 
     apps.push({
       name: 'dashboard-api',
@@ -334,11 +336,11 @@ module.exports.startServices = async configs => {
         DB_NAME: 'erxes',
         CUBEJS_URL: DASHBOARD_API_DOMAIN,
         CUBEJS_API_SECRET: CUBE_API_SECRET,
-        CUBEJS_TOKEN: cubejsToken,
         CUBEJS_DB_TYPE: 'elasticsearch',
         CUBEJS_DB_URL: ELASTICSEARCH_URL,
         SCHEMA_PATH: dasbhoardSchemaPath,
-        REDIS_URL: REDIS_HOST,
+        REDIS_URL: `redis://${REDIS_HOST}:${REDIS_PORT ||
+          6379}?password=${REDIS_PASSWORD || ''}`,
         REDIS_PASSWORD: REDIS_PASSWORD
       }
     });
@@ -354,7 +356,6 @@ module.exports.startServices = async configs => {
         NODE_ENV: "production",
         REACT_APP_API_URL: "${API_DOMAIN}",
         REACT_APP_DASHBOARD_API_URL: "${DASHBOARD_API_DOMAIN}",
-        REACT_APP_DASHBOARD_CUBE_TOKEN: "${cubejsToken}",
         REACT_APP_API_SUBSCRIPTION_URL: "${subscriptionsUrl}"
       }
     `
@@ -463,7 +464,11 @@ module.exports.startServices = async configs => {
 
   log('Running migrations ...');
 
-  await execCommand(`MONGO_URL="${API_MONGO_URL}" node ${filePath('build/api/commands/migrate.js')}`);
+  await execCommand(
+    `MONGO_URL="${API_MONGO_URL}" node ${filePath(
+      'build/api/commands/migrate.js'
+    )}`
+  );
 
   return runCommand('pm2', ['start', filePath('ecosystem.config.js')], false);
 };
@@ -496,7 +501,7 @@ const generateNginxConf = async ({
             proxy_pass http://127.0.0.1:${PORT_DASHBOARD_UI}/;
             ${commonConfig}
         }
-        location /dashboard/api {
+        location /dashboard/api/ {
           proxy_pass http://127.0.0.1:${PORT_DASHBOARD_API}/;
           ${commonConfig}
         }

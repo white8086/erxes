@@ -1,8 +1,8 @@
 const cubejs = require('@cubejs-client/core');
 const elasticsearch = require('elasticsearch');
-const resolvers = require('./constants.js');
+const { resolvers } = require('./constants.js');
 
-const { CUBEJS_TOKEN, CUBEJS_URL, CUBEJS_DB_URL } = process.env;
+const { CUBEJS_URL, CUBEJS_DB_URL } = process.env;
 
 const client = new elasticsearch.Client({
   hosts: [CUBEJS_DB_URL]
@@ -13,13 +13,21 @@ const generateReport = async (req, res) => {
 
   const { dashboardToken } = query;
 
+  let resultSet = {};
+
   const dashboardQuery = JSON.parse(query.dashboardQuery);
 
   const cubejsApi = cubejs.default(dashboardToken, {
     apiUrl: `${CUBEJS_URL}/cubejs-api/v1`
   });
 
-  const resultSet = await cubejsApi.load(dashboardQuery);
+  try {
+    resultSet = await cubejsApi.load(dashboardQuery);
+  } catch (e) {
+    if (!e.message.includes('Values required for filter')) {
+      res.send('No data');
+    }
+  }
 
   if (resultSet.loadResponse.query.dimensions[0]) {
     const dimensions = resultSet.loadResponse.query.dimensions[0];
@@ -34,8 +42,14 @@ const generateReport = async (req, res) => {
               id: data[dimensions]
             });
 
-            data[dimensions] =
-              response._source[resolver.fieldname] || 'unknown';
+            const fieldName = resolver.fieldname.split('.');
+
+            if (fieldName.length == 2) {
+              data[dimensions] =
+                response._source[fieldName[0]][fieldName[1]] || 'unknown';
+            } else {
+              data[dimensions] = response._source[fieldName] || 'unknown';
+            }
           } catch (e) {
             data[dimensions] = 'unknown';
           }

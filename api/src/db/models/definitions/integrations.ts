@@ -43,6 +43,14 @@ export interface IMessageDataMessages {
 export interface IMessengerData {
   botEndpointUrl?: string;
   botShowInitialMessage?: boolean;
+  skillData?: {
+    typeId: string;
+    options: Array<{
+      label: string;
+      response: string;
+      typeId: string;
+    }>;
+  };
   supporterIds?: string[];
   notifyCustomer?: boolean;
   availabilityMethod?: string;
@@ -77,6 +85,7 @@ export interface ILeadData {
   adminEmails?: string;
   adminEmailTitle?: string;
   adminEmailContent?: string;
+  thankTitle?: string;
   thankContent?: string;
   redirectUrl?: string;
   themeColor?: string;
@@ -90,6 +99,7 @@ export interface ILeadData {
 export interface IWebhookData {
   script: string;
   token: string;
+  origin: string;
 }
 
 export interface ILeadDataDocument extends ILeadData, Document {
@@ -145,6 +155,7 @@ const messengerOnlineHoursSchema = new Schema(
 // subdocument schema for MessengerData
 const messengerDataSchema = new Schema(
   {
+    skillData: field({ type: Object, optional: true }),
     botEndpointUrl: field({ type: String }),
     botShowInitialMessage: field({ type: Boolean }),
     supporterIds: field({ type: [String] }),
@@ -246,6 +257,11 @@ export const leadDataSchema = new Schema(
       optional: true,
       label: 'Admin email content'
     }),
+    thankTitle: field({
+      type: String,
+      optional: true,
+      label: 'Thank content title'
+    }),
     thankContent: field({
       type: String,
       optional: true,
@@ -304,7 +320,8 @@ const uiOptionsSchema = new Schema(
 const webhookDataSchema = new Schema(
   {
     script: field({ type: String, optional: true }),
-    token: field({ type: String })
+    token: field({ type: String }),
+    origin: field({ type: String, optional: true })
   },
   { _id: false }
 );

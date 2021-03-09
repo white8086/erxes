@@ -1,6 +1,7 @@
 import { Comments, Customers, Posts } from './models';
 import { ICommentParams, IPostParams } from './types';
 
+import { debugError } from '../debuggers';
 import { sendMessage, sendRPCMessage } from '../messageBroker';
 import { Accounts, Integrations } from '../models';
 import {
@@ -124,6 +125,10 @@ export const getOrCreatePost = async (
 
   const doc = generatePostDoc(postParams, pageId, userId);
 
+  if (!doc.attachments && doc.content === '...') {
+    throw new Error();
+  }
+
   doc.permalink_url = postUrl;
 
   post = await Posts.create(doc);
@@ -201,9 +206,17 @@ export const getOrCreateCustomer = async (
   if (customer) {
     return customer;
   }
+
   // create customer
-  const fbUser =
-    (await getFacebookUser(pageId, facebookPageTokensMap, userId)) || {};
+  let fbUser = {} as any;
+
+  try {
+    fbUser =
+      (await getFacebookUser(pageId, facebookPageTokensMap, userId)) || {};
+  } catch (e) {
+    debugError(`Error during get customer info: ${e.message}`);
+  }
+
   const fbUserProfilePic =
     fbUser.profile_pic ||
     (await getFacebookUserProfilePic(pageId, facebookPageTokensMap, userId));

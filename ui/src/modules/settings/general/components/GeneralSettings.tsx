@@ -8,10 +8,12 @@ import CURRENCIES from 'modules/common/constants/currencies';
 import { Title } from 'modules/common/styles/main';
 import { __ } from 'modules/common/utils';
 import Wrapper from 'modules/layout/components/Wrapper';
+import EmailConfigForm from 'modules/settings/general/components/EmailConfigForm';
 import React from 'react';
 import Select from 'react-select-plus';
 import { ContentBox } from '../../styles';
 import {
+  DATA_RETENTION_DURATION,
   FILE_MIME_TYPES,
   FILE_SYSTEM_TYPES,
   KEY_LABELS,
@@ -35,6 +37,7 @@ type Props = {
 type State = {
   configsMap: IConfigsMap;
   language: string;
+  isSaved: boolean;
 };
 
 class GeneralSettings extends React.Component<Props, State> {
@@ -43,7 +46,8 @@ class GeneralSettings extends React.Component<Props, State> {
 
     this.state = {
       configsMap: props.configsMap,
-      language: props.currentLanguage
+      language: props.currentLanguage,
+      isSaved: false
     };
   }
 
@@ -51,6 +55,8 @@ class GeneralSettings extends React.Component<Props, State> {
     e.preventDefault();
 
     const { configsMap, language } = this.state;
+
+    this.setState({ isSaved: true });
 
     this.props.save(configsMap);
 
@@ -63,6 +69,12 @@ class GeneralSettings extends React.Component<Props, State> {
     configsMap[code] = value;
 
     this.setState({ configsMap });
+  };
+
+  onChangeEmailConfig = (emailConfig: any) => {
+    this.onChangeConfig('COMPANY_EMAIL_FROM', emailConfig.email);
+    this.onChangeConfig('COMPANY_EMAIL_TEMPLATE_TYPE', emailConfig.type);
+    this.onChangeConfig('COMPANY_EMAIL_TEMPLATE', emailConfig.template);
   };
 
   onChangeMultiCombo = (code: string, values) => {
@@ -140,6 +152,7 @@ class GeneralSettings extends React.Component<Props, State> {
 
     const actionButtons = (
       <Button
+        id="generalSettingsSave"
         btnStyle="primary"
         onClick={this.save}
         icon="check-circle"
@@ -353,11 +366,37 @@ class GeneralSettings extends React.Component<Props, State> {
             </a>
           </Info>
 
-          {this.renderItem('COMPANY_EMAIL_FROM')}
-          {this.renderItem(
-            'DEFAULT_EMAIL_SERVICE',
-            'Write your default email service name. Default email service is SES'
-          )}
+          <EmailConfigForm
+            emailConfig={{
+              email: configsMap.COMPANY_EMAIL_FROM,
+              type: configsMap.COMPANY_EMAIL_TEMPLATE_TYPE,
+              template: configsMap.COMPANY_EMAIL_TEMPLATE
+            }}
+            emailText="Set an email address you wish to send your internal transactional emails from. For example, task notifications, team member mentions, etc."
+            setEmailConfig={this.onChangeEmailConfig}
+            isSaved={this.state.isSaved}
+          />
+          <FormGroup>
+            <ControlLabel>DEFAULT EMAIL SERVICE</ControlLabel>
+            <p>
+              {__(
+                'Choose your email service name. The default email service is SES.'
+              )}
+            </p>
+            <Select
+              options={[
+                { label: 'SES', value: 'SES' },
+                { label: 'Custom', value: 'custom' }
+              ]}
+              value={configsMap.DEFAULT_EMAIL_SERVICE || 'SES'}
+              clearable={false}
+              searchable={false}
+              onChange={this.onChangeSingleCombo.bind(
+                this,
+                'DEFAULT_EMAIL_SERVICE'
+              )}
+            />
+          </FormGroup>
         </CollapseContent>
 
         <CollapseContent title={__('Custom mail service')}>
@@ -375,6 +414,20 @@ class GeneralSettings extends React.Component<Props, State> {
           {this.renderItem('MAIL_USER')}
           {this.renderItem('MAIL_PASS')}
           {this.renderItem('MAIL_HOST')}
+        </CollapseContent>
+
+        <CollapseContent title={__('Data retention')}>
+          <ControlLabel>{KEY_LABELS.NOTIFICATION_DATA_RETENTION}</ControlLabel>
+          <Select
+            options={DATA_RETENTION_DURATION}
+            value={configsMap.NOTIFICATION_DATA_RETENTION || 3}
+            clearable={false}
+            searchable={false}
+            onChange={this.onChangeSingleCombo.bind(
+              this,
+              'NOTIFICATION_DATA_RETENTION'
+            )}
+          />
         </CollapseContent>
 
         <CollapseContent title={__('Constants')}>

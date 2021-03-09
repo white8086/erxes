@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import { connect } from '../db/connection';
-import { debugCrons } from '../debuggers';
+import { debugCrons, debugError } from '../debuggers';
 
 import { initMemoryStorage } from '../inmemoryStorage';
 import { initBroker } from '../messageBroker';
@@ -10,6 +10,7 @@ import './conversations';
 import './deals';
 import './engages';
 import './integrations';
+import './notificatons';
 import './robot';
 
 // load environment variables
@@ -30,7 +31,7 @@ app.listen(PORT_CRONS, () => {
     initMemoryStorage();
 
     initBroker(app).catch(e => {
-      debugCrons(`Error ocurred during broker init ${e.message}`);
+      debugError(`Error ocurred during broker init ${e.message}`);
     });
   });
 

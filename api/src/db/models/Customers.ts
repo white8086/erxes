@@ -63,6 +63,7 @@ export interface IUpdateMessengerCustomerParams {
 
 export interface IVisitorContactInfoParams {
   customerId: string;
+  visitorId?: string;
   type: string;
   value: string;
 }
@@ -268,7 +269,11 @@ export const loadClass = () => {
       user?: IUserDocument
     ): Promise<ICustomerDocument> {
       // Checking duplicated fields of customer
-      await Customers.checkDuplication(doc);
+      try {
+        await Customers.checkDuplication(doc);
+      } catch (e) {
+        throw new Error(e.message);
+      }
 
       if (!doc.ownerId && user) {
         doc.ownerId = user._id;
@@ -327,7 +332,11 @@ export const loadClass = () => {
      */
     public static async updateCustomer(_id: string, doc: ICustomer) {
       // Checking duplicated fields of customer
-      await Customers.checkDuplication(doc, _id);
+      try {
+        await Customers.checkDuplication(doc, _id);
+      } catch (e) {
+        throw new Error(e.message);
+      }
 
       const oldCustomer = await Customers.getCustomer(_id);
 

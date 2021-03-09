@@ -4,7 +4,8 @@ import {
   Fields,
   FieldsGroups,
   Integrations,
-  Products
+  Products,
+  Tags
 } from '../../../db/models';
 import { fetchElk } from '../../../elasticsearch';
 import { EXTEND_FIELDS, FIELD_CONTENT_TYPES } from '../../constants';
@@ -149,6 +150,11 @@ export const checkFieldNames = async (type: string, fields: string[]) => {
       property.type = 'pronoun';
     }
 
+    if (fieldName === 'categoryCode') {
+      property.name = 'categoryCode';
+      property.type = 'categoryCode';
+    }
+
     if (!property.type) {
       throw new Error(`Bad column name ${fieldName}`);
     }
@@ -171,13 +177,34 @@ const getIntegrations = async () => {
   ]);
 };
 
+const getTags = async (type: string) => {
+  const tags = await Tags.aggregate([
+    { $match: { type } },
+    {
+      $project: {
+        _id: 0,
+        label: '$name',
+        value: '$_id'
+      }
+    }
+  ]);
+
+  return {
+    _id: Math.random(),
+    name: 'tagIds',
+    label: 'Tag',
+    type: 'tag',
+    selectOptions: tags
+  };
+};
+
 /*
  * Generates fields using given schema
  */
 const generateFieldsFromSchema = async (queSchema: any, namePrefix: string) => {
-  const queFields: any = [];
+  const fields: any = [];
 
-  // field definations
+  // field definitions
   const paths = queSchema.paths;
 
   const integrations = await getIntegrations();
@@ -187,6 +214,7 @@ const generateFieldsFromSchema = async (queSchema: any, namePrefix: string) => {
 
     const label = path.options.label;
     const type = path.instance;
+
     const selectOptions =
       name === 'integrationId'
         ? integrations || []
@@ -194,7 +222,7 @@ const generateFieldsFromSchema = async (queSchema: any, namePrefix: string) => {
 
     if (['String', 'Number', 'Date', 'Boolean'].includes(type) && label) {
       // add to fields list
-      queFields.push({
+      fields.push({
         _id: Math.random(),
         name: `${namePrefix}${name}`,
         label,
@@ -204,7 +232,7 @@ const generateFieldsFromSchema = async (queSchema: any, namePrefix: string) => {
     }
   }
 
-  return queFields;
+  return fields;
 };
 
 /**
@@ -221,7 +249,15 @@ export const fieldsCombinedByContentType = async ({
 }) => {
   let schema: any;
   let extendFields: Array<{ name: string; label?: string }> = [];
-  let fields: Array<{ _id: number; name: string; label?: string }> = [];
+  let fields: Array<{
+    _id: number;
+    name: string;
+    label?: string;
+    type?: string;
+    validation?: string;
+    options?: string[];
+    selectOptions?: Array<{ label: string; value: string }>;
+  }> = [];
 
   switch (contentType) {
     case FIELD_CONTENT_TYPES.COMPANY:
@@ -266,7 +302,10 @@ export const fieldsCombinedByContentType = async ({
       fields.push({
         _id: Math.random(),
         name: `customFieldsData.${customField._id}`,
-        label: customField.text
+        label: customField.text,
+        options: customField.options,
+        validation: customField.validation,
+        type: customField.type
       });
     }
   }
@@ -275,10 +314,26 @@ export const fieldsCombinedByContentType = async ({
     extendFields = EXTEND_FIELDS.CUSTOMER;
   }
 
-  for (const extendFeild of extendFields) {
+  if (contentType === 'customer' || contentType === 'company') {
+    const tags = await getTags(contentType);
+    fields = [...fields, ...[tags]];
+
+    if (contentType === 'customer') {
+      const integrations = await getIntegrations();
+
+      fields.push({
+        _id: Math.random(),
+        name: 'relatedIntegrationIds',
+        label: 'Related integration',
+        selectOptions: integrations
+      });
+    }
+  }
+
+  for (const extendField of extendFields) {
     fields.push({
       _id: Math.random(),
-      ...extendFeild
+      ...extendField
     });
   }
 

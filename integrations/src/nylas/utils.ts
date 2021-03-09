@@ -1,19 +1,20 @@
 import * as dotenv from 'dotenv';
-import { debugNylas } from '../debuggers';
+import { debugError, debugNylas } from '../debuggers';
 import { getGoogleConfigs } from '../gmail/utils';
 import { sendMessage } from '../messageBroker';
 import { Accounts, Integrations } from '../models';
 import { compose, getConfig, getEnv } from '../utils';
 import { getCalendarOrEvent, getMessageById } from './api';
 import {
+  GOOGLE_CALENDAR_SCOPES,
+  GOOGLE_GMAIL_SCOPES,
   GOOGLE_OAUTH_ACCESS_TOKEN_URL,
   GOOGLE_OAUTH_AUTH_URL,
-  GOOGLE_SCOPES,
   MICROSOFT_OAUTH_ACCESS_TOKEN_URL,
   MICROSOFT_OAUTH_AUTH_URL,
   MICROSOFT_SCOPES
 } from './constants';
-import { NylasCalendars, NylasEvent } from './models';
+import { NylasCalendars, NylasEvents } from './models';
 import {
   createOrGetNylasConversation as storeConversation,
   createOrGetNylasConversationMessage as storeMessage,
@@ -62,7 +63,7 @@ export const syncEvents = async (
         await storeEvents([newEvent]);
         break;
       case 'event.deleted':
-        await NylasEvent.deleteOne({ accountUid, providerEventId: eventId });
+        await NylasEvents.deleteOne({ accountUid, providerEventId: eventId });
         break;
       case 'event.updated':
         const event: IEvent = await getCalendarOrEvent(
@@ -74,7 +75,7 @@ export const syncEvents = async (
         break;
     }
   } catch (e) {
-    debugNylas(`Failed to sync events: ${e.message}`);
+    debugError(`Failed to sync events: ${e.message}`);
 
     throw e;
   }
@@ -113,7 +114,7 @@ export const syncCalendars = async (
         break;
       case 'calendar.deleted':
         await NylasCalendars.deleteOne({ providerCalendarId: calendarId });
-        await NylasEvent.deleteMany({ providerCalendarId: calendarId });
+        await NylasEvents.deleteMany({ providerCalendarId: calendarId });
         break;
       case 'calendar.updated':
         const calendar: ICalendar = await getCalendarOrEvent(
@@ -125,7 +126,7 @@ export const syncCalendars = async (
         break;
     }
   } catch (e) {
-    debugNylas(`Failed to sync calendars: ${e.message}`);
+    debugError(`Failed to sync calendars: ${e.message}`);
 
     throw e;
   }
@@ -142,41 +143,46 @@ const syncMessages = async (accountId: string, messageId: string) => {
     nylasAccountId: accountId
   }).lean();
 
-  if (!integration) {
-    throw new Error(`Integration not found with nylasAccountId: ${accountId}`);
-  }
+  if (integration) {
+    const { nylasToken, email, kind } = integration;
 
-  const { nylasToken, email, kind } = integration;
+    let message: any = {};
 
-  let message;
+    try {
+      message = await getMessageById(nylasToken, messageId);
 
-  try {
-    message = await getMessageById(nylasToken, messageId);
-  } catch (e) {
-    debugNylas(`Failed to get nylas message by id: ${e.message}`);
+      const folder = message.folder || {};
+      const folderName = folder.name || '';
 
-    throw e;
-  }
+      if (folderName === 'drafts') {
+        return;
+      }
+    } catch (e) {
+      debugError(`Failed to get nylas message by id: ${e.message}`);
 
-  const [from] = message.from;
-
-  // Prevent to send email to itself
-  if (from.email === integration.email && !message.subject.includes('Re:')) {
-    return;
-  }
-
-  const doc = {
-    kind,
-    message: JSON.parse(JSON.stringify(message)),
-    toEmail: email,
-    integrationIds: {
-      id: integration._id,
-      erxesApiId: integration.erxesApiId
+      throw e;
     }
-  };
 
-  // Store new received message
-  return compose(storeMessage, storeConversation, storeCustomer)(doc);
+    const [from] = message.from;
+
+    // Prevent to send email to itself
+    if (from.email === integration.email && !message.subject.includes('Re:')) {
+      return;
+    }
+
+    const doc = {
+      kind,
+      message: JSON.parse(JSON.stringify(message)),
+      toEmail: email,
+      integrationIds: {
+        id: integration._id,
+        erxesApiId: integration.erxesApiId
+      }
+    };
+
+    // Store new received message
+    return compose(storeMessage, storeConversation, storeCustomer)(doc);
+  }
 };
 
 export const getNylasConfig = async () => {
@@ -256,13 +262,14 @@ export const getProviderSettings = async (
  * @param {String} kind
  * @returns {Object} configs
  */
-const getProviderConfigs = (kind: string) => {
+const getProviderConfigs = (kind: string, type?: string) => {
   switch (kind) {
     case 'gmail': {
       return {
         params: {
           access_type: 'offline',
-          scope: GOOGLE_SCOPES
+          scope:
+            type === 'calendar' ? GOOGLE_CALENDAR_SCOPES : GOOGLE_GMAIL_SCOPES
         },
         urls: {
           authUrl: GOOGLE_OAUTH_AUTH_URL,
@@ -285,6 +292,18 @@ const getProviderConfigs = (kind: string) => {
       };
     }
   }
+};
+
+export const extractDate = (date: Date) => {
+  return {
+    month: date.getMonth(),
+    year: date.getFullYear(),
+    date: date.getDate()
+  };
+};
+
+export const getTime = (date: Date) => {
+  return date.getTime() / 1000;
 };
 
 export { getProviderConfigs, buildEmailAddress, syncMessages };

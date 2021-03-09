@@ -1,4 +1,3 @@
-import { getEnv } from 'apolloClient';
 import Button from 'modules/common/components/Button';
 import DataWithLoader from 'modules/common/components/DataWithLoader';
 import EmptyContent from 'modules/common/components/empty/EmptyContent';
@@ -7,7 +6,7 @@ import ModalTrigger from 'modules/common/components/ModalTrigger';
 import Pagination from 'modules/common/components/pagination/Pagination';
 import Table from 'modules/common/components/table';
 import { IRouterProps } from 'modules/common/types';
-import { __ } from 'modules/common/utils';
+import { __, getEnv } from 'modules/common/utils';
 import Wrapper from 'modules/layout/components/Wrapper';
 import { BarItems } from 'modules/layout/styles';
 import { EMPTY_IMPORT_CONTENT } from 'modules/settings/constants';
@@ -39,7 +38,13 @@ const DATA_IMPORT_TYPES = [
   'lead'
 ];
 
-const DYNAMICLY_TEMPLATE_TYPES = ['customer', 'company', 'product', 'lead'];
+const DYNAMICLY_TEMPLATE_TYPES = [
+  'customer',
+  'company',
+  'product',
+  'lead',
+  'visitor'
+];
 
 class Histories extends React.Component<Props & IRouterProps> {
   renderHistories = () => {
@@ -107,6 +112,7 @@ class Histories extends React.Component<Props & IRouterProps> {
         btnStyle = 'success';
         text = 'Download template';
         break;
+
       case 'export':
         icon = 'export';
         btnStyle = 'primary';
@@ -115,7 +121,14 @@ class Histories extends React.Component<Props & IRouterProps> {
     }
 
     const manageColumns = props => {
-      return <ManageColumns {...props} contentType={currentType} type={type} />;
+      return (
+        <ManageColumns
+          {...props}
+          contentType={currentType}
+          type={type}
+          isImport={true}
+        />
+      );
     };
 
     const editColumns = (
@@ -146,16 +159,16 @@ class Histories extends React.Component<Props & IRouterProps> {
       return this.renderColumnChooser('import');
     }
 
-    let name = 'product_template.xlsx';
+    let name = 'product_template.csv';
 
     switch (currentType) {
       case 'product':
-        name = 'product_template.xlsx';
+        name = 'product_template.csv';
         break;
       case 'deal':
       case 'task':
       case 'ticket':
-        name = 'board_item_template.xlsx';
+        name = 'board_item_template.csv';
         break;
       default:
         break;

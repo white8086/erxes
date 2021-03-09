@@ -1,6 +1,7 @@
 import './setup.ts';
 
 import * as faker from 'faker';
+
 import messageBroker from '../messageBroker';
 
 import {
@@ -195,6 +196,7 @@ describe('integrationQueries', () => {
           websiteMessengerApps { _id }
           knowledgeBaseMessengerApps { _id }
           leadMessengerApps { _id }
+          healthStatus
         }
       }
     `;
@@ -231,6 +233,28 @@ describe('integrationQueries', () => {
     expect(response.websiteMessengerApps.length).toBe(0);
     expect(response.knowledgeBaseMessengerApps.length).toBe(0);
     expect(response.leadMessengerApps.length).toBe(0);
+    expect(response.healthStatus).toBeDefined();
+
+    const spy = jest.spyOn(dataSources.IntegrationsAPI, 'fetchApi');
+    spy.mockImplementation(() => Promise.resolve([]));
+
+    const facebookIntegration = await integrationFactory({
+      kind: 'facebook-post'
+    });
+
+    response = await graphqlRequest(qry, 'integrationDetail', {
+      _id: facebookIntegration._id
+    });
+
+    try {
+      await graphqlRequest(qry, 'integrationDetail', {
+        _id: facebookIntegration._id
+      });
+    } catch (e) {
+      expect(e[0].message).toBeDefined();
+    }
+
+    spy.mockRestore();
   });
 
   test('Get total count of integrations by kind', async () => {
@@ -341,7 +365,7 @@ describe('integrationQueries', () => {
     const usedTypes = await graphqlRequest(qry, 'integrationsGetUsedTypes');
 
     expect(usedTypes[0]._id).toBe('messenger');
-    expect(usedTypes[0].name).toBe('Web messenger');
+    expect(usedTypes[0].name).toBe('Messenger');
   });
 
   test('line webhook', async () => {
@@ -386,5 +410,48 @@ describe('integrationQueries', () => {
     expect(secondResponse).toBe('https://webhookurl');
 
     spy1.mockRestore();
+  });
+
+  test('Integrations county query with filter', async () => {
+    await integrationFactory({ kind: 'lead', isActive: true });
+    await integrationFactory({ kind: 'lead', isActive: false });
+
+    const countQuery = `
+    query integrationsTotalCount($kind: String, $status: String) {
+      integrationsTotalCount(kind: $kind, status: $status) {
+        total
+        byTag
+        byKind
+        byBrand
+        byChannel
+        byStatus
+      }
+    }
+  `;
+
+    // mail ========================
+    const activeResponse = await graphqlRequest(
+      countQuery,
+      'integrationsTotalCount',
+      {
+        kind: 'lead',
+        status: 'active'
+      }
+    );
+
+    const archivedResponse = await graphqlRequest(
+      countQuery,
+      'integrationsTotalCount',
+      {
+        kind: 'lead',
+        status: 'archived'
+      }
+    );
+
+    expect(activeResponse.total).toBe(2);
+    expect(activeResponse.byStatus.active).toBe(1);
+    expect(activeResponse.byStatus.archived).toBe(0);
+    expect(archivedResponse.byStatus.active).toBe(0);
+    expect(archivedResponse.byStatus.archived).toBe(1);
   });
 });

@@ -1,4 +1,5 @@
 import * as sinon from 'sinon';
+import { MESSAGE_KINDS } from '../data/constants';
 import {
   brandFactory,
   conversationMessageFactory,
@@ -20,9 +21,9 @@ import {
   Tags,
   Users
 } from '../db/models';
-
 import Messages from '../db/models/ConversationMessages';
 import { IBrandDocument } from '../db/models/definitions/brands';
+import { METHODS } from '../db/models/definitions/constants';
 import { ICustomerDocument } from '../db/models/definitions/customers';
 import { IIntegrationDocument } from '../db/models/definitions/integrations';
 import { IUserDocument } from '../db/models/definitions/users';
@@ -41,7 +42,7 @@ describe('engage messages model tests', () => {
     _segment = await segmentFactory({});
     _brand = await brandFactory({});
     _tag = await tagsFactory({});
-    _message = await engageMessageFactory({ kind: 'auto' });
+    _message = await engageMessageFactory({ kind: MESSAGE_KINDS.AUTO });
   });
 
   afterEach(async () => {
@@ -57,7 +58,7 @@ describe('engage messages model tests', () => {
     try {
       await EngageMessages.getEngageMessage('fakeId');
     } catch (e) {
-      expect(e.message).toBe('Engage message not found');
+      expect(e.message).toBe('Campaign not found');
     }
 
     const response = await EngageMessages.getEngageMessage(_message._id);
@@ -67,17 +68,22 @@ describe('engage messages model tests', () => {
 
   test('create messages', async () => {
     const doc = {
-      kind: 'manual',
+      kind: MESSAGE_KINDS.MANUAL,
       title: 'Message test',
       fromUserId: _user._id,
       segmentIds: [_segment._id],
       brandIds: [_brand._id],
       tagIds: [_tag._id],
       isLive: true,
-      isDraft: false
+      isDraft: false,
+      createdBy: _user._id
     };
 
-    const message = await EngageMessages.createEngageMessage(doc);
+    const message = await EngageMessages.createEngageMessage({
+      ...doc,
+      method: METHODS.EMAIL
+    });
+
     expect(message.kind).toEqual(doc.kind);
     expect(message.title).toEqual(doc.title);
     expect(message.fromUserId).toEqual(_user._id);
@@ -86,6 +92,7 @@ describe('engage messages model tests', () => {
     expect(message.tagIds).toEqual(expect.arrayContaining(doc.tagIds));
     expect(message.isLive).toEqual(doc.isLive);
     expect(message.isDraft).toEqual(doc.isDraft);
+    expect(message.createdBy).toBe(doc.createdBy);
   });
 
   test('update messages', async () => {
@@ -94,7 +101,9 @@ describe('engage messages model tests', () => {
       fromUserId: _user._id,
       segmentIds: [_segment._id],
       brandIds: [_brand._id],
-      tagIds: [_tag._id]
+      tagIds: [_tag._id],
+      method: _message.method,
+      kind: _message.kind
     });
 
     expect(message.title).toEqual('Message test updated');
@@ -104,19 +113,22 @@ describe('engage messages model tests', () => {
     expect(message.tagIds).toEqual(expect.arrayContaining([_tag._id]));
   });
 
-  test('update messages: can not update manual message', async () => {
+  test('update messages: can not update manual live campaign', async () => {
     expect.assertions(1);
 
     const manualMessage = await engageMessageFactory({
-      kind: 'manual'
+      kind: MESSAGE_KINDS.MANUAL,
+      isLive: true
     });
 
     try {
       await EngageMessages.updateEngageMessage(manualMessage._id, {
-        title: 'Message test updated'
+        title: 'Message test updated',
+        method: manualMessage.method,
+        kind: manualMessage.kind
       });
     } catch (e) {
-      expect(e.message).toBe('Can not update manual message');
+      expect(e.message).toBe('Can not update manual live campaign');
     }
   });
 
@@ -133,7 +145,7 @@ describe('engage messages model tests', () => {
     const message = await EngageMessages.findOne({ _id: _message._id });
 
     if (!message) {
-      throw new Error('Engage message not found');
+      throw new Error('Campaign not found');
     }
 
     expect(message.isLive).toEqual(true);
@@ -145,21 +157,19 @@ describe('engage messages model tests', () => {
     const message = await EngageMessages.findOne({ _id: _message._id });
 
     if (!message) {
-      throw new Error('Engage message not found');
+      throw new Error('Campaign not found');
     }
 
     expect(message.isLive).toEqual(false);
   });
 
-  test('Engage message remove not found', async () => {
+  test('Campaign remove that throws not found exception', async () => {
     expect.assertions(1);
 
     try {
       await EngageMessages.removeEngageMessage(_segment._id);
     } catch (e) {
-      expect(e.message).toEqual(
-        `Engage message not found with id ${_segment._id}`
-      );
+      expect(e.message).toEqual(`Campaign not found with id ${_segment._id}`);
     }
   });
 
@@ -242,8 +252,8 @@ describe('createConversation', () => {
     const replacedContent = 'hi Full name';
 
     const kwargs = {
-      customer: _customer,
-      integration: _integration,
+      customerId: _customer._id,
+      integrationId: _integration._id,
       user,
       replacedContent,
       engageData: engageDataFactory({
@@ -367,8 +377,8 @@ describe('createConversation', () => {
     });
 
     response = await EngageMessages.createOrUpdateConversationAndMessages({
-      customer: _customer,
-      integration: _integration,
+      customerId: _customer._id,
+      integrationId: _integration._id,
       user,
       replacedContent,
       engageData: {
@@ -650,10 +660,10 @@ describe('createVisitorOrCustomerMessages', () => {
     const customer = await customerFactory({ state: 'customer' });
 
     await engageMessageFactory({
-      kind: 'manual',
+      kind: MESSAGE_KINDS.MANUAL,
       userId: _user._id,
       isLive: true,
-      tagIds: [(await tagsFactory({}))._id],
+      customerTagIds: [(await tagsFactory({}))._id],
       messenger: {
         brandId: _brand._id,
         content: 'hi,{{ customer.firstName }} {{ customer.lastName }}'

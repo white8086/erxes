@@ -54,7 +54,7 @@ export const queries = `
   productCategoriesTotalCount: Int
   productCategoryDetail(_id: String): ProductCategory
 
-  products(type: String, categoryId: String, searchValue: String, tag: String, page: Int, perPage: Int ids: [String]): [Product]
+  products(type: String, categoryId: String, searchValue: String, tag: String, page: Int, perPage: Int ids: [String], excludeIds: Boolean): [Product]
   productsTotalCount(type: String): Int
   productDetail(_id: String): Product
   productCountByTags: JSON
@@ -63,8 +63,8 @@ export const queries = `
 export const mutations = `
   productsAdd(${productParams}): Product
   productsEdit(_id: String!, ${productParams}): Product
-  productsRemove(productIds: [String!]): JSON
-
+  productsRemove(productIds: [String!]): String
+  productsMerge(productIds: [String], productFields: JSON): Product
   productCategoriesAdd(${productCategoryParams}): ProductCategory
   productCategoriesEdit(_id: String!, ${productCategoryParams}): ProductCategory
   productCategoriesRemove(_id: String!): JSON

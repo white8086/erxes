@@ -3,7 +3,8 @@ import { Brands, Conformities, Segments, Tags } from '../../../db/models';
 import { companySchema } from '../../../db/models/definitions/companies';
 import { KIND_CHOICES } from '../../../db/models/definitions/constants';
 import { customerSchema } from '../../../db/models/definitions/customers';
-import { debugBase } from '../../../debuggers';
+import { ISegmentDocument } from '../../../db/models/definitions/segments';
+import { debugError } from '../../../debuggers';
 import { fetchElk } from '../../../elasticsearch';
 import { COC_LEAD_STATUS_TYPES } from '../../constants';
 import { fetchBySegments } from '../segments/queryBuilder';
@@ -29,21 +30,31 @@ export const getEsTypes = (contentType: string) => {
 
 export const countBySegment = async (
   contentType: string,
-  qb
+  qb,
+  source?: string
 ): Promise<ICountBy> => {
   const counts: ICountBy = {};
 
-  // Count customers by segments
-  const segments = await Segments.find({ contentType });
+  // Count cocs by segments
+  let segments: ISegmentDocument[] = [];
 
-  // Count customers by segment
+  // show all contact related engages when engage
+  if (source === 'engages') {
+    segments = await Segments.find({
+      contentType: ['customer', 'lead', 'visitor']
+    });
+  } else {
+    segments = await Segments.find({ contentType });
+  }
+
+  // Count cocs by segment
   for (const s of segments) {
     try {
       await qb.buildAllQueries();
       await qb.segmentFilter(s._id);
       counts[s._id] = await qb.runQueries('count');
     } catch (e) {
-      debugBase(`Error during segment count ${e.message}`);
+      debugError(`Error during segment count ${e.message}`);
       counts[s._id] = 0;
     }
   }
@@ -117,6 +128,7 @@ interface ICommonListArgs {
   segment?: string;
   tag?: string;
   ids?: string[];
+  excludeIds?: boolean;
   searchValue?: string;
   autoCompletion?: boolean;
   autoCompletionType?: string;
@@ -126,6 +138,7 @@ interface ICommonListArgs {
   conformityMainTypeId?: string;
   conformityIsRelated?: boolean;
   conformityIsSaved?: boolean;
+  source?: string;
 }
 
 export class CommonBuilder<IListArgs extends ICommonListArgs> {
@@ -149,6 +162,11 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
     this.negativeList = [];
 
     this.resetPositiveList();
+    this.resetNegativeList();
+  }
+
+  public resetNegativeList() {
+    this.negativeList = [{ term: { status: 'deleted' } }];
   }
 
   public resetPositiveList() {
@@ -173,21 +191,52 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
   }
 
   // filter by tagId
-  public tagFilter(tagId: string) {
+  public async tagFilter(tagId: string, withRelated?: boolean) {
+    let tagIds: string[] = [tagId];
+
+    if (withRelated) {
+      const tag = await Tags.findOne({ _id: tagId });
+
+      tagIds = [tagId, ...(tag?.relatedIds || [])];
+    }
+
     this.positiveList.push({
       terms: {
-        tagIds: [tagId]
+        tagIds
       }
     });
   }
 
   // filter by search value
   public searchFilter(value: string): void {
-    this.positiveList.push({
-      wildcard: {
-        searchText: `*${value.toLowerCase()}*`
-      }
-    });
+    if (value.includes('@')) {
+      this.positiveList.push({
+        match_phrase: {
+          searchText: {
+            query: value
+          }
+        }
+      });
+    } else {
+      this.positiveList.push({
+        bool: {
+          should: [
+            {
+              match: {
+                searchText: {
+                  query: value
+                }
+              }
+            },
+            {
+              wildcard: {
+                searchText: `*${value.toLowerCase()}*`
+              }
+            }
+          ]
+        }
+      });
+    }
   }
 
   // filter by auto-completion type
@@ -201,11 +250,11 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
 
   // filter by id
   public idsFilter(ids: string[]): void {
-    this.positiveList.push({
-      terms: {
-        _id: ids
-      }
-    });
+    if (this.params.excludeIds) {
+      this.negativeList.push({ terms: { _id: ids } });
+    } else {
+      this.positiveList.push({ terms: { _id: ids } });
+    }
   }
 
   // filter by leadStatus
@@ -265,7 +314,7 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
    */
   public async buildAllQueries(): Promise<void> {
     this.resetPositiveList();
-    this.negativeList = [];
+    this.resetNegativeList();
 
     // filter by segment
     if (this.params.segment) {
@@ -274,7 +323,7 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
 
     // filter by tag
     if (this.params.tag) {
-      this.tagFilter(this.params.tag);
+      await this.tagFilter(this.params.tag, true);
     }
 
     // filter by leadStatus
@@ -283,7 +332,7 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
     }
 
     // If there are ids and form params, returning ids filter only filter by ids
-    if (this.params.ids) {
+    if (this.params.ids && this.params.ids.length > 0) {
       this.idsFilter(this.params.ids.filter(id => id));
     }
 
@@ -310,19 +359,28 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
   /*
    * Run queries
    */
-  public async runQueries(action = 'search', isExport?: boolean): Promise<any> {
-    const { page = 0, perPage = 0, sortField, sortDirection } = this.params;
+  public async runQueries(
+    action = 'search',
+    unlimited?: boolean
+  ): Promise<any> {
+    const {
+      page = 0,
+      perPage = 0,
+      sortField,
+      sortDirection,
+      searchValue
+    } = this.params;
     const paramKeys = Object.keys(this.params).join(',');
 
     const _page = Number(page || 1);
     let _limit = Number(perPage || 20);
 
-    if (isExport) {
+    if (unlimited) {
       _limit = 10000;
     }
 
     if (
-      !isExport &&
+      !unlimited &&
       page === 1 &&
       perPage === 20 &&
       (paramKeys === 'page,perPage' || paramKeys === 'page,perPage,type')
@@ -351,15 +409,17 @@ export class CommonBuilder<IListArgs extends ICommonListArgs> {
         fieldToSort = `${fieldToSort}.keyword`;
       }
 
-      queryOptions.sort = {
-        [fieldToSort]: {
-          order: sortDirection
-            ? sortDirection === -1
-              ? 'desc'
-              : 'asc'
-            : 'desc'
-        }
-      };
+      if (!searchValue) {
+        queryOptions.sort = {
+          [fieldToSort]: {
+            order: sortDirection
+              ? sortDirection === -1
+                ? 'desc'
+                : 'asc'
+              : 'desc'
+          }
+        };
+      }
     }
 
     const response = await fetchElk(action, this.contentType, queryOptions);

@@ -26,6 +26,7 @@ type Props = {
   fromUserId: string;
   content: string;
   scheduleDate: IEngageScheduleDate;
+  isSaved?: boolean;
 };
 
 type State = {
@@ -139,7 +140,8 @@ class MessengerForm extends React.Component<Props, State> {
                 ...MAIL_TOOLBARS_CONFIG
               ]}
               height={300}
-              name={`engage_${messageKind}_${messenger.brandId || 'create'}`}
+              name={`engage_${messageKind}_${messenger.brandId}`}
+              isSubmitted={this.props.isSaved}
             />
           </FormGroup>
 
@@ -192,8 +194,8 @@ class MessengerForm extends React.Component<Props, State> {
               ))}
             </FormControl>
           </FormGroup>
-
-          {this.renderScheduler()}
+          {/* TODO enable after engage update */}
+          {/* {this.renderScheduler()} */}
         </FlexPad>
 
         <FlexItem overflow="auto" count="2">

@@ -1,15 +1,20 @@
 import * as fs from 'fs';
 import * as Nylas from 'nylas';
-import { debugNylas } from '../debuggers';
+import { debugError, debugNylas } from '../debuggers';
 import { Integrations } from '../models';
 import { sendRequest } from '../utils';
-import { NYLAS_API_URL } from './constants';
+import { getConfig } from '../utils';
+import { NYLAS_API_URL, NYLAS_SCHEDULE_MANAGE_PAGES } from './constants';
+import { NylasCalendars } from './models';
+import { storePages } from './store';
 import {
   ICalendarAvailability,
   IEvent,
   IEventDoc,
-  IMessageDraft
+  IMessageDraft,
+  INylasSchedulePageDoc
 } from './types';
+import { extractDate } from './utils';
 
 /**
  * Build message and send API request
@@ -251,6 +256,18 @@ export const enableOrDisableAccount = async (
   });
 };
 
+/**
+ * Revoke nylas token
+ * @param {String} accountId
+ */
+export const revokeTokenAccount = async (accountId: string) => {
+  debugNylas(`account with uid: ${accountId}`);
+
+  await nylasInstance('accounts', 'find', accountId).then(account =>
+    account.revokeAll()
+  );
+};
+
 export const checkEmailDuplication = async (
   email: string,
   kind: string
@@ -279,14 +296,35 @@ const getCalendarOrEvent = async (
 
     return JSON.parse(response);
   } catch (e) {
-    debugNylas(`Failed to get events: ${e.message}`);
+    debugError(`Failed to get events: ${e.message}`);
 
     throw e;
   }
 };
 
-const getCalenderOrEventList = async (
-  type: 'calendars' | 'events',
+const getCalendarList = async (accessToken: string) => {
+  const type = 'calendars';
+
+  try {
+    const responses = await nylasInstanceWithToken({
+      accessToken,
+      name: type,
+      method: 'list'
+    });
+
+    if (!responses) {
+      throw new Error(`${type} not found`);
+    }
+
+    return responses.map(response => JSON.parse(response));
+  } catch (e) {
+    debugError(`Failed to get calendar list: ${e.message}`);
+
+    throw e;
+  }
+};
+
+const getEventList = async (
   accessToken: string,
   filter?: {
     show_cancelled?: boolean;
@@ -294,25 +332,17 @@ const getCalenderOrEventList = async (
     calendar_id?: string;
     description?: string;
     title?: string;
-    date?: string;
-  }
+  },
+  date?: Date
 ) => {
   const options: any = filter || {};
+  const type = 'events';
 
-  const extractDate = (date: Date) => {
-    return {
-      month: date.getMonth(),
-      year: date.getFullYear(),
-      date: date.getDate()
-    };
-  };
+  const { month, year } = extractDate(date || new Date());
 
-  if (type === 'events' && !filter.date) {
-    const { month, year } = extractDate(new Date());
-
-    options.starts_after = new Date(year, month, 1).getTime() / 1000;
-    options.ends_before = new Date(year, month + 3, 0).getTime() / 1000;
-  }
+  options.expand_recurring = true;
+  options.starts_after = new Date(year, month, 1).getTime() / 1000;
+  options.ends_before = new Date(year, month + 1, 0).getTime() / 1000;
 
   try {
     const responses = await nylasInstanceWithToken({
@@ -326,9 +356,23 @@ const getCalenderOrEventList = async (
       throw new Error(`${type} not found`);
     }
 
+    const calendar = await NylasCalendars.findOne({
+      providerCalendarId: filter.calendar_id
+    });
+
+    if (calendar) {
+      const { syncedMonths = [] } = calendar;
+      syncedMonths.push(`${year}-${month}`);
+
+      await NylasCalendars.update(
+        { providerCalendarId: filter.calendar_id },
+        { $set: { syncedMonths } }
+      );
+    }
+
     return responses.map(response => JSON.parse(response));
   } catch (e) {
-    debugNylas(`Failed to get list: ${e.message}`);
+    debugError(`Failed to get event list: ${e.message}`);
 
     throw e;
   }
@@ -341,7 +385,6 @@ const checkCalendarAvailability = async (
 ): Promise<ICalendarAvailability[]> => {
   try {
     const responses = await sendRequest({
-      url: `${NYLAS_API_URL}/calendars/free-busy`,
       method: 'POST',
       headerParams: {
         Authorization: `Basic ${Buffer.from(`${accessToken}:`).toString(
@@ -360,7 +403,7 @@ const checkCalendarAvailability = async (
 
     return responses.map(response => JSON.parse(response));
   } catch (e) {
-    debugNylas(`Failed to check availability: ${e.message}`);
+    debugError(`Failed to check availability: ${e.message}`);
 
     throw e;
   }
@@ -383,10 +426,30 @@ const deleteCalendarEvent = async (eventId: string, accessToken: string) => {
 
     debugNylas(`Successfully deleted the event`);
   } catch (e) {
-    debugNylas(`Failed to delete event: ${e.message}`);
+    debugError(`Failed to delete event: ${e.message}`);
 
     throw e;
   }
+};
+
+const generateEventParams = (doc: IEventDoc) => {
+  const start = new Date(doc.start).getTime() / 1000;
+  const end = new Date(doc.end).getTime() / 1000;
+
+  const params = { when: { start_time: start, end_time: end }, start, end };
+  const { rrule, timezone } = doc;
+
+  if (!rrule) {
+    return params;
+  }
+
+  return {
+    ...params,
+    recurrence: {
+      rrule: [rrule],
+      timezone
+    }
+  };
 };
 
 const createEvent = async (
@@ -400,8 +463,17 @@ const createEvent = async (
       method: 'build'
     });
 
-    const start = new Date(doc.start).getTime() / 1000;
-    const end = new Date(doc.end).getTime() / 1000;
+    const {
+      start,
+      end,
+      when,
+      recurrence
+    }: {
+      start: number;
+      end: number;
+      when: { [key: string]: number };
+      recurrence?: any;
+    } = generateEventParams(doc);
 
     event.title = doc.title;
     event.location = doc.location;
@@ -409,15 +481,19 @@ const createEvent = async (
     event.busy = doc.busy;
     event.calendarId = doc.calendarId;
     event.participants = doc.participants;
-    event.when = { start_time: start, end_time: end };
+    event.when = when;
     event.start = start;
     event.end = end;
+
+    if (recurrence) {
+      event.recurrence = recurrence;
+    }
 
     debugNylas(`Successfully created the calendar event`);
 
     return event.save({ notify_participants: doc.notifyParticipants });
   } catch (e) {
-    debugNylas(`Failed to create event: ${e.message}`);
+    debugError(`Failed to create event: ${e.message}`);
 
     throw e;
   }
@@ -429,6 +505,8 @@ const updateEvent = async (
   accessToken: string
 ): Promise<IEvent> => {
   try {
+    const params = generateEventParams(doc);
+
     const response = await sendRequest({
       url: `${NYLAS_API_URL}/events/${eventId}`,
       method: 'PUT',
@@ -449,7 +527,9 @@ const updateEvent = async (
         read_only: doc.readonly,
         participants: doc.participants,
         description: doc.description,
-        when: doc.when
+        when: params.when || doc.when,
+        start: params.start,
+        end: params.end
       }
     });
 
@@ -457,7 +537,7 @@ const updateEvent = async (
 
     return response;
   } catch (e) {
-    debugNylas(`Failed to update event: ${e.message}`);
+    debugError(`Failed to update event: ${e.message}`);
 
     throw e;
   }
@@ -485,9 +565,158 @@ const sendEventAttendance = async (
 
     debugNylas(`Successfully send attendance with event id: ${eventId}`);
   } catch (e) {
-    debugNylas(`Failed to send event attendance: ${e.message}`);
+    debugError(`Failed to send event attendance: ${e.message}`);
 
     throw e;
+  }
+};
+
+// schedule
+
+const getSchedulePages = async (accessToken: string) => {
+  try {
+    const response = await sendRequest({
+      url: NYLAS_SCHEDULE_MANAGE_PAGES,
+      method: 'GET',
+      headerParams: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    if (!response) {
+      throw new Error(`page not found`);
+    }
+
+    return response;
+  } catch (e) {
+    debugError(`Failed to get pages: ${e.message}`);
+
+    throw e.error;
+  }
+};
+
+const generatePageBody = async (
+  doc: INylasSchedulePageDoc,
+  accessToken: string
+) => {
+  const NYLAS_WEBHOOK_CALLBACK_URL = await getConfig(
+    'NYLAS_WEBHOOK_CALLBACK_URL'
+  );
+
+  const appearance = doc.appearance;
+  const booking = doc.booking;
+
+  return {
+    access_tokens: [accessToken],
+    name: doc.name,
+    slug: doc.slug,
+    config: {
+      appearance: {
+        color: appearance.color,
+        company_name: appearance.companyName,
+        submit_text: appearance.submitText,
+        show_nylas_branding: false,
+        thank_you_text: appearance.thankYouText
+      },
+      event: doc.event,
+      booking: {
+        cancellation_policy: booking.cancellationPolicy,
+        confirmation_method: booking.confirmationMethod,
+        additional_fields: booking.additionalFields,
+        opening_hours: booking.openingHours,
+        confirmation_emails_to_host: false,
+        confirmation_emails_to_guests: false
+      },
+      reminders: [
+        {
+          delivery_method: 'webhook',
+          delivery_recipient: 'customer',
+          time_before_event: 60,
+          webhook_url: NYLAS_WEBHOOK_CALLBACK_URL
+        }
+      ],
+      timezone: doc.timezone
+    }
+  };
+};
+
+const createSchedulePage = async (
+  accessToken: string,
+  doc: INylasSchedulePageDoc,
+  accountId: string
+) => {
+  try {
+    const body = await generatePageBody(doc, accessToken);
+
+    const response = await sendRequest({
+      url: NYLAS_SCHEDULE_MANAGE_PAGES,
+      method: 'POST',
+      body
+    });
+
+    if (!response) {
+      throw new Error(`page not found`);
+    }
+
+    await storePages([response], accountId);
+
+    return response;
+  } catch (e) {
+    debugError(`Failed to get pages: ${e.message}`);
+
+    throw e.error || e.statusCode;
+  }
+};
+
+const updateSchedulePage = async (
+  pageId: number,
+  doc: INylasSchedulePageDoc,
+  editToken: string
+) => {
+  try {
+    const body = await generatePageBody(doc, editToken);
+
+    const response = await sendRequest({
+      url: `${NYLAS_SCHEDULE_MANAGE_PAGES}/${pageId}`,
+      method: 'PUT',
+      headerParams: {
+        Authorization: `Basic ${Buffer.from(`${editToken}:`).toString(
+          'base64'
+        )}`
+      },
+      body
+    });
+
+    debugNylas(`Successfully updated the page`);
+
+    return response;
+  } catch (e) {
+    debugError(`Failed to delete page: ${e.message}`);
+
+    throw e.error;
+  }
+};
+
+const deleteSchedulePage = async (pageId: string, accessToken: string) => {
+  try {
+    await sendRequest({
+      url: `${NYLAS_SCHEDULE_MANAGE_PAGES}/${pageId}`,
+      method: 'DELETE',
+      headerParams: {
+        Authorization: `Basic ${Buffer.from(`${accessToken}:`).toString(
+          'base64'
+        )}`
+      },
+      body: {
+        notify_participants: true
+      }
+    });
+
+    debugNylas(`Successfully deleted the page`);
+  } catch (e) {
+    debugError(`Failed to delete page: ${e.message}`);
+
+    throw e.error;
   }
 };
 
@@ -498,11 +727,16 @@ export {
   getMessages,
   getAttachment,
   checkCredentials,
-  getCalenderOrEventList,
+  getCalendarList,
+  getEventList,
   getCalendarOrEvent,
   checkCalendarAvailability,
   deleteCalendarEvent,
   createEvent,
   updateEvent,
-  sendEventAttendance
+  sendEventAttendance,
+  getSchedulePages,
+  createSchedulePage,
+  deleteSchedulePage,
+  updateSchedulePage
 };

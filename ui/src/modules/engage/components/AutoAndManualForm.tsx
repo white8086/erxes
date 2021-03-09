@@ -17,7 +17,7 @@ import { IConfig } from 'modules/settings/general/types';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { IBreadCrumbItem, IConditionsRule } from '../../common/types';
-import { METHODS } from '../constants';
+import { MESSAGE_KINDS, METHODS } from '../constants';
 import {
   IEngageEmail,
   IEngageMessage,
@@ -53,8 +53,6 @@ type Props = {
 };
 
 type State = {
-  activeStep: number;
-  maxStep: number;
   method: string;
   title: string;
   segmentIds: string[];
@@ -67,6 +65,7 @@ type State = {
   scheduleDate: IEngageScheduleDate;
   shortMessage?: IEngageSms;
   rules: IConditionsRule[];
+  isSaved: boolean;
 };
 
 class AutoAndManualForm extends React.Component<Props, State> {
@@ -88,20 +87,19 @@ class AutoAndManualForm extends React.Component<Props, State> {
     }
 
     this.state = {
-      activeStep: 1,
-      maxStep: 3,
       method: message.method || METHODS.EMAIL,
       title: message.title || '',
       segmentIds: message.segmentIds || [],
       brandIds: message.brandIds || [],
-      tagIds: message.tagIds || [],
+      tagIds: message.customerTagIds || [],
       content,
       fromUserId: message.fromUserId,
       messenger: message.messenger,
       email: message.email,
       scheduleDate: message.scheduleDate,
       shortMessage: message.shortMessage,
-      rules
+      rules,
+      isSaved: false
     };
   }
 
@@ -121,7 +119,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
   handleSubmit = (type: string): Promise<any> | void => {
     const doc = {
       segmentIds: this.state.segmentIds,
-      tagIds: this.state.tagIds,
+      customerTagIds: this.state.tagIds,
       brandIds: this.state.brandIds,
       title: this.state.title,
       fromUserId: this.state.fromUserId,
@@ -176,15 +174,22 @@ class AutoAndManualForm extends React.Component<Props, State> {
     }
 
     if (response.status === 'ok' && response.doc) {
+      this.setState({ isSaved: true });
+
       return this.props.save(response.doc);
     }
   };
 
   renderSaveButton = () => {
-    const { isActionLoading, kind } = this.props;
+    const { isActionLoading, kind, message } = this.props;
 
     const cancelButton = (
-      <Link to="/engage">
+      <Link
+        to="/campaigns"
+        onClick={() => {
+          this.setState({ isSaved: true });
+        }}
+      >
         <Button btnStyle="simple" uppercase={false} icon="times-circle">
           Cancel
         </Button>
@@ -192,7 +197,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
     );
 
     const saveButton = () => {
-      if (kind === 'auto') {
+      if (kind === MESSAGE_KINDS.AUTO) {
         return (
           <>
             <Button
@@ -222,11 +227,15 @@ class AutoAndManualForm extends React.Component<Props, State> {
           disabled={isActionLoading}
           btnStyle="success"
           icon={isActionLoading ? undefined : 'check-circle'}
-          onClick={this.handleSubmit.bind(this, 'live')}
+          // set live only in create mode
+          onClick={this.handleSubmit.bind(
+            this,
+            message && message._id ? 'draft' : 'live'
+          )}
           uppercase={false}
         >
           {isActionLoading && <SmallLoader />}
-          Send
+          Save
         </Button>
       );
     };
@@ -257,7 +266,8 @@ class AutoAndManualForm extends React.Component<Props, State> {
       content,
       scheduleDate,
       method,
-      shortMessage
+      shortMessage,
+      isSaved
     } = this.state;
 
     const imagePath = '/images/icons/erxes-08.svg';
@@ -281,7 +291,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
     return (
       <Step
         img={imagePath}
-        title="Compose your message"
+        title="Compose your campaign"
         message={message}
         noButton={method !== METHODS.EMAIL && true}
       >
@@ -297,6 +307,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
           fromUserId={fromUserId}
           content={content}
           scheduleDate={scheduleDate}
+          isSaved={isSaved}
         />
       </Step>
     );
@@ -306,11 +317,11 @@ class AutoAndManualForm extends React.Component<Props, State> {
     const { method } = this.state;
 
     if (method !== METHODS.MESSENGER) {
-      return <div />;
+      return null;
     }
 
     return (
-      <Step img="/images/icons/erxes-02.svg" title="Rule">
+      <Step img="/images/icons/erxes-04.svg" title="Rule" stepNumber={3}>
         <ConditionsRule
           rules={this.state.rules || []}
           onChange={this.changeState}
@@ -323,7 +334,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
     const { content, email, method } = this.state;
 
     if (method !== METHODS.EMAIL) {
-      return <div />;
+      return null;
     }
 
     return (
@@ -343,14 +354,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
   render() {
     const { renderTitle, breadcrumbs } = this.props;
 
-    const {
-      activeStep,
-      maxStep,
-      segmentIds,
-      brandIds,
-      title,
-      tagIds
-    } = this.state;
+    const { segmentIds, brandIds, title, tagIds } = this.state;
 
     const onChange = e =>
       this.changeState('title', (e.target as HTMLInputElement).value);
@@ -368,7 +372,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
           />
           {this.renderSaveButton()}
         </TitleContainer>
-        <Steps maxStep={maxStep} active={activeStep}>
+        <Steps maxStep={4} active={1}>
           <Step img="/images/icons/erxes-05.svg" title="Choose channel">
             <ChannelStep
               onChange={this.changeState}
@@ -377,8 +381,8 @@ class AutoAndManualForm extends React.Component<Props, State> {
           </Step>
 
           <Step
-            img="/images/icons/erxes-02.svg"
-            title="Who is this message for?"
+            img="/images/icons/erxes-06.svg"
+            title="Who is this campaign for?"
           >
             <MessageTypeStep
               onChange={this.changeState}

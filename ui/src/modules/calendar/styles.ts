@@ -2,7 +2,7 @@ import { HeaderButton } from 'modules/boards/styles/header';
 import { rgba } from 'modules/common/styles/color';
 import styled from 'styled-components';
 import styledTS from 'styled-components-ts';
-import { colors, dimensions } from '../common/styles';
+import { colors } from '../common/styles';
 
 const rowHeight = 40;
 const borderColor = '#D9E2EC';
@@ -73,7 +73,7 @@ const Row = styled.div`
   border-bottom: ${borderColor} 1px solid;
   display: flex;
   flex: 1 1 0%;
-  min-height: 80px;
+  min-height: 98px;
 `;
 
 const RowWrapper = styled.div`
@@ -91,7 +91,9 @@ const Cell = styledTS<{ isCurrent?: boolean }>(styled.div)`
   flex: 1 1 0%;
   display: block;
   min-height: 70px;
-  background: ${props => props.isCurrent && colors.bgLight};
+  background: ${props => props.isCurrent && rgba(colors.colorPrimary, 0.05)};
+  position: relative;
+  transition: background 0.3s ease;
 
   &:last-child {
     border: none;
@@ -115,6 +117,8 @@ const Day = styledTS<{ isSelectedDate?: boolean; isSameMonth: boolean }>(
   color: ${props => (props.isSameMonth ? textColor : '#9FB3C8')};
   line-height: 22px;
   border-radius: 8px;
+  position: relative;
+  z-index: 2;
   
   ${props =>
     props.isSelectedDate &&
@@ -131,20 +135,19 @@ const Day = styledTS<{ isSelectedDate?: boolean; isSameMonth: boolean }>(
 `;
 
 const AddEventBtn = styled.div`
-  background-color: ${colors.colorCoreGreen};
   position: absolute;
   top: 0;
   right: 0;
-  width: ${dimensions.coreSpacing}px;
-  height: ${dimensions.coreSpacing}px;
-  border-radius: 4px;
-  line-height: ${dimensions.coreSpacing}px;
-  color: ${colors.colorWhite};
+  left: 0;
+  bottom: 0;
   text-align: center;
   cursor: pointer;
-  opacity: 0;
-  transition: all ease 0.4s;
-  z-index: 3;
+  transition: background ease 0.3s;
+  z-index: 0;
+
+  &:hover {
+    background-color: ${rgba(colors.colorPrimary, 0.05)};
+  }
 `;
 
 const DayRow = styled.div`
@@ -155,7 +158,6 @@ const DayRow = styled.div`
     flex: 1 1 0%;
     height: ${rowHeight}px;
     border-bottom: none;
-    cursor: none;
   }
 
   span {
@@ -164,12 +166,6 @@ const DayRow = styled.div`
     line-height: ${rowHeight}px;
     width: 60px;
     text-align: center;
-  }
-
-  &:hover {
-    ${AddEventBtn} {
-      opacity: 0.8;
-    }
   }
 `;
 
@@ -186,12 +182,6 @@ const WeekData = styled.div`
   overflow: hidden;
   position: relative;
   color: ${textColor};
-
-  &:hover {
-    ${AddEventBtn} {
-      opacity: 0.8;
-    }
-  }
 `;
 
 const WeekHours = styled.div`
@@ -208,10 +198,6 @@ const WeekHours = styled.div`
     padding-right: 10px;
     text-align: right;
   }
-`;
-
-const MainContainer = styled.div`
-  height: calc(100vh - 175px);
 `;
 
 const CalendarController = styled.div`
@@ -248,6 +234,15 @@ const CalendarItem = styled.div`
   &:hover {
     background: ${colors.bgMain};
   }
+`;
+
+const Events = styled.div`
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
 `;
 
 const EventWrapper = styled.div`
@@ -292,12 +287,14 @@ const EventTitle = styledTS<{
       position: absolute;
       top: ${(rowHeight + 1) * props.start + 1}px;
       width: 100%;  
-      left: ${
-        props.order > 0 ? `${(100 / props.count) * props.order}%` : '1px'
-      };
-      width: calc(${100 / props.count}% - 2px);
-      height: ${rowHeight * props.height}px;
+      left: ${props.order > 0 ? `${(100 / props.count) * props.order}%` : '0'};
+      width: ${100 / props.count}%;
+      height: ${rowHeight * props.height + props.height - 1}px;
       min-height: ${rowHeight / 2}px;
+      line-height: 18px;
+      z-index: 2;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #fff;
   `}
 
   &:before {
@@ -325,6 +322,7 @@ const EventHeading = styled.div`
 
   h4 {
     margin: 0 10px 0 0;
+    word-break: break-word;
   }
 
   > div {
@@ -336,6 +334,7 @@ const EventRow = styled.div`
   display: flex;
   align-items: baseline;
   margin-bottom: 10px;
+  word-break: break-word;
 
   i {
     margin-right: 10px;
@@ -363,6 +362,10 @@ const WeekCol = styledTS<{ isCurrent?: boolean }>(styled.div)`
   position: relative;
   background: ${props => props.isCurrent && colors.bgLight};
 
+  ${EventTitle} {
+    padding: 1px 4px;
+  }
+
   &:last-child {
     border: none;
   }
@@ -377,7 +380,7 @@ const SidebarHeading = styled.h4`
   font-weight: 500;
   letter-spacing: 0.25px;
   line-height: 20px;
-  margin: 0 0 15px;
+  margin: 10px 0 10px 0;
   padding: 0 20px;
 `;
 
@@ -410,7 +413,53 @@ const HeadButton = styled(HeaderButton)`
   }
 `;
 
+const PopoverCell = styled.div`
+  padding: 10px;
+
+  h5 {
+    text-align: center;
+    margin: 0 0 10px 0;
+    font-size: 18px;
+  }
+
+  > i {
+    position: absolute;
+    right: 10px;
+    top: 6px;
+    color: ${colors.colorCoreGray};
+    cursor: pointer;
+  }
+`;
+
+const SeeAll = styled.div`
+  background: ${colors.bgActive};
+  padding: 1px 8px;
+  border-radius: 4px;
+  margin: 2px;
+  line-height: 20px;
+  font-size: 12px;
+  position: relative;
+  z-index: 3;
+
+  &:hover {
+    background: ${colors.bgGray};
+    cursor: pointer;
+  }
+`;
+
+const CalendarForm = styled.div`
+  ul {
+    list-style: none;
+    padding-left: 20px;
+
+    ul li {
+      cursor: pointer;
+    }
+  }
+`;
+
 export {
+  CalendarForm,
   CalendarWrapper,
   Grid,
   Header,
@@ -421,7 +470,6 @@ export {
   Cell,
   Day,
   DayRow,
-  MainContainer,
   SidebarHeading,
   EventTitle,
   EventContent,
@@ -438,5 +486,8 @@ export {
   Indicator,
   EventRow,
   EventHeading,
-  HeadButton
+  HeadButton,
+  SeeAll,
+  PopoverCell,
+  Events
 };
