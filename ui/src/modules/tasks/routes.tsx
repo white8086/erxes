@@ -51,7 +51,7 @@ const calendar = ({ location }) => {
   return (
     <Calendar
       type="task"
-      title="Tasks"
+      title="Task"
       queryParams={queryParams}
       ItemColumnComponent={CalendarColumn}
       MainActionBarComponent={MainActionBar}
