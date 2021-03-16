@@ -11,4 +11,4 @@ RUN pip install mongo-connector==3.1.1 \
 
 COPY mongo-connector-config.json main.py ./
 
-CMD ["sh"]
+ENTRYPOINT ["python3", "main.py"]
