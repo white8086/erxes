@@ -1,47 +1,25 @@
+import {
+  ColumnContainer,
+  ColumnContentBody,
+  ColumnFooter
+} from 'modules/boards/components/Calendar';
 import { AddNew } from 'modules/boards/styles/stage';
 import EmptyState from 'modules/common/components/EmptyState';
 import Icon from 'modules/common/components/Icon';
-import { colors } from 'modules/common/styles';
 import { IDateColumn } from 'modules/common/types';
 import { __ } from 'modules/common/utils';
 import React from 'react';
 import styled from 'styled-components';
-import options from '../../options';
-import { IDeal, IDealTotalAmount } from '../../types';
-import Deal from '../DealItem';
+import options from '../options';
+import { IDeal, IDealTotalAmount } from '../types';
+import Deal from './DealItem';
 
 type Props = {
   deals: IDeal[];
   date: IDateColumn;
   dealTotalAmounts: IDealTotalAmount;
-  onUpdate: (deal: IDeal) => void;
-  onRemove: () => void;
   onLoadMore: (skip: number) => void;
 };
-
-const Container = styled.div`
-  position: relative;
-  height: 100%;
-`;
-
-const ContentBody = styled.div`
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  padding: 0 4px 90px;
-  margin: 0 4px;
-  overflow-y: auto;
-`;
-
-const Footer = styled.div`
-  position: absolute;
-  z-index: 2;
-  bottom: 31px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  background: ${colors.bgLight};
-`;
 
 const Amount = styled.ul`
   list-style: none;
@@ -75,35 +53,28 @@ class DealColumn extends React.Component<Props, {}> {
   };
 
   renderContent() {
-    const { deals, onUpdate, onRemove } = this.props;
+    const { deals } = this.props;
 
     if (deals.length === 0) {
       return <EmptyState icon="piggy-bank" text="No Sales Pipelines" />;
     }
 
     const contents = deals.map((deal: IDeal, index: number) => (
-      <Deal
-        options={options}
-        key={index}
-        item={deal}
-        onRemove={onRemove}
-        onUpdate={onUpdate}
-        portable={true}
-      />
+      <Deal options={options} key={index} item={deal} portable={true} />
     ));
 
-    return <ContentBody>{contents}</ContentBody>;
+    return <ColumnContentBody>{contents}</ColumnContentBody>;
   }
 
   renderAmount(currencies: [{ name: string; amount: number }]) {
     return currencies.map((total, index) => (
-      <>
+      <div key={index} style={{ display: 'inline' }}>
         {total.amount.toLocaleString()}{' '}
         <span>
           {total.name}
           {index < currencies.length - 1 && ', '}
         </span>
-      </>
+      </div>
     ));
   }
 
@@ -132,21 +103,21 @@ class DealColumn extends React.Component<Props, {}> {
     }
 
     return (
-      <Footer>
+      <ColumnFooter>
         <AddNew onClick={this.onLoadMore}>
           <Icon icon="refresh" /> {__('Load more')}
         </AddNew>
-      </Footer>
+      </ColumnFooter>
     );
   }
 
   render() {
     return (
-      <Container>
+      <ColumnContainer>
         {this.renderTotalAmount()}
         {this.renderContent()}
         {this.renderFooter()}
-      </Container>
+      </ColumnContainer>
     );
   }
 }

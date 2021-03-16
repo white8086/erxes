@@ -181,3 +181,18 @@ export const generateButtonClass = (closeDate: Date, isComplete?: boolean) => {
 
   return colorName;
 };
+
+export const onCalendarLoadMore = (fetchMore, queryName, skip: number) => {
+  fetchMore({
+    variables: { skip },
+    updateQuery: (prevResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult || fetchMoreResult[queryName].length === 0) {
+        return prevResult;
+      }
+
+      return {
+        [queryName]: prevResult[queryName].concat(fetchMoreResult[queryName])
+      };
+    }
+  });
+};
