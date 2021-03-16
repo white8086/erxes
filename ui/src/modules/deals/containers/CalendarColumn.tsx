@@ -4,7 +4,7 @@ import {
   ColumnProps,
   getCommonParams
 } from 'modules/boards/components/Calendar';
-import { onCalendarLoadMore } from 'modules/boards/utils';
+import { calendarColumnQuery, onCalendarLoadMore } from 'modules/boards/utils';
 import { IDateColumn } from 'modules/common/types';
 import { withProps } from 'modules/common/utils';
 import { getMonthTitle } from 'modules/common/utils/calendar';
@@ -83,42 +83,8 @@ class DealColumnContainer extends React.Component<FinalProps> {
 
 export default withProps<ColumnProps>(
   compose(
-    graphql<
-      ColumnProps,
-      DealsQueryResponse,
-      { skip: number; date: IDateColumn }
-    >(gql(queries.deals), {
-      name: 'dealsQuery',
-      options: ({ date, pipelineId, queryParams }: ColumnProps) => {
-        return {
-          notifyOnNetworkStatusChange: true,
-          variables: {
-            skip: 0,
-            date,
-            pipelineId,
-            ...getCommonParams(queryParams)
-          }
-        };
-      }
-    }),
-    graphql<
-      ColumnProps,
-      DealsTotalCountQueryResponse,
-      { skip: number; date: IDateColumn }
-    >(gql(queries.dealsTotalCount), {
-      name: 'dealsTotalCountQuery',
-      options: ({ date, pipelineId, queryParams }: ColumnProps) => {
-        return {
-          notifyOnNetworkStatusChange: true,
-          variables: {
-            skip: 0,
-            date,
-            pipelineId,
-            ...getCommonParams(queryParams)
-          }
-        };
-      }
-    }),
+    calendarColumnQuery(queries.deals, 'dealsQuery'),
+    calendarColumnQuery(queries.dealsTotalCount, 'dealsTotalCountQuery'),
     graphql<ColumnProps, DealsTotalAmountsQueryResponse, { date: IDateColumn }>(
       gql(queries.dealsTotalAmounts),
       {
