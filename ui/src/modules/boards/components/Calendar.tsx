@@ -61,6 +61,8 @@ export const getCommonParams = queryParams => {
 };
 
 type Props = {
+  type: string;
+  title: string;
   queryParams: any;
   ItemColumnComponent;
   MainActionBarComponent;
@@ -102,11 +104,11 @@ class CalendarView extends React.Component<Props> {
   };
 
   renderActionBar = (renderMiddleContent: () => React.ReactNode) => {
-    const { MainActionBarComponent } = this.props;
+    const { MainActionBarComponent, type } = this.props;
 
     return (
       <MainActionBar
-        type="deal"
+        type={type}
         component={MainActionBarComponent}
         middleContent={renderMiddleContent}
       />
@@ -121,11 +123,12 @@ class CalendarView extends React.Component<Props> {
     renderMonths: () => React.ReactNode[],
     renderMiddleContent: () => React.ReactNode
   ) => {
-    const breadcrumb = [{ title: __('Deal') }];
+    const { title } = this.props;
+    const breadcrumb = [{ title: __(title) }];
 
     return (
       <BoardContainer>
-        <Header title={__('Deal')} breadcrumb={breadcrumb} />
+        <Header title={__(title)} breadcrumb={breadcrumb} />
         <BoardContent transparent={true}>
           {this.renderActionBar(renderMiddleContent)}
           <ScrolledContent>

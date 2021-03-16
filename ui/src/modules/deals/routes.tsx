@@ -56,6 +56,8 @@ const calendar = ({ location }) => {
 
   return (
     <Calendar
+      type="deal"
+      title="Deals"
       queryParams={queryParams}
       ItemColumnComponent={DealColumn}
       MainActionBarComponent={DealMainActionBar}
