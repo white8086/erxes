@@ -452,6 +452,28 @@ describe('dealQueries', () => {
     expect(response.length).toBe(1);
   });
 
+  test('Deals total count', async () => {
+    const stage = await stageFactory({});
+    const currentUser = await userFactory({});
+
+    const args = { stageId: stage._id };
+
+    await dealFactory(args);
+    await dealFactory(args);
+
+    const qry = `
+      query dealsTotalCount($stageId: String!) {
+        dealsTotalCount(stageId: $stageId)
+      }
+    `;
+
+    const response = await graphqlRequest(qry, 'dealsTotalCount', args, {
+      user: currentUser
+    });
+
+    expect(response).toBe(2);
+  });
+
   test('Deal detail', async () => {
     const currentUser = await userFactory({});
     const board = await boardFactory();
