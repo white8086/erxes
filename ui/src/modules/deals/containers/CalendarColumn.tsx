@@ -12,19 +12,30 @@ import CalendarColumn from 'modules/deals/components/CalendarColumn';
 import React from 'react';
 import { graphql } from 'react-apollo';
 import { queries } from '../graphql';
-import { DealsQueryResponse, DealsTotalAmountsQueryResponse } from '../types';
+import {
+  DealsQueryResponse,
+  DealsTotalAmountsQueryResponse,
+  DealsTotalCountQueryResponse
+} from '../types';
 
 type FinalProps = ColumnProps & {
   dealsQuery: DealsQueryResponse;
+  dealsTotalCountQuery: DealsTotalCountQueryResponse;
   dealsTotalAmountsQuery: DealsTotalAmountsQueryResponse;
 };
 
 class DealColumnContainer extends React.Component<FinalProps> {
   componentWillReceiveProps(nextProps: FinalProps) {
-    const { updatedAt, dealsQuery, dealsTotalAmountsQuery } = this.props;
+    const {
+      updatedAt,
+      dealsQuery,
+      dealsTotalCountQuery,
+      dealsTotalAmountsQuery
+    } = this.props;
 
     if (updatedAt !== nextProps.updatedAt) {
       dealsQuery.refetch();
+      dealsTotalCountQuery.refetch();
       dealsTotalAmountsQuery.refetch();
     }
   }
@@ -32,6 +43,7 @@ class DealColumnContainer extends React.Component<FinalProps> {
   render() {
     const {
       dealsQuery,
+      dealsTotalCountQuery,
       dealsTotalAmountsQuery,
       date: { month }
     } = this.props;
@@ -43,15 +55,14 @@ class DealColumnContainer extends React.Component<FinalProps> {
       localStorage.setItem('cacheInvalidated', 'false');
 
       dealsQuery.refetch();
+      dealsTotalCountQuery.refetch();
       dealsTotalAmountsQuery.refetch();
     }
 
     const title = getMonthTitle(month);
     const deals = dealsQuery.deals || [];
-    const dealTotalAmounts = dealsTotalAmountsQuery.dealsTotalAmounts || {
-      dealCount: 0,
-      dealAmounts: []
-    };
+    const totalCount = dealsTotalCountQuery.dealsTotalCount || 0;
+    const dealTotalAmounts = dealsTotalAmountsQuery.dealsTotalAmounts || [];
 
     const onLoadMore = (skip: number) => {
       return onCalendarLoadMore(fetchMore, 'deals', skip);
@@ -60,6 +71,7 @@ class DealColumnContainer extends React.Component<FinalProps> {
     const updatedProps = {
       ...this.props,
       deals,
+      totalCount,
       title,
       onLoadMore,
       dealTotalAmounts
@@ -77,6 +89,24 @@ export default withProps<ColumnProps>(
       { skip: number; date: IDateColumn }
     >(gql(queries.deals), {
       name: 'dealsQuery',
+      options: ({ date, pipelineId, queryParams }: ColumnProps) => {
+        return {
+          notifyOnNetworkStatusChange: true,
+          variables: {
+            skip: 0,
+            date,
+            pipelineId,
+            ...getCommonParams(queryParams)
+          }
+        };
+      }
+    }),
+    graphql<
+      ColumnProps,
+      DealsTotalCountQueryResponse,
+      { skip: number; date: IDateColumn }
+    >(gql(queries.dealsTotalCount), {
+      name: 'dealsTotalCountQuery',
       options: ({ date, pipelineId, queryParams }: ColumnProps) => {
         return {
           notifyOnNetworkStatusChange: true,
