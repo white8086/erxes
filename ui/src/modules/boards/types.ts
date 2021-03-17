@@ -318,6 +318,7 @@ export interface IFilterParams extends ISavedConformity {
   closeDateType?: string;
   labelIds?: string;
   userIds?: string;
+  segment?: string;
 }
 
 export interface INonFilterParams {

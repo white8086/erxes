@@ -92,17 +92,13 @@ const segmentQueries = {
       subOf
     }: { contentType: string; conditions; subOf?: string }
   ) {
-    return fetchSegment(
-      'count',
-      {
-        name: 'preview',
-        color: '#fff',
-        subOf: subOf || '',
-        contentType,
-        conditions
-      },
-      0
-    );
+    return fetchSegment('count', {
+      name: 'preview',
+      color: '#fff',
+      subOf: subOf || '',
+      contentType,
+      conditions
+    });
   }
 };
 

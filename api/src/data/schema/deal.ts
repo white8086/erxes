@@ -56,6 +56,7 @@ const commonQueryParams = `
   sortField: String
   sortDirection: Int
   userIds: [String]
+  segment: String
   `;
 
 const listQueryParams = `

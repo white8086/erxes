@@ -33,6 +33,7 @@ export interface IListParams extends IConformityQueryParams {
   sortDirection?: number;
   labelIds?: string[];
   userIds?: string[];
+  segment?: string;
 }
 
 const boardQueries = {
@@ -319,7 +320,7 @@ const boardQueries = {
     const counts = {};
 
     for (const segment of segments) {
-      counts[segment._id] = await fetchSegment('count', segment, 0);
+      counts[segment._id] = await fetchSegment('count', segment);
     }
 
     return counts;

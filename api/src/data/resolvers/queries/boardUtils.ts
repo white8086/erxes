@@ -5,12 +5,14 @@ import {
   Customers,
   Notifications,
   Pipelines,
+  Segments,
   Stages
 } from '../../../db/models';
 import { getCollection } from '../../../db/models/boardUtils';
 import { IItemCommonFields } from '../../../db/models/definitions/boards';
 import { BOARD_STATUSES } from '../../../db/models/definitions/constants';
 import { IUserDocument } from '../../../db/models/definitions/users';
+import { fetchSegment } from '../../modules/segments/queryBuilder';
 import { getNextMonth, getToday, regexSearchText } from '../../utils';
 import { IListParams } from './boards';
 
@@ -45,7 +47,8 @@ export const generateCommonFilters = async (
     type,
     labelIds,
     priority,
-    userIds
+    userIds,
+    segment
   } = args;
 
   const isListEmpty = value => {
@@ -198,6 +201,13 @@ export const generateCommonFilters = async (
     const isEmpty = isListEmpty(userIds);
 
     filter.userId = isEmpty ? { $in: [null, []] } : { $in: userIds };
+  }
+
+  if (segment) {
+    const segmentObj = await Segments.findOne({ _id: segment }).lean();
+    const itemIds = await fetchSegment('search', segmentObj);
+
+    filter._id = { $in: itemIds };
   }
 
   return filter;

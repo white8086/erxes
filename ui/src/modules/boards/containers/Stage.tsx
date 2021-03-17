@@ -245,6 +245,7 @@ const getFilterParams = (
     closeDateType: queryParams.closeDateType,
     labelIds: queryParams.labelIds,
     userIds: queryParams.userIds,
+    segment: queryParams.segment,
     ...getExtraParams(queryParams)
   };
 };
