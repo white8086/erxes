@@ -440,3 +440,34 @@ function elkConvertConditionToQuery(args: {
     negative.push(negativeQuery);
   }
 }
+
+export const fetchSegment = async (action, segment: ISegment, defaultValue) => {
+  const { contentType } = segment;
+
+  const { positiveList, negativeList } = await fetchBySegments(segment, action);
+
+  let index = 'customers';
+
+  if (contentType === 'company') {
+    index = 'companies';
+  }
+
+  if (contentType === 'deal') {
+    index = 'deals';
+  }
+
+  try {
+    const response = await fetchElk(action, index, {
+      query: {
+        bool: {
+          must: positiveList,
+          must_not: negativeList
+        }
+      }
+    });
+
+    return response.count;
+  } catch (e) {
+    return defaultValue;
+  }
+};
