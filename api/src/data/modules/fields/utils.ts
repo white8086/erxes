@@ -1,6 +1,7 @@
 import {
   Companies,
   Customers,
+  Deals,
   Fields,
   FieldsGroups,
   Integrations,
@@ -267,11 +268,14 @@ export const fieldsCombinedByContentType = async ({
     case FIELD_CONTENT_TYPES.PRODUCT:
       schema = Products.schema;
       extendFields = EXTEND_FIELDS.PRODUCT;
-
       break;
 
     case FIELD_CONTENT_TYPES.CUSTOMER:
       schema = Customers.schema;
+      break;
+
+    case 'deal':
+      schema = Deals.schema;
       break;
   }
 

@@ -36,6 +36,13 @@ function TagsSidebar() {
               {__('Company')}
             </NavLink>
           </li>
+
+          <li>
+            <NavLink activeClassName="active" to="/segments/deal">
+              {__('Deal')}
+            </NavLink>
+          </li>
+
           <li>
             <a
               target="_blank"

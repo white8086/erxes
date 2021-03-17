@@ -103,19 +103,25 @@ const segmentQueries = {
       'count'
     );
 
+    let index = 'customers';
+
+    if (contentType === 'company') {
+      index = 'companies';
+    }
+
+    if (contentType === 'deal') {
+      index = 'deals';
+    }
+
     try {
-      const response = await fetchElk(
-        'count',
-        contentType === 'company' ? 'companies' : 'customers',
-        {
-          query: {
-            bool: {
-              must: positiveList,
-              must_not: negativeList
-            }
+      const response = await fetchElk('count', index, {
+        query: {
+          bool: {
+            must: positiveList,
+            must_not: negativeList
           }
         }
-      );
+      });
 
       return response.count;
     } catch (e) {
