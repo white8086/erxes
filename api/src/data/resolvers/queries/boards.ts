@@ -309,6 +309,11 @@ const boardQueries = {
       ticketUrl,
       taskUrl
     };
+  },
+
+  async itemsCountBySegments(_root, { type }: { type: string }) {
+    console.log('type', type);
+    return {};
   }
 };
 

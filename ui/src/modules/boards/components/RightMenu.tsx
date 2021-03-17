@@ -9,6 +9,7 @@ import React from 'react';
 import Select from 'react-select-plus';
 import RTG from 'react-transition-group';
 import { PRIORITIES } from '../constants';
+import SegmentFilter from '../containers/SegmentFilter';
 import {
   FilterBox,
   FilterButton,
@@ -182,6 +183,8 @@ export default class RightMenu extends React.Component<Props, State> {
 
         {extraFilter}
         {this.renderDates()}
+
+        <SegmentFilter type="deal" />
       </FilterBox>
     );
   }
