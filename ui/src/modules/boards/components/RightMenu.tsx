@@ -23,7 +23,7 @@ import SelectLabel from './label/SelectLabel';
 
 type Props = {
   onSearch: (search: string) => void;
-  onSelect: (values: string[] | string, name: string) => void;
+  onSelect: (values: string[] | string, key: string) => void;
   queryParams: any;
   link: string;
   extraFilter?: React.ReactNode;
@@ -92,16 +92,17 @@ export default class RightMenu extends React.Component<Props, State> {
     this.setState({ [name]: value } as Pick<StringState, keyof StringState>);
   };
 
-  renderLink(label: string, name: string) {
+  renderLink(label: string, key: string, value: string) {
     const { onSelect, queryParams } = this.props;
 
-    const selected = queryParams.closeDateType === name;
+    const selected = queryParams[key] === value;
+
+    const onClick = _e => {
+      onSelect(value, key);
+    };
 
     return (
-      <FilterButton
-        selected={selected}
-        onClick={onSelect.bind(this, name, 'closeDateType')}
-      >
+      <FilterButton selected={selected} onClick={onClick}>
         {__(label)}
         {selected && <Icon icon="check-1" size={14} />}
       </FilterButton>
@@ -117,12 +118,12 @@ export default class RightMenu extends React.Component<Props, State> {
 
     return (
       <>
-        {this.renderLink('Assigned to me', 'assignedToMe')}
-        {this.renderLink('Due to the next day', 'nextDay')}
-        {this.renderLink('Due in the next week', 'nextWeek')}
-        {this.renderLink('Due in the next month', 'nextMonth')}
-        {this.renderLink('Has no close date', 'noCloseDate')}
-        {this.renderLink('Overdue', 'overdue')}
+        {this.renderLink('Assigned to me', 'assignedToMe', 'true')}
+        {this.renderLink('Due to the next day', 'closeDateType', 'nextDay')}
+        {this.renderLink('Due in the next week', 'closeDateType', 'nextWeek')}
+        {this.renderLink('Due in the next month', 'closeDateType', 'nextMonth')}
+        {this.renderLink('Has no close date', 'closeDateType', 'noCloseDate')}
+        {this.renderLink('Overdue', 'closeDateType', 'overdue')}
       </>
     );
   }

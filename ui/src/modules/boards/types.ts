@@ -319,6 +319,7 @@ export interface IFilterParams extends ISavedConformity {
   labelIds?: string;
   userIds?: string;
   segment?: string;
+  assignedToMe?: string;
 }
 
 export interface INonFilterParams {

@@ -48,7 +48,8 @@ export const generateCommonFilters = async (
     labelIds,
     priority,
     userIds,
-    segment
+    segment,
+    assignedToMe
   } = args;
 
   const isListEmpty = value => {
@@ -201,6 +202,10 @@ export const generateCommonFilters = async (
     const isEmpty = isListEmpty(userIds);
 
     filter.userId = isEmpty ? { $in: [null, []] } : { $in: userIds };
+  }
+
+  if (assignedToMe) {
+    filter.userId = currentUserId;
   }
 
   if (segment) {

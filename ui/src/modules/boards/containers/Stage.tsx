@@ -246,6 +246,7 @@ const getFilterParams = (
     labelIds: queryParams.labelIds,
     userIds: queryParams.userIds,
     segment: queryParams.segment,
+    assignedToMe: queryParams.assignedToMe,
     ...getExtraParams(queryParams)
   };
 };

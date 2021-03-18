@@ -57,6 +57,7 @@ const commonQueryParams = `
   sortDirection: Int
   userIds: [String]
   segment: String
+  assignedToMe: String
   `;
 
 const listQueryParams = `

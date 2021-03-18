@@ -39,6 +39,7 @@ const FILTER_PARAMS = [
   'companyIds',
   'customerIds',
   'segment',
+  'assignedToMe',
   'closeDateType'
 ];
 
@@ -65,14 +66,14 @@ class Main extends React.Component<FinalProps> {
     routerUtils.setParams(this.props.history, { search });
   };
 
-  onSelect = (values: string[] | string, name: string) => {
+  onSelect = (values: string[] | string, key: string) => {
     const params = generateQueryParams(this.props.history);
 
-    if (params.closeDateType === values) {
-      return routerUtils.removeParams(this.props.history, name);
+    if (params[key] === values) {
+      return routerUtils.removeParams(this.props.history, key);
     }
 
-    return routerUtils.setParams(this.props.history, { [name]: values });
+    return routerUtils.setParams(this.props.history, { [key]: values });
   };
 
   isFiltered = (): boolean => {
