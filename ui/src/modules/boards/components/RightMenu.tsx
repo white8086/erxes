@@ -124,11 +124,11 @@ export default class RightMenu extends React.Component<Props, State> {
     return (
       <>
         {this.renderLink('Assigned to me', 'assignedToMe', 'true')}
-        {this.renderLink('Due to the next day', 'closeDateType', 'nextDay')}
-        {this.renderLink('Due in the next week', 'closeDateType', 'nextWeek')}
-        {this.renderLink('Due in the next month', 'closeDateType', 'nextMonth')}
+        {this.renderLink('Due tomorrow', 'closeDateType', 'nextDay')}
+        {this.renderLink('Due next week', 'closeDateType', 'nextWeek')}
+        {this.renderLink('Due next month', 'closeDateType', 'nextMonth')}
         {this.renderLink('Has no close date', 'closeDateType', 'noCloseDate')}
-        {this.renderLink('Overdue', 'closeDateType', 'overdue')}
+        {this.renderLink('Overdue', 'overdue', 'closeDateType')}
       </>
     );
   }
