@@ -5,6 +5,8 @@ import {
   Fields,
   FieldsGroups,
   Integrations,
+  PipelineLabels,
+  Pipelines,
   Products,
   Tags,
   Users
@@ -200,6 +202,28 @@ const generateUsersOptions = async (
   };
 };
 
+const getPipelineLabelOptions = async () => {
+  const labels = await PipelineLabels.find();
+  const options: Array<{ label: string; value: any }> = [];
+
+  for (const label of labels) {
+    const pipeline = await Pipelines.findOne({ _id: label.pipelineId });
+
+    options.push({
+      value: label._id,
+      label: `${pipeline?.name}: ${label.name}`
+    });
+  }
+
+  return {
+    _id: Math.random(),
+    name: 'labelIds',
+    label: 'Labels',
+    type: 'label',
+    selectOptions: options
+  };
+};
+
 const getTags = async (type: string) => {
   const tags = await Tags.aggregate([
     { $match: { type } },
@@ -381,13 +405,16 @@ export const fieldsCombinedByContentType = async ({
       'user'
     );
 
+    const labelOptions = await getPipelineLabelOptions();
+
     fields = [
       ...fields,
       ...[
         createdByOptions,
         modifiedByOptions,
         assignedUserOptions,
-        watchedUserOptions
+        watchedUserOptions,
+        labelOptions
       ]
     ];
   }

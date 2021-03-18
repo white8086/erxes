@@ -166,7 +166,7 @@ export const commonItemFieldsSchema = {
   description: field({ type: String, optional: true, label: 'Description' }),
   assignedUserIds: field({ type: [String], esType: 'keyword' }),
   watchedUserIds: field({ type: [String], esType: 'keyword' }),
-  labelIds: field({ type: [String], label: 'Labels', esType: 'keyword' }),
+  labelIds: field({ type: [String], esType: 'keyword' }),
   attachments: field({ type: [attachmentSchema], label: 'Attachments' }),
   stageId: field({ type: String, index: true }),
   initialStageId: field({
