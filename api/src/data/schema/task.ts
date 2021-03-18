@@ -45,6 +45,8 @@ const listQueryParams = `
     userIds: [String]
     segment: String
     assignedToMe: String
+    startDate: String
+    endDate: String
     ${conformityQueryFields}
 `;
 
