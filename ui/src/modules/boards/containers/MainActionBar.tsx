@@ -38,6 +38,7 @@ const FILTER_PARAMS = [
   'productIds',
   'companyIds',
   'customerIds',
+  'segment',
   'closeDateType'
 ];
 
