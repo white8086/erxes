@@ -223,7 +223,7 @@ export const generateCommonFilters = async (
   }
 
   if (assignedToMe) {
-    filter.userId = currentUserId;
+    filter.assignedUserIds = { $in: [currentUserId] };
   }
 
   if (segment) {
