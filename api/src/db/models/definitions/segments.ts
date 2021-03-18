@@ -7,8 +7,10 @@ export const CONTENT_TYPES = {
   VISITOR: 'visitor',
   COMPANY: 'company',
   DEAL: 'deal',
+  TASK: 'task',
+  TICKET: 'ticket',
 
-  ALL: ['customer', 'lead', 'visitor', 'company', 'deal']
+  ALL: ['customer', 'lead', 'visitor', 'company', 'deal', 'task', 'ticket']
 };
 
 export interface IAttributeFilter {

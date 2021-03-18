@@ -9,6 +9,8 @@ import {
   Pipelines,
   Products,
   Tags,
+  Tasks,
+  Tickets,
   Users
 } from '../../../db/models';
 import { fetchElk } from '../../../elasticsearch';
@@ -322,6 +324,14 @@ export const fieldsCombinedByContentType = async ({
 
     case 'deal':
       schema = Deals.schema;
+      break;
+
+    case 'task':
+      schema = Tasks.schema;
+      break;
+
+    case 'ticket':
+      schema = Tickets.schema;
       break;
   }
 

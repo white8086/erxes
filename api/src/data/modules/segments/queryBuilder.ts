@@ -453,6 +453,14 @@ const getIndexByContentType = (contentType: string) => {
     index = 'deals';
   }
 
+  if (contentType === 'task') {
+    index = 'tasks';
+  }
+
+  if (contentType === 'ticket') {
+    index = 'tickets';
+  }
+
   return index;
 };
 
