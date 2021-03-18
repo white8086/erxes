@@ -92,36 +92,37 @@ export default class RightMenu extends React.Component<Props, State> {
     this.setState({ [name]: value } as Pick<StringState, keyof StringState>);
   };
 
+  renderLink(label: string, name: string) {
+    const { onSelect, queryParams } = this.props;
+
+    const selected = queryParams.closeDateType === name;
+
+    return (
+      <FilterButton
+        selected={selected}
+        onClick={onSelect.bind(this, name, 'closeDateType')}
+      >
+        {__(label)}
+        {selected && <Icon icon="check-1" size={14} />}
+      </FilterButton>
+    );
+  }
+
   renderDates() {
-    const { queryParams, link } = this.props;
+    const { link } = this.props;
 
     if (link.includes('calendar')) {
       return null;
     }
 
-    const { onSelect } = this.props;
-
-    const renderLink = (label: string, name: string) => {
-      const selected = queryParams.closeDateType === name;
-
-      return (
-        <FilterButton
-          selected={selected}
-          onClick={onSelect.bind(this, name, 'closeDateType')}
-        >
-          {__(label)}
-          {selected && <Icon icon="check-1" size={14} />}
-        </FilterButton>
-      );
-    };
-
     return (
       <>
-        {renderLink('Due to the next day', 'nextDay')}
-        {renderLink('Due in the next week', 'nextWeek')}
-        {renderLink('Due in the next month', 'nextMonth')}
-        {renderLink('Has no close date', 'noCloseDate')}
-        {renderLink('Overdue', 'overdue')}
+        {this.renderLink('Assigned to me', 'assignedToMe')}
+        {this.renderLink('Due to the next day', 'nextDay')}
+        {this.renderLink('Due in the next week', 'nextWeek')}
+        {this.renderLink('Due in the next month', 'nextMonth')}
+        {this.renderLink('Has no close date', 'noCloseDate')}
+        {this.renderLink('Overdue', 'overdue')}
       </>
     );
   }
@@ -161,6 +162,7 @@ export default class RightMenu extends React.Component<Props, State> {
           multi={true}
           loadingPlaceholder={__('Loading...')}
         />
+
         <SelectTeamMembers
           label="Filter by team members"
           name="assignedUserIds"

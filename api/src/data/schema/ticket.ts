@@ -38,6 +38,7 @@ const listQueryParams = `
   sortField: String
   sortDirection: Int
   userIds: [String]
+  segment: String
   ${conformityQueryFields}
 `;
 
