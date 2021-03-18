@@ -49,7 +49,9 @@ export const generateCommonFilters = async (
     priority,
     userIds,
     segment,
-    assignedToMe
+    assignedToMe,
+    startDate,
+    endDate
   } = args;
 
   const isListEmpty = value => {
@@ -162,6 +164,22 @@ export const generateCommonFilters = async (
       const today = getToday(now);
 
       filter.closeDate = { $lt: today };
+    }
+  }
+
+  if (startDate) {
+    filter.closeDate = {
+      $gte: new Date(startDate)
+    };
+  }
+
+  if (endDate) {
+    if (filter.closeDate) {
+      filter.closeDate.$lte = new Date(endDate);
+    } else {
+      filter.closeDate = {
+        $lte: new Date(endDate)
+      };
     }
   }
 

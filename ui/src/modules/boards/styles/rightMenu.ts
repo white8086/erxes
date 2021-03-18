@@ -14,6 +14,10 @@ const FilterBox = styled.div`
   input {
     margin-bottom: 20px;
   }
+
+  .input-container {
+    width: 50%;
+  }
 `;
 
 const CustomRangeContainer = styled.div`
@@ -23,11 +27,11 @@ const CustomRangeContainer = styled.div`
     flex: 1;
 
     &:last-child {
-      margin-left: 10px;
+      margin-left: 5px;
     }
   }
 
-  input[type='text'] {
+  input[type='date'] {
     width: 100%;
   }
 `;

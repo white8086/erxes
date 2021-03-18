@@ -23,6 +23,8 @@ const commonParams = `
   $userIds: [String],
   $segment: String,
   $assignedToMe: String,
+  $startDate: String,
+  $endDate: String,
   ${conformityQueryFields}
 `;
 
@@ -42,6 +44,8 @@ const commonParamDefs = `
   userIds: $userIds,
   segment: $segment,
   assignedToMe: $assignedToMe,
+  startDate: $startDate,
+  endDate: $endDate,
   ${conformityQueryFieldDefs}
 `;
 

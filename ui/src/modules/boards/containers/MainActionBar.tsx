@@ -40,7 +40,9 @@ const FILTER_PARAMS = [
   'customerIds',
   'segment',
   'assignedToMe',
-  'closeDateType'
+  'closeDateType',
+  'startDate',
+  'endDate'
 ];
 
 const generateQueryParams = ({ location }) => {

@@ -1,9 +1,7 @@
 import Button from 'modules/common/components/Button';
 import { ControlLabel, FormControl } from 'modules/common/components/form';
-import DateControl from 'modules/common/components/form/DateControl';
 import Icon from 'modules/common/components/Icon';
 import { Tabs, TabTitle } from 'modules/common/components/tabs';
-import { DateContainer } from 'modules/common/styles/main';
 import { IOption } from 'modules/common/types';
 import { __ } from 'modules/common/utils';
 import SelectTeamMembers from 'modules/settings/team/containers/SelectTeamMembers';
@@ -112,6 +110,10 @@ export default class RightMenu extends React.Component<Props, State> {
     );
   }
 
+  onChangeRangeFilter = (kind, e) => {
+    this.props.onSelect(e.currentTarget.value, kind);
+  };
+
   renderDates() {
     const { link } = this.props;
 
@@ -193,21 +195,27 @@ export default class RightMenu extends React.Component<Props, State> {
         <ControlLabel>Date range:</ControlLabel>
 
         <CustomRangeContainer>
-          <DateContainer>
-            <DateControl
+          <div className="input-container">
+            <FormControl
+              defaultValue={queryParams.startDate}
+              type="date"
               required={false}
               name="startDate"
+              onChange={this.onChangeRangeFilter.bind(this, 'startDate')}
               placeholder={'Start date'}
             />
-          </DateContainer>
+          </div>
 
-          <DateContainer>
-            <DateControl
+          <div className="input-container">
+            <FormControl
+              defaultValue={queryParams.endDate}
+              type="date"
               required={false}
               name="endDate"
               placeholder={'End date'}
+              onChange={this.onChangeRangeFilter.bind(this, 'endDate')}
             />
-          </DateContainer>
+          </div>
         </CustomRangeContainer>
 
         {this.renderDates()}

@@ -320,6 +320,8 @@ export interface IFilterParams extends ISavedConformity {
   userIds?: string;
   segment?: string;
   assignedToMe?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface INonFilterParams {
