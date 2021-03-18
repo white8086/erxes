@@ -8,6 +8,7 @@ import {
   PipelineLabels,
   Pipelines,
   Products,
+  Stages,
   Tags,
   Tasks,
   Tickets,
@@ -200,6 +201,28 @@ const generateUsersOptions = async (
     name,
     label,
     type,
+    selectOptions: options
+  };
+};
+
+const getStageOptions = async () => {
+  const stages = await Stages.find();
+  const options: Array<{ label: string; value: any }> = [];
+
+  for (const stage of stages) {
+    const pipeline = await Pipelines.findOne({ _id: stage.pipelineId });
+
+    options.push({
+      value: stage._id,
+      label: `${pipeline?.name}: ${stage.name}`
+    });
+  }
+
+  return {
+    _id: Math.random(),
+    name: 'stageId',
+    label: 'Stage',
+    type: 'stage',
     selectOptions: options
   };
 };
@@ -417,6 +440,8 @@ export const fieldsCombinedByContentType = async ({
 
     const labelOptions = await getPipelineLabelOptions();
 
+    const stageOptions = await getStageOptions();
+
     fields = [
       ...fields,
       ...[
@@ -424,6 +449,7 @@ export const fieldsCombinedByContentType = async ({
         modifiedByOptions,
         assignedUserOptions,
         watchedUserOptions,
+        stageOptions,
         labelOptions
       ]
     ];
