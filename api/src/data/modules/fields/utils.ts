@@ -362,13 +362,34 @@ export const fieldsCombinedByContentType = async ({
       'Created by',
       'user'
     );
+
     const modifiedByOptions = await generateUsersOptions(
       'modifiedBy',
       'Modified by',
       'user'
     );
 
-    fields = [...fields, ...[createdByOptions, modifiedByOptions]];
+    const assignedUserOptions = await generateUsersOptions(
+      'assignedUserIds',
+      'Assigned users',
+      'user'
+    );
+
+    const watchedUserOptions = await generateUsersOptions(
+      'watchedUserIds',
+      'Watched users',
+      'user'
+    );
+
+    fields = [
+      ...fields,
+      ...[
+        createdByOptions,
+        modifiedByOptions,
+        assignedUserOptions,
+        watchedUserOptions
+      ]
+    ];
   }
 
   for (const extendField of extendFields) {
