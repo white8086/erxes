@@ -1,7 +1,9 @@
 import Button from 'modules/common/components/Button';
-import { FormControl } from 'modules/common/components/form';
+import { ControlLabel, FormControl } from 'modules/common/components/form';
+import DateControl from 'modules/common/components/form/DateControl';
 import Icon from 'modules/common/components/Icon';
 import { Tabs, TabTitle } from 'modules/common/components/tabs';
+import { DateContainer } from 'modules/common/styles/main';
 import { IOption } from 'modules/common/types';
 import { __ } from 'modules/common/utils';
 import SelectTeamMembers from 'modules/settings/team/containers/SelectTeamMembers';
@@ -11,6 +13,7 @@ import RTG from 'react-transition-group';
 import { PRIORITIES } from '../constants';
 import SegmentFilter from '../containers/SegmentFilter';
 import {
+  CustomRangeContainer,
   FilterBox,
   FilterButton,
   MenuFooter,
@@ -148,6 +151,7 @@ export default class RightMenu extends React.Component<Props, State> {
           onKeyPress={this.onSearch}
           autoFocus={true}
         />
+
         <SelectTeamMembers
           label="Filter by created members"
           name="userIds"
@@ -185,6 +189,26 @@ export default class RightMenu extends React.Component<Props, State> {
         />
 
         {extraFilter}
+
+        <ControlLabel>Date range:</ControlLabel>
+
+        <CustomRangeContainer>
+          <DateContainer>
+            <DateControl
+              required={false}
+              name="startDate"
+              placeholder={'Start date'}
+            />
+          </DateContainer>
+
+          <DateContainer>
+            <DateControl
+              required={false}
+              name="endDate"
+              placeholder={'End date'}
+            />
+          </DateContainer>
+        </CustomRangeContainer>
 
         {this.renderDates()}
 

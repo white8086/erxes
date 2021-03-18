@@ -16,6 +16,22 @@ const FilterBox = styled.div`
   }
 `;
 
+const CustomRangeContainer = styled.div`
+  display: flex;
+
+  > div {
+    flex: 1;
+
+    &:last-child {
+      margin-left: 10px;
+    }
+  }
+
+  input[type='text'] {
+    width: 100%;
+  }
+`;
+
 const FilterButton = styledTS<{ selected?: boolean }>(styled.div)`
   padding: 5px 20px;
   background: ${props =>
@@ -142,6 +158,7 @@ export {
   TopBar,
   ItemContainer,
   LoadMore,
+  CustomRangeContainer,
   BoardItem,
   ArchiveWrapper
 };
