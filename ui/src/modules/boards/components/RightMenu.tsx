@@ -127,7 +127,7 @@ export default class RightMenu extends React.Component<Props, State> {
   }
 
   renderFilter() {
-    const { queryParams, onSelect, extraFilter } = this.props;
+    const { queryParams, onSelect, extraFilter, options } = this.props;
 
     const priorityValues = PRIORITIES.map(p => ({ label: p, value: p }));
     const priorities = queryParams ? queryParams.priority : [];
@@ -182,9 +182,10 @@ export default class RightMenu extends React.Component<Props, State> {
         />
 
         {extraFilter}
+
         {this.renderDates()}
 
-        <SegmentFilter type="deal" />
+        <SegmentFilter type={options.type} />
       </FilterBox>
     );
   }
