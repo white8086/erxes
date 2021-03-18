@@ -6,7 +6,8 @@ import {
   FieldsGroups,
   Integrations,
   Products,
-  Tags
+  Tags,
+  Users
 } from '../../../db/models';
 import { fetchElk } from '../../../elasticsearch';
 import { EXTEND_FIELDS, FIELD_CONTENT_TYPES } from '../../constants';
@@ -178,6 +179,27 @@ const getIntegrations = async () => {
   ]);
 };
 
+const generateUsersOptions = async (
+  name: string,
+  label: string,
+  type: string
+) => {
+  const users = await Users.find();
+
+  const options: Array<{ label: string; value: any }> = users.map(user => ({
+    value: user._id,
+    label: user.username || user.email || ''
+  }));
+
+  return {
+    _id: Math.random(),
+    name,
+    label,
+    type,
+    selectOptions: options
+  };
+};
+
 const getTags = async (type: string) => {
   const tags = await Tags.aggregate([
     { $match: { type } },
@@ -332,6 +354,21 @@ export const fieldsCombinedByContentType = async ({
         selectOptions: integrations
       });
     }
+  }
+
+  if (['deal', 'task', 'ticket'].includes(contentType)) {
+    const createdByOptions = await generateUsersOptions(
+      'userId',
+      'Created by',
+      'user'
+    );
+    const modifiedByOptions = await generateUsersOptions(
+      'modifiedBy',
+      'Modified by',
+      'user'
+    );
+
+    fields = [...fields, ...[createdByOptions, modifiedByOptions]];
   }
 
   for (const extendField of extendFields) {

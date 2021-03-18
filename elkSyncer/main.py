@@ -130,6 +130,18 @@ company_mapping = {
 }
 
 deal_mapping = {
+    'userId': {
+        'type': 'keyword',
+    },
+    'assignedUserIds': {
+        'type': 'keyword',
+    },
+    'watchedUserIds': {
+        'type': 'keyword',
+    },
+    'labelIds': {
+        'type': 'keyword',
+    },
     'customFieldsData' : nestedType
 }
 

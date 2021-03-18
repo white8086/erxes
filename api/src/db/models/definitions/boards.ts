@@ -151,19 +151,32 @@ const timeTrackSchema = new Schema(
 
 export const commonItemFieldsSchema = {
   _id: field({ pkey: true }),
-  userId: field({ type: String, label: 'Created by' }),
+  userId: field({ type: String, esType: 'keyword' }),
   createdAt: field({ type: Date, label: 'Created at', esType: 'date' }),
   order: field({ type: Number }),
   name: field({ type: String, label: 'Name' }),
   closeDate: field({ type: Date, label: 'Close date', esType: 'date' }),
   reminderMinute: field({ type: Number, label: 'Reminder minute' }),
-  isComplete: field({ type: Boolean, default: false, label: 'Is complete' }),
+  isComplete: field({
+    type: Boolean,
+    default: false,
+    label: 'Is complete',
+    esType: 'boolean'
+  }),
   description: field({ type: String, optional: true, label: 'Description' }),
-  assignedUserIds: field({ type: [String], label: 'Assigned users' }),
-  watchedUserIds: field({ type: [String], label: 'Watched users' }),
-  labelIds: field({ type: [String], label: 'Labels' }),
+  assignedUserIds: field({
+    type: [String],
+    label: 'Assigned users',
+    esType: 'keyword'
+  }),
+  watchedUserIds: field({
+    type: [String],
+    label: 'Watched users',
+    esType: 'keyword'
+  }),
+  labelIds: field({ type: [String], label: 'Labels', esType: 'keyword' }),
   attachments: field({ type: [attachmentSchema], label: 'Attachments' }),
-  stageId: field({ type: String, label: 'Stage', index: true }),
+  stageId: field({ type: String, index: true }),
   initialStageId: field({
     type: String,
     optional: true
@@ -174,7 +187,7 @@ export const commonItemFieldsSchema = {
     label: 'Modified at',
     esType: 'date'
   }),
-  modifiedBy: field({ type: String, label: 'Modified by' }),
+  modifiedBy: field({ type: String, esType: 'keyword' }),
   searchText: field({ type: String, optional: true, index: true }),
   priority: field({ type: String, optional: true, label: 'Priority' }),
   // TODO remove after migration
