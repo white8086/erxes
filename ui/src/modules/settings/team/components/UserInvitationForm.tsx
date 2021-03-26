@@ -8,6 +8,7 @@ import Info from 'modules/common/components/Info';
 import { ModalFooter } from 'modules/common/styles/main';
 import { IButtonMutateProps, IFormProps } from 'modules/common/types';
 import { __, Alert } from 'modules/common/utils';
+import { IChannel } from 'modules/settings/channels/types';
 import { ICommonFormProps } from 'modules/settings/common/types';
 import { IUserGroup } from 'modules/settings/permissions/types';
 import React from 'react';
@@ -18,6 +19,7 @@ import { IInvitationEntry } from '../types';
 type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   usersGroups: IUserGroup[];
+  channels: IChannel[];
   refetchQueries: any;
 } & ICommonFormProps;
 
@@ -33,9 +35,9 @@ class UserInvitationForm extends React.Component<Props, State> {
 
     this.state = {
       entries: [
-        { email: '', password: '', groupId: '' },
-        { email: '', password: '', groupId: '' },
-        { email: '', password: '', groupId: '' }
+        { email: '', password: '', groupId: '', channelIds: [] },
+        { email: '', password: '', groupId: '', channelIds: [] },
+        { email: '', password: '', groupId: '', channelIds: [] }
       ],
       addMany: false,
       isSubmitted: false
@@ -58,10 +60,23 @@ class UserInvitationForm extends React.Component<Props, State> {
 
   onChange = (
     i: number,
-    type: 'email' | 'password' | 'groupId',
-    e: React.FormEvent
+    type: 'email' | 'password' | 'groupId' | 'channelIds',
+    e
   ) => {
-    const { value } = e.target as HTMLInputElement;
+    const elm = e.target as HTMLInputElement;
+
+    let value: string | string[] = elm.value;
+
+    if (type === 'channelIds') {
+      const selectedOptions = e.target.selectedOptions;
+      const selectedValues: string[] = [];
+
+      for (const option of selectedOptions) {
+        selectedValues.push(option.value);
+      }
+
+      value = selectedValues;
+    }
 
     const entries = [...this.state.entries];
 
@@ -72,7 +87,10 @@ class UserInvitationForm extends React.Component<Props, State> {
 
   onAddMoreInput = () => {
     this.setState({
-      entries: [...this.state.entries, { email: '', password: '', groupId: '' }]
+      entries: [
+        ...this.state.entries,
+        { email: '', password: '', groupId: '', channelIds: [] }
+      ]
     });
   };
 
@@ -94,7 +112,12 @@ class UserInvitationForm extends React.Component<Props, State> {
     const emails = values.split(',');
 
     emails.map(e =>
-      entries.splice(0, 0, { email: e, password: '', groupId: '' })
+      entries.splice(0, 0, {
+        email: e,
+        password: '',
+        groupId: '',
+        channelIds: []
+      })
     );
 
     this.setState({ addMany: false });
@@ -192,6 +215,9 @@ class UserInvitationForm extends React.Component<Props, State> {
               <th>
                 <ControlLabel required={true}>Permission</ControlLabel>
               </th>
+              <th>
+                <ControlLabel>Channels</ControlLabel>
+              </th>
               <th />
             </tr>
           </thead>
@@ -238,6 +264,21 @@ class UserInvitationForm extends React.Component<Props, State> {
                     onChange={this.onChange.bind(this, i, 'groupId')}
                     required={true}
                   />
+                </td>
+
+                <td>
+                  <select
+                    multiple={true}
+                    onChange={this.onChange.bind(this, i, 'channelIds')}
+                  >
+                    <option value="">Choose channels ...</option>
+
+                    {this.props.channels.map(group => (
+                      <option value={group._id} key={group._id}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
                 </td>
 
                 <td>{this.renderRemoveInput(i)}</td>
