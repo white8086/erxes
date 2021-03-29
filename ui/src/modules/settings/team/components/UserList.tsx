@@ -320,7 +320,7 @@ class UserList extends React.Component<FinalProps, States> {
     return (
       <List
         formTitle={__('Invite team members')}
-        size="lg"
+        size="xl"
         breadcrumb={[
           { title: __('Settings'), link: '/settings' },
           { title: __('Team members') }

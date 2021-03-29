@@ -6,14 +6,15 @@ import ControlLabel from 'modules/common/components/form/Label';
 import Icon from 'modules/common/components/Icon';
 import Info from 'modules/common/components/Info';
 import { ModalFooter } from 'modules/common/styles/main';
-import { IButtonMutateProps, IFormProps } from 'modules/common/types';
+import { IButtonMutateProps, IFormProps, IOption } from 'modules/common/types';
 import { __, Alert } from 'modules/common/utils';
 import { IChannel } from 'modules/settings/channels/types';
 import { ICommonFormProps } from 'modules/settings/common/types';
 import { IUserGroup } from 'modules/settings/permissions/types';
 import React from 'react';
+import Select from 'react-select-plus';
 import { Description } from '../../styles';
-import { InviteOption, LinkButton, RemoveRow } from '../styles';
+import { FormTable, InviteOption, LinkButton, RemoveRow } from '../styles';
 import { IInvitationEntry } from '../types';
 
 type Props = {
@@ -65,13 +66,12 @@ class UserInvitationForm extends React.Component<Props, State> {
   ) => {
     const elm = e.target as HTMLInputElement;
 
-    let value: string | string[] = elm.value;
+    let value: string | string[] = elm && elm.value;
 
     if (type === 'channelIds') {
-      const selectedOptions = e.target.selectedOptions;
       const selectedValues: string[] = [];
 
-      for (const option of selectedOptions) {
+      for (const option of e) {
         selectedValues.push(option.value);
       }
 
@@ -185,11 +185,30 @@ class UserInvitationForm extends React.Component<Props, State> {
     );
   }
 
+  generateChannelOptions(array: IChannel[] = []): IOption[] {
+    return array.map(item => {
+      const channel = item || ({} as IChannel);
+
+      return {
+        value: channel._id,
+        label: channel.name
+      };
+    });
+  }
+
   generateGroupsChoices = () => {
     return this.props.usersGroups.map(group => ({
       value: group._id,
       label: group.name
     }));
+  };
+
+  renderChannelOption = group => {
+    return (
+      <option value={group._id} key={group._id}>
+        {group.name}
+      </option>
+    );
   };
 
   renderContent = (formProps: IFormProps) => {
@@ -203,7 +222,7 @@ class UserInvitationForm extends React.Component<Props, State> {
 
     return (
       <>
-        <table style={{ width: '100%' }}>
+        <FormTable>
           <thead>
             <tr>
               <th>
@@ -266,26 +285,21 @@ class UserInvitationForm extends React.Component<Props, State> {
                   />
                 </td>
 
-                <td>
-                  <select
-                    multiple={true}
+                <td className="">
+                  <Select
+                    value={entries[i].channelIds}
+                    options={this.generateChannelOptions(this.props.channels)}
                     onChange={this.onChange.bind(this, i, 'channelIds')}
-                  >
-                    <option value="">Choose channels ...</option>
-
-                    {this.props.channels.map(group => (
-                      <option value={group._id} key={group._id}>
-                        {group.name}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder={__('Choose channels ...')}
+                    multi={true}
+                  />
                 </td>
 
                 <td>{this.renderRemoveInput(i)}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </FormTable>
 
         <InviteOption>
           <LinkButton onClick={this.onAddMoreInput}>
