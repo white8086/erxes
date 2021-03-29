@@ -203,14 +203,6 @@ class UserInvitationForm extends React.Component<Props, State> {
     }));
   };
 
-  renderChannelOption = group => {
-    return (
-      <option value={group._id} key={group._id}>
-        {group.name}
-      </option>
-    );
-  };
-
   renderContent = (formProps: IFormProps) => {
     const { addMany, entries } = this.state;
     const { closeModal, renderButton } = this.props;
