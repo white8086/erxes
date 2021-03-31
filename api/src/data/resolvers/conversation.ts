@@ -7,7 +7,7 @@ import {
 } from '../../db/models';
 import { MESSAGE_TYPES } from '../../db/models/definitions/constants';
 import { IConversationDocument } from '../../db/models/definitions/conversations';
-import { debugExternalApi } from '../../debuggers';
+import { debugError } from '../../debuggers';
 import { IContext } from '../types';
 
 export default {
@@ -76,7 +76,7 @@ export default {
 
       return response;
     } catch (e) {
-      debugExternalApi(e);
+      debugError(e);
       return null;
     }
   },
@@ -106,7 +106,7 @@ export default {
 
         return response ? response.audioSrc : '';
       } catch (e) {
-        debugExternalApi(e);
+        debugError(e);
         return null;
       }
     }
@@ -142,26 +142,7 @@ export default {
 
       return response;
     } catch (e) {
-      debugExternalApi(e);
-      return null;
-    }
-  },
-
-  async productBoardLink(
-    conversation: IConversationDocument,
-    _args,
-    { dataSources }: IContext
-  ) {
-    try {
-      const response = await dataSources.IntegrationsAPI.fetchApi(
-        '/productBoard/note',
-        {
-          erxesApiId: conversation._id
-        }
-      );
-      return response;
-    } catch (e) {
-      debugExternalApi(e);
+      debugError(e);
       return null;
     }
   },

@@ -102,7 +102,6 @@ describe('conversationQueries', () => {
         messageCount
         number
         tagIds
-        productBoardLink
         videoCallData {
           url
           name
@@ -666,9 +665,14 @@ describe('conversationQueries', () => {
 
     expect(responses.length).toEqual(0);
 
-    const responses1 = await graphqlRequest(qryConversations, 'conversations', {
-      brandId: brand._id
-    });
+    const responses1 = await graphqlRequest(
+      qryConversations,
+      'conversations',
+      {
+        brandId: brand._id
+      },
+      { user }
+    );
 
     expect(responses1.length).toBe(1);
 
@@ -1631,10 +1635,26 @@ describe('conversationQueries', () => {
       'conversationsTotalCount',
       {
         brandId: brand._id
-      }
+      },
+      { user }
     );
 
     expect(response1).toBe(1);
+
+    const newBrand = await brandFactory();
+
+    await conversationFactory({ integrationId: integration._id });
+
+    const response2 = await graphqlRequest(
+      qryTotalCount,
+      'conversationsTotalCount',
+      {
+        brandId: newBrand._id
+      },
+      { user }
+    );
+
+    expect(response2).toBe(2);
 
     // Conversations with userRelevance ===================
     await conversationFactory({
@@ -1659,14 +1679,14 @@ describe('conversationQueries', () => {
     await conversationFactory({ integrationId: integration2._id });
     await conversationFactory({ integrationId: integration2._id });
 
-    const response2 = await graphqlRequest(
+    const response3 = await graphqlRequest(
       qryTotalCount,
       'conversationsTotalCount',
       { brandId: brand._id },
       { user: userWithCode }
     );
 
-    expect(response2).toBe(4);
+    expect(response3).toBe(5);
   });
 
   test('Get total count of conversations by unassigned', async () => {
@@ -2238,35 +2258,6 @@ describe('conversationQueries', () => {
     );
 
     expect(response.videoCallData).not.toBeNull();
-
-    spy.mockRestore();
-  });
-
-  test('Conversation detail product board', async () => {
-    const messengerConversation = await conversationFactory();
-    await conversationMessageFactory({
-      conversationId: messengerConversation._id,
-      contentType: MESSAGE_TYPES.VIDEO_CALL
-    });
-
-    await graphqlRequest(
-      qryConversationDetail,
-      'conversationDetail',
-      { _id: messengerConversation._id },
-      { user, dataSources }
-    );
-
-    const spy = jest.spyOn(dataSources.IntegrationsAPI, 'fetchApi');
-    spy.mockImplementation(() => Promise.resolve(''));
-
-    const response = await graphqlRequest(
-      qryConversationDetail,
-      'conversationDetail',
-      { _id: messengerConversation._id },
-      { user, dataSources }
-    );
-
-    expect(response.productBoardLink).not.toBeNull();
 
     spy.mockRestore();
   });

@@ -1,6 +1,7 @@
 import { Model, model } from 'mongoose';
 import {
   conformitySchema,
+  IConformitiesRemove,
   IConformityAdd,
   IConformityChange,
   IConformityDocument,
@@ -8,7 +9,8 @@ import {
   IConformityFilter,
   IConformityRelated,
   IConformityRemove,
-  IConformitySaved
+  IConformitySaved,
+  IGetConformityBulk
 } from './definitions/conformities';
 
 const getSavedAnyConformityMatch = ({
@@ -49,9 +51,11 @@ export interface IConformityModel extends Model<IConformityDocument> {
   editConformity(doc: IConformityEdit): void;
   changeConformity(doc: IConformityChange): void;
   removeConformity(doc: IConformityRemove): void;
+  removeConformities(doc: IConformitiesRemove): void;
   savedConformity(doc: IConformitySaved): Promise<string[]>;
   relatedConformity(doc: IConformityRelated): Promise<string[]>;
   filterConformity(doc: IConformityFilter): Promise<string[]>;
+  getConformities(doc: IGetConformityBulk): Promise<IConformityDocument[]>;
 }
 
 export const loadConformityClass = () => {
@@ -205,6 +209,31 @@ export const loadConformityClass = () => {
       return relTypeIds.map(item => String(item.relTypeId));
     }
 
+    public static async getConformities(doc: IGetConformityBulk) {
+      return Conformities.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                $and: [
+                  { mainType: doc.mainType },
+                  { mainTypeId: { $in: doc.mainTypeIds } },
+                  { relType: { $in: doc.relTypes } }
+                ]
+              },
+              {
+                $and: [
+                  { mainType: { $in: doc.relTypes } },
+                  { relType: doc.mainType },
+                  { relTypeId: { $in: doc.mainTypeIds } }
+                ]
+              }
+            ]
+          }
+        }
+      ]);
+    }
+
     public static async relatedConformity(doc: IConformityRelated) {
       const match = getSavedAnyConformityMatch({
         mainType: doc.mainType,
@@ -286,6 +315,28 @@ export const loadConformityClass = () => {
       });
 
       await Conformities.deleteMany(match);
+    }
+
+    /**
+     * Remove conformities
+     */
+    public static async removeConformities(doc: IConformitiesRemove) {
+      await Conformities.deleteMany({
+        $or: [
+          {
+            $and: [
+              { mainType: doc.mainType },
+              { mainTypeId: { $in: doc.mainTypeIds } }
+            ]
+          },
+          {
+            $and: [
+              { relType: doc.mainType },
+              { relTypeId: { $in: doc.mainTypeIds } }
+            ]
+          }
+        ]
+      });
     }
   }
 

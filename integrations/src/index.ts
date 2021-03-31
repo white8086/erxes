@@ -5,6 +5,7 @@ import initCallPro from './callpro/controller';
 import initChatfuel from './chatfuel/controller';
 import { connect, mongoStatus } from './connection';
 import {
+  debugError,
   debugInit,
   debugIntegrations,
   debugRequest,
@@ -21,7 +22,6 @@ import { initMemoryStorage } from './inmemoryStorage';
 import { initBroker } from './messageBroker';
 import { Accounts, Configs, Integrations } from './models/index';
 import { initNylas } from './nylas/controller';
-import initProductBoard from './productBoard/controller';
 import initSmooch from './smooch/controller';
 import { init } from './startup';
 import systemStatus from './systemStatus';
@@ -67,7 +67,7 @@ app.get('/health', async (_req, res, next) => {
   try {
     await mongoStatus();
   } catch (e) {
-    debugIntegrations('MongoDB is not running');
+    debugError('MongoDB is not running');
     return next(e);
   }
   res.end('ok');
@@ -173,9 +173,6 @@ initDaily(app);
 
 // init smooch
 initSmooch(app);
-
-// init product board
-initProductBoard(app);
 
 // init telnyx
 initTelnyx(app);
