@@ -43,15 +43,27 @@ class FieldForm extends React.Component<Props, State> {
     super(props);
 
     const { field } = props;
+
     const selectedOption = field.associatedField && {
       value: field.associatedField._id,
       label: field.associatedField.text
     };
 
+    let group =
+      (field.associatedField && field.associatedField.contentType) || '';
+
+    if (field.type.includes('customerLinks')) {
+      group = 'customer';
+    }
+
+    if (field.type.includes('companyLinks')) {
+      group = 'company';
+    }
+
     this.state = {
       field,
       selectedOption,
-      group: ''
+      group
     };
   }
 
@@ -84,7 +96,6 @@ class FieldForm extends React.Component<Props, State> {
     field.validation = selectedField.validation;
     field.options = selectedField.options;
     field.type = selectedField.type;
-    field.isRequired = selectedField.isRequired;
     field.text = selectedField.text;
     field.description = selectedField.description;
 
@@ -425,7 +436,7 @@ class FieldForm extends React.Component<Props, State> {
           <FormControl
             id="propertyGroup"
             componentClass="select"
-            value={group}
+            defaultValue={group}
             onChange={this.onPropertyGroupChange}
           >
             <option value={''} />
@@ -515,12 +526,16 @@ class FieldForm extends React.Component<Props, State> {
       return;
     }
 
+    const defaultValue =
+      (selectedOption && selectedOption.value) ||
+      this.props.field.associatedFieldId;
+
     return (
       <>
         <FormGroup>
           <SelectProperty
             queryParams={{ type: group }}
-            defaultValue={selectedOption && selectedOption.value}
+            defaultValue={defaultValue}
             description="Any data collected through this field will copy to:"
             onChange={this.onPropertyChange}
           />
