@@ -17,6 +17,9 @@ const command = async () => {
     { customerId: { $exists: true } },
     { customerId: 1 }
   );
+
+  console.log('Total conversations with customerId', conversations.length);
+
   const usedCustomerIds: string[] = [];
 
   for (const conversation of conversations) {
