@@ -9,7 +9,7 @@ const command = async () => {
   console.log(`Process started at: ${new Date()}`);
 
   const argv = process.argv;
-  const limit = argv[2] || 50000;
+  const limit = parseInt(argv[2] || '50000', 10);
 
   await connect();
 
