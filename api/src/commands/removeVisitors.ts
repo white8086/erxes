@@ -18,19 +18,10 @@ const command = async () => {
     { customerId: 1 }
   ).distinct('customerId');
 
-  const selector = { $and: [{ state: 'visitor' }, { profileScore: 0 }] };
-
-  const totalCustomersCount = await Customers.find(selector).count();
-
-  console.log(
-    'total customers count',
-    usedCustomerIds,
-    totalCustomersCount,
-    usedCustomerIds
-  );
+  console.log('used customers', usedCustomerIds, usedCustomerIds);
 
   const customers = await Customers.aggregate([
-    { $match: selector },
+    { $match: { $and: [{ state: 'visitor' }, { profileScore: 0 }] } },
     { $project: { _id: '$_id' } },
     { $limit: limit }
   ]);
