@@ -8,6 +8,9 @@ dotenv.config();
 const command = async () => {
   console.log(`Process started at: ${new Date()}`);
 
+  const argv = process.argv;
+  const limit = parseInt(argv[2] || '50000', 10);
+
   await connect();
 
   const usedCustomerIds = await Conversations.find(
@@ -21,56 +24,45 @@ const command = async () => {
 
   console.log('total customers count', totalCustomersCount);
 
-  const perPage = 10000;
-  let page = 0;
+  const customers = await Customers.aggregate([
+    { $match: selector },
+    { $project: { _id: '$_id' } },
+    { $limit: limit }
+  ]);
 
-  while (page * perPage <= totalCustomersCount) {
-    console.log(page, perPage);
+  const customerIds = customers.map(c => c._id);
 
-    const customers = await Customers.aggregate([
-      { $match: selector },
-      { $project: { _id: '$_id' } },
-      { $sort: { createdAt: 1 } },
-      { $skip: page * perPage },
-      { $limit: perPage }
-    ]);
+  console.log('visitors', customerIds.length);
 
-    const customerIds = customers.map(c => c._id);
+  const idsToRemove = customerIds.filter(e => !usedCustomerIds.includes(e));
 
-    console.log('visitors', customerIds.length);
+  console.log('idsToRemove', idsToRemove.length);
 
-    const idsToRemove = customerIds.filter(e => !usedCustomerIds.includes(e));
+  let deletedCount = 0;
 
-    console.log('idsToRemove', idsToRemove.length);
+  await stream(
+    async chunk => {
+      deletedCount = deletedCount + chunk.length;
+      console.log('deletedCount', deletedCount);
+      await Customers.deleteMany({ _id: { $in: chunk } });
+    },
+    (variables, root) => {
+      const parentIds = variables.parentIds || [];
 
-    let deletedCount = 0;
+      parentIds.push(root._id);
 
-    await stream(
-      async chunk => {
-        deletedCount = deletedCount + chunk.length;
-        console.log('deletedCount', deletedCount);
-        await Customers.deleteMany({ _id: { $in: chunk } });
-      },
-      (variables, root) => {
-        const parentIds = variables.parentIds || [];
-
-        parentIds.push(root._id);
-
-        variables.parentIds = parentIds;
-      },
-      () => {
-        return Customers.find(
-          {
-            _id: { $in: idsToRemove }
-          },
-          { _id: 1 }
-        ) as any;
-      },
-      1000
-    );
-
-    page++;
-  }
+      variables.parentIds = parentIds;
+    },
+    () => {
+      return Customers.find(
+        {
+          _id: { $in: idsToRemove }
+        },
+        { _id: 1 }
+      ) as any;
+    },
+    1000
+  );
 };
 
 command().then(() => {
