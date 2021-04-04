@@ -22,7 +22,12 @@ const command = async () => {
 
   const totalCustomersCount = await Customers.find(selector).count();
 
-  console.log('total customers count', totalCustomersCount);
+  console.log(
+    'total customers count',
+    usedCustomerIds,
+    totalCustomersCount,
+    usedCustomerIds
+  );
 
   const customers = await Customers.aggregate([
     { $match: selector },
@@ -32,7 +37,7 @@ const command = async () => {
 
   const customerIds = customers.map(c => c._id);
 
-  console.log('visitors', customerIds.length);
+  console.log('visitors', customerIds, customerIds.length);
 
   const idsToRemove = customerIds.filter(e => !usedCustomerIds.includes(e));
 
