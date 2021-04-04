@@ -23,6 +23,8 @@ const command = async () => {
   const usedCustomerIds: string[] = [];
 
   for (const conversation of conversations) {
+    console.log('customerId ..........', conversation.customerId);
+
     if (
       conversation.customerId &&
       !usedCustomerIds.includes(conversation.customerId)
