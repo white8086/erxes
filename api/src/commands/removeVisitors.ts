@@ -19,7 +19,10 @@ const command = async () => {
 
   console.log('visitors', customerIds.length);
 
-  const conversations = await Conversations.find().distinct('customerId');
+  const conversations = await Conversations.find(
+    {},
+    { customerId: 1 }
+  ).distinct('customerId');
 
   const idsToRemove = customerIds.filter(e => !conversations.includes(e));
 
