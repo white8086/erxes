@@ -297,7 +297,6 @@ export default class Builder {
     return {
       $and: [
         { $or: this.defaultUserQuery() },
-        { $or: this.userRelevanceQuery() },
         ...(integrationType
           ? await this.integrationTypeFilter(integrationType)
           : [])
