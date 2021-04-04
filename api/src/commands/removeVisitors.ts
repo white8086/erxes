@@ -13,28 +13,6 @@ const command = async () => {
 
   await connect();
 
-  const conversations = await Conversations.find(
-    { customerId: { $exists: true } },
-    { customerId: 1 }
-  );
-
-  console.log('Total conversations with customerId', conversations.length);
-
-  const usedCustomerIds: string[] = [];
-
-  for (const conversation of conversations) {
-    console.log('customerId ..........', conversation.customerId);
-
-    if (
-      conversation.customerId &&
-      !usedCustomerIds.includes(conversation.customerId)
-    ) {
-      usedCustomerIds.push(conversation.customerId);
-    }
-  }
-
-  console.log('Used customer ids', usedCustomerIds.length);
-
   const customers = await Customers.aggregate([
     { $match: { $and: [{ state: 'visitor' }, { profileScore: 0 }] } },
     { $project: { _id: '$_id' } },
@@ -45,7 +23,14 @@ const command = async () => {
 
   console.log('visitors', customerIds.length);
 
-  const idsToRemove = customerIds.filter(e => !usedCustomerIds.includes(e));
+  const conversations = await Conversations.find(
+    { customerId: { $exists: true } },
+    { customerId: 1 }
+  ).distinct('customerId');
+
+  console.log('visitors', customerIds.length);
+
+  const idsToRemove = customerIds.filter(e => !conversations.includes(e));
 
   console.log('idsToRemove', idsToRemove.length);
 
