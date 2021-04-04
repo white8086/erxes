@@ -30,6 +30,7 @@ const command = async () => {
     const customers = await Customers.aggregate([
       { $match: selector },
       { $project: { _id: '$_id' } },
+      { $sort: { createdAt: 1 } },
       { $skip: page * perPage },
       { $limit: perPage }
     ]);
