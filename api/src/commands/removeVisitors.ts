@@ -8,12 +8,15 @@ dotenv.config();
 const command = async () => {
   console.log(`Process started at: ${new Date()}`);
 
+  const argv = process.argv;
+  const limit = argv[2] || 50000;
+
   await connect();
 
   const customers = await Customers.aggregate([
     { $match: { $and: [{ state: 'visitor' }, { profileScore: 0 }] } },
     { $project: { _id: '$_id' } },
-    { $limit: 300000 }
+    { $limit: limit }
   ]);
 
   const customerIds = customers.map(c => c._id);
