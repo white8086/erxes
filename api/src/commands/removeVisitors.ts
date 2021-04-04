@@ -12,7 +12,8 @@ const command = async () => {
 
   const customers = await Customers.aggregate([
     { $match: { $and: [{ state: 'visitor' }, { profileScore: 0 }] } },
-    { $project: { _id: '$_id' } }
+    { $project: { _id: '$_id' } },
+    { $limit: 10000 }
   ]);
 
   const customerIds = customers.map(c => c._id);
