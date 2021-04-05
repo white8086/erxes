@@ -257,7 +257,18 @@ const conversationQueries = {
 
     await qb.buildAllQueries();
 
-    return Conversations.findOne(qb.mainQuery()).sort({ updatedAt: -1 });
+    console.log(
+      'conversationsGetLast query start',
+      JSON.stringify(qb.mainQuery())
+    );
+
+    const conversation = await Conversations.findOne(qb.mainQuery()).sort({
+      updatedAt: -1
+    });
+
+    console.log('conversationsGetLast done');
+
+    return conversation;
   },
 
   /**
@@ -272,12 +283,23 @@ const conversationQueries = {
     // get all possible integration ids
     const integrationsFilter = await qb.integrationsFilter();
 
-    return Conversations.find({
+    const selector = {
       ...integrationsFilter,
       status: { $in: [CONVERSATION_STATUSES.NEW, CONVERSATION_STATUSES.OPEN] },
       readUserIds: { $ne: user._id },
       $and: [{ $or: qb.defaultUserQuery() }, { $or: qb.userRelevanceQuery() }]
-    }).countDocuments();
+    };
+
+    console.log(
+      'conversationsTotalUnreadCount query start',
+      JSON.stringify(selector)
+    );
+
+    const c = await Conversations.find(selector).countDocuments();
+
+    console.log('conversationsTotalUnreadCount query done');
+
+    return c;
   }
 };
 
