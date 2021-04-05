@@ -45,9 +45,15 @@ const conversationQueries = {
 
     await qb.buildAllQueries();
 
-    return Conversations.find(qb.mainQuery())
+    console.log('Conversations query start', JSON.stringify(qb.mainQuery()));
+
+    const conversations = await Conversations.find(qb.mainQuery())
       .sort({ updatedAt: -1 })
       .limit(params.limit || 0);
+
+    console.log('Conversations query end');
+
+    return conversations;
   },
 
   /**
@@ -226,7 +232,16 @@ const conversationQueries = {
 
     await qb.buildAllQueries();
 
-    return Conversations.find(qb.mainQuery()).countDocuments();
+    console.log(
+      'Conversations total count query start',
+      JSON.stringify(qb.mainQuery())
+    );
+
+    const c = await Conversations.find(qb.mainQuery()).countDocuments();
+
+    console.log('Conversations total count query end');
+
+    return c;
   },
 
   /**

@@ -161,11 +161,15 @@ export class Builder extends CommonBuilder<IListArgs> {
       ]
     };
 
+    console.log('Customers query start', JSON.stringify(selector));
+
     const customers = await Customers.find(selector)
       .sort({ createdAt: -1 })
       .limit(limit);
 
     const count = await Customers.find(selector).countDocuments();
+
+    console.log('Customers query done');
 
     return {
       list: customers,
