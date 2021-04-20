@@ -8,7 +8,6 @@ import {
   Forms,
   Integrations,
   KnowledgeBaseArticles,
-  MessengerApps,
   Users
 } from '../../../db/models';
 import Messages from '../../../db/models/ConversationMessages';
@@ -47,7 +46,7 @@ import {
   sendToWebhook
 } from '../../utils';
 import { convertVisitorToCustomer, solveSubmissions } from '../../widgetUtils';
-import { getDocument } from './cacheUtils';
+import { getDocument, getMessengerApps } from './cacheUtils';
 import { conversationNotifReceivers } from './conversations';
 import { sendMsgToGolomt } from './golomtApi';
 
@@ -78,10 +77,7 @@ export const getMessengerData = async (integration: IIntegrationDocument) => {
   }
 
   // knowledgebase app =======
-  const kbApp = await MessengerApps.findOne({
-    kind: 'knowledgebase',
-    'credentials.integrationId': integration._id
-  });
+  const kbApp = await getMessengerApps('knowledgebase', integration._id);
 
   const topicId =
     kbApp && kbApp.credentials
@@ -89,10 +85,7 @@ export const getMessengerData = async (integration: IIntegrationDocument) => {
       : null;
 
   // lead app ==========
-  const leadApp = await MessengerApps.findOne({
-    kind: 'lead',
-    'credentials.integrationId': integration._id
-  });
+  const leadApp = await getMessengerApps('lead', integration._id);
 
   const formCode =
     leadApp && leadApp.credentials
@@ -100,10 +93,7 @@ export const getMessengerData = async (integration: IIntegrationDocument) => {
       : null;
 
   // website app ============
-  const websiteApps = await MessengerApps.find({
-    kind: 'website',
-    'credentials.integrationId': integration._id
-  });
+  const websiteApps = await getMessengerApps('website', integration._id, false);
 
   return {
     ...(messengerData || {}),
@@ -284,10 +274,14 @@ const widgetMutations = {
     }
 
     // find integration
-    const integration = await Integrations.getIntegration({
+    const integration = await getDocument('integrations', {
       brandId: brand._id,
       kind: KIND_CHOICES.MESSENGER
     });
+
+    if (!integration) {
+      throw new Error('Integration not found');
+    }
 
     let customer;
 

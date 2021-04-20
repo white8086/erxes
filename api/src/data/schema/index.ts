@@ -201,6 +201,10 @@ import {
   queries as WidgetQueries,
   types as WidgetTypes
 } from './widget';
+import {
+  queries as SmsDeliveryQueries,
+  types as SmsDeliveryTypes
+} from './smsDelivery';
 
 import { mutations as golomtApiMutations } from './golomtApi';
 
@@ -250,6 +254,7 @@ export let types = `
   ${WidgetTypes}
   ${WebhookTypes}
   ${CalendarTypes}
+  ${SmsDeliveryTypes}
 `;
 
 export let queries = `
@@ -294,6 +299,7 @@ export let queries = `
   ${WebhookQueries}
   ${CalendarQueries}
   ${MessengerAppQueries}
+  ${SmsDeliveryQueries}
 `;
 
 export let mutations = `
