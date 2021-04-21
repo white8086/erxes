@@ -45,15 +45,9 @@ const conversationQueries = {
 
     await qb.buildAllQueries();
 
-    console.log('Conversations query start', JSON.stringify(qb.mainQuery()));
-
-    const conversations = await Conversations.find(qb.mainQuery())
+    return Conversations.find(qb.mainQuery())
       .sort({ updatedAt: -1 })
       .limit(params.limit || 0);
-
-    console.log('Conversations query end');
-
-    return conversations;
   },
 
   /**
@@ -232,16 +226,7 @@ const conversationQueries = {
 
     await qb.buildAllQueries();
 
-    console.log(
-      'Conversations total count query start',
-      JSON.stringify(qb.mainQuery())
-    );
-
-    const c = await Conversations.find(qb.mainQuery()).countDocuments();
-
-    console.log('Conversations total count query end');
-
-    return c;
+    return Conversations.find(qb.mainQuery()).countDocuments();
   },
 
   /**
@@ -257,18 +242,7 @@ const conversationQueries = {
 
     await qb.buildAllQueries();
 
-    console.log(
-      'conversationsGetLast query start',
-      JSON.stringify(qb.mainQuery())
-    );
-
-    const conversation = await Conversations.findOne(qb.mainQuery()).sort({
-      updatedAt: -1
-    });
-
-    console.log('conversationsGetLast done');
-
-    return conversation;
+    return Conversations.findOne(qb.mainQuery()).sort({ updatedAt: -1 });
   },
 
   /**
@@ -283,23 +257,12 @@ const conversationQueries = {
     // get all possible integration ids
     const integrationsFilter = await qb.integrationsFilter();
 
-    const selector = {
+    return Conversations.find({
       ...integrationsFilter,
       status: { $in: [CONVERSATION_STATUSES.NEW, CONVERSATION_STATUSES.OPEN] },
       readUserIds: { $ne: user._id },
-      $and: [{ $or: qb.defaultUserQuery() }, { $or: qb.userRelevanceQuery() }]
-    };
-
-    console.log(
-      'conversationsTotalUnreadCount query start',
-      JSON.stringify(selector)
-    );
-
-    const c = await Conversations.find(selector).countDocuments();
-
-    console.log('conversationsTotalUnreadCount query done');
-
-    return c;
+      $and: [{ $or: qb.userRelevanceQuery() }]
+    }).countDocuments();
   }
 };
 
