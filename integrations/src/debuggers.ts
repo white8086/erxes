@@ -9,6 +9,7 @@ export const debugFacebook = debug('erxes-integrations:facebook');
 export const debugTwitter = debug('erxes-integrations:twitter');
 export const debugGmail = debug('erxes-integrations:gmail');
 export const debugCallPro = debug('erxes-integrations:callpro');
+export const debugGrandStream = debug('erxes-integrations:grandstream');
 export const debugChatfuel = debug('erxes-integrations:chatfuel');
 export const debugNylas = debug('erxes-integrations:nylas');
 export const debugWhatsapp = debug('erxes-integrations:whatsapp');
