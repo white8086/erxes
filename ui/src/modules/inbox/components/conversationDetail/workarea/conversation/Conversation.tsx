@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { IConversation, IMessage } from '../../../../types';
 import CallPro from '../callpro/Callpro';
+import GrandStream from '../grandstream/GrandStream';
 import MailConversation from '../mail/MailConversation';
 import AttachmentPreview from './AttachmentPreview';
 import Message from './messages/Message';
@@ -101,6 +102,15 @@ class Conversation extends React.Component<Props, { isResolved: boolean }> {
       return (
         <>
           <CallPro conversation={conversation} />
+          {this.renderMessages(messages, firstMessage)}
+        </>
+      );
+    }
+
+    if (kind === 'grandstream') {
+      return (
+        <>
+          <GrandStream conversation={conversation} />
           {this.renderMessages(messages, firstMessage)}
         </>
       );

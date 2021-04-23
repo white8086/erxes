@@ -5,6 +5,7 @@ import { mutations } from 'modules/settings/integrations/graphql';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import Chatfuel from '../../components/chatfuel/Form';
+import GrandStream from '../../components/grandstream/Form';
 import Telegram from '../../components/telegram/Telegram';
 import TelnyxForm from '../../components/telnyx/TelnyxForm';
 import Viber from '../../components/viber/Viber';
@@ -25,6 +26,7 @@ type FinalProps = {} & IRouterProps & Props;
 
 const INTEGRATION_FORM = {
   callpro: CallPro,
+  grandstream: GrandStream,
   chatfuel: Chatfuel,
   'smooch-viber': Viber,
   'smooch-telegram': Telegram,

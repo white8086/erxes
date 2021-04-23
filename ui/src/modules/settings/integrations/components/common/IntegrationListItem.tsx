@@ -284,6 +284,10 @@ class IntegrationListItem extends React.Component<Props, State> {
       case INTEGRATION_KINDS.CALLPRO:
         value = externalData.phoneNumber;
         break;
+
+      case INTEGRATION_KINDS.GRANDSTREAM:
+        value = externalData.phoneNumber;
+        break;
       case INTEGRATION_KINDS.CHATFUEL:
         value = (externalData.chatfuelConfigs || {}).toString();
         break;

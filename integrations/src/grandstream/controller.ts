@@ -82,42 +82,6 @@ const init = async app => {
     routeErrorHandling(async (req, res) => {
       debugRequest(debugGrandStream, req);
 
-      // const sda = {
-      //   AcctId: '77',
-      //   accountcode: '',
-      //   src: '99126730',
-      //   dst: '+97675070099',
-      //   dcontext: 'ext-did-3',
-      //   clid: '"" <99126730>',
-      //   channel: 'PJSIP/trunk_3-00000002',
-      //   dstchannel: '',
-      //   lastapp: 'ForkCDR',
-      //   lastdata: 'ae',
-      //   start: '2021-04-23 11:39:29',
-      //   answer: '2021-04-23 11:39:29',
-      //   end: '2021-04-23 11:39:29',
-      //   duration: '0',
-      //   billsec: '0',
-      //   disposition: 'NO ANSWER',
-      //   amaflags: 'DOCUMENTATION',
-      //   uniqueid: '1619149169.14',
-      //   userfield: 'Inbound',
-      //   channel_ext: 'trunk_3',
-      //   dstchannel_ext: '+97675070099',
-      //   service: 's',
-      //   caller_name: '',
-      //   recordfiles: '',
-      //   dstanswer: '',
-      //   chanext: '',
-      //   dstchanext: '',
-      //   session: '1619149169718566-99126730',
-      //   action_owner: '99126730',
-      //   action_type: 'DIAL',
-      //   src_trunk_name: '75070099',
-      //   dst_trunk_name: '',
-      //   sn: 'Serial Number:21AWM9WL802AF159'
-      // };
-
       const { action_owner, src_trunk_name, disposition, uniqueid } = req.body;
 
       try {
@@ -206,6 +170,26 @@ const init = async app => {
           debugError(message);
           throw new Error(message);
         }
+
+        // save on api
+        try {
+          const apiConversationResponse = await sendRPCMessage({
+            action: 'create-or-update-conversation',
+            payload: JSON.stringify({
+              customerId: customer.erxesApiId,
+              content: disposition,
+              integrationId: integration.erxesApiId
+            })
+          });
+
+          conversation.erxesApiId = apiConversationResponse._id;
+          await conversation.save();
+        } catch (e) {
+          await Conversations.deleteOne({ _id: conversation._id });
+
+          debugError(e.message);
+          throw new Error(e);
+        }
       }
 
       // Check state of call and update
@@ -229,26 +213,6 @@ const init = async app => {
         }
 
         return res.send('success');
-      }
-
-      // save on api
-      try {
-        const apiConversationResponse = await sendRPCMessage({
-          action: 'create-or-update-conversation',
-          payload: JSON.stringify({
-            customerId: customer.erxesApiId,
-            content: disposition,
-            integrationId: integration.erxesApiId
-          })
-        });
-
-        conversation.erxesApiId = apiConversationResponse._id;
-        await conversation.save();
-      } catch (e) {
-        await Conversations.deleteOne({ _id: conversation._id });
-
-        debugError(e.message);
-        throw new Error(e);
       }
 
       res.send('success');

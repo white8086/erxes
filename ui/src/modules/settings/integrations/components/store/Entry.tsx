@@ -17,6 +17,7 @@ type TotalCount = {
   form: number;
   facebook: number;
   callpro: number;
+  grandstream: number;
   chatfuel: number;
   gmail: number;
   imap: number;

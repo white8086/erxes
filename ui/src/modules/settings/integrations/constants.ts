@@ -76,6 +76,7 @@ export const INTEGRATION_KINDS = {
   NYLAS_YAHOO: 'nylas-yahoo',
   FORMS: 'lead',
   CALLPRO: 'callpro',
+  GRANDSTREAM: 'grandstream',
   TWITTER_DM: 'twitter-dm',
   CHATFUEL: 'chatfuel',
   SMOOCH_TELEGRAM: 'smooch-telegram',
@@ -96,6 +97,7 @@ export const INTEGRATION_KINDS = {
     { text: 'Gmail', value: 'gmail' },
     { text: 'Webhook', value: 'webhook' },
     { text: 'Callpro', value: 'callpro' },
+    { text: 'Grand Stream', value: 'grandstream' },
     { text: 'Chatfuel', value: 'chatfuel' },
 
     { text: 'WhatsApp by Smooch', value: 'whatsapp' },
@@ -291,6 +293,19 @@ export const INTEGRATIONS = [
     category:
       'All integrations, For support teams, Marketing automation, Phone and video, Conversation'
   },
+
+  {
+    name: 'Grand Stream',
+    description: 'Connect your call pro phone number',
+    inMessenger: false,
+    isAvailable: true,
+    kind: 'grandstream',
+    logo: '/images/integrations/grandstream.png',
+    createModal: 'grandstream',
+    category:
+      'All integrations, For support teams, Marketing automation, Phone and video, Conversation'
+  },
+
   {
     name: 'Chatfuel',
     description: 'Connect your chatfuel account',

@@ -95,6 +95,7 @@ export const KIND_CHOICES = {
   NYLAS_OUTLOOK: 'nylas-outlook',
   NYLAS_YAHOO: 'nylas-yahoo',
   CALLPRO: 'callpro',
+  GRANDSTREAM: 'grandstream',
   TWITTER_DM: 'twitter-dm',
   CHATFUEL: 'chatfuel',
   SMOOCH_VIBER: 'smooch-viber',
@@ -125,7 +126,8 @@ export const KIND_CHOICES = {
     'smooch-twilio',
     'whatsapp',
     'telnyx',
-    'webhook'
+    'webhook',
+    'grandstream'
   ]
 };
 

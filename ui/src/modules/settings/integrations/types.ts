@@ -210,6 +210,7 @@ export type ByKindTotalCount = {
   facebook: number;
   gmail: number;
   callpro: number;
+  grandstream: number;
   chatfuel: number;
   imap: number;
   office365: number;
