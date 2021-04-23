@@ -163,6 +163,9 @@ class Dashboard extends React.Component<Props, State> {
     const { visible, toEmails } = this.state;
     const onCopy = () => this.setState({ copied: true });
 
+    const isPublic =
+      queryParams && queryParams.public === 'true' ? true : false;
+
     if (dashboardItems.length === 0) {
       return (
         <EmptyWrapper>
@@ -183,6 +186,7 @@ class Dashboard extends React.Component<Props, State> {
               dashboardId={dashboardId}
               title={item.name}
               query={item.vizState.query}
+              isPublic={isPublic}
               removeDashboardItem={removeDashboardItem}
             >
               <ChartRenderer
@@ -220,7 +224,7 @@ class Dashboard extends React.Component<Props, State> {
                 </Button>
               </CopyToClipboard>
 
-              <Button
+              {/* <Button
                 onClick={this.printDashboard}
                 shape="round"
                 icon={<Icon icon="pdf" />}
@@ -233,7 +237,7 @@ class Dashboard extends React.Component<Props, State> {
                 icon={<Icon icon="envelope-upload" />}
               >
                 Email this Dashboard
-              </Button>
+              </Button> */}
             </Actions>
           </ShadowedHeader>
         )}
@@ -310,6 +314,12 @@ class Dashboard extends React.Component<Props, State> {
           rowHeight={40}
           onLayoutChange={this.onLayoutChange}
           isDragging={this.state.isDragging}
+          isDraggable={
+            queryParams && queryParams.public === 'true' ? false : true
+          }
+          isResizable={
+            queryParams && queryParams.public === 'true' ? false : true
+          }
         >
           {dashboardItems.map(deserializeItem).map(dashboardItem)}
         </DragField>

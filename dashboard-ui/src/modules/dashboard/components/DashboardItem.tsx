@@ -13,7 +13,8 @@ const DashboardItemDropdown = ({
   dashboardId,
   removeDashboardItem,
   query,
-  title
+  title,
+  isPublic
 }) => {
   const onClick = () => {
     window.open(
@@ -59,9 +60,10 @@ const DashboardItemDropdown = ({
       </Menu.Item>
     </Menu>
   );
+
   return (
     <Dropdown
-      overlay={dashboardItemDropdownMenu}
+      overlay={!isPublic ? dashboardItemDropdownMenu : <></>}
       placement="bottomLeft"
       trigger={['click']}
     >
@@ -76,13 +78,15 @@ const DashboardItem = ({
   children,
   title,
   removeDashboardItem,
-  query
+  query,
+  isPublic
 }) => (
   <StyledCard
     title={title}
     bordered={false}
     extra={
       <DashboardItemDropdown
+        isPublic={isPublic}
         itemId={itemId}
         dashboardId={dashboardId}
         removeDashboardItem={removeDashboardItem}
