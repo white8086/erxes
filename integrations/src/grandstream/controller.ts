@@ -65,12 +65,12 @@ const init = async app => {
       }
 
       const { recordUrl } = integration;
-      const { callId } = conversation;
+      const { recordFile } = conversation;
 
       let audioSrc = '';
 
       if (recordUrl) {
-        audioSrc = `${recordUrl}&id=${callId}`;
+        audioSrc = `${recordUrl}&data=${recordFile.replace('@', '')}`;
       }
 
       return res.json({ audioSrc });
@@ -82,7 +82,13 @@ const init = async app => {
     routeErrorHandling(async (req, res) => {
       debugRequest(debugGrandStream, req);
 
-      const { action_owner, src_trunk_name, disposition, uniqueid } = req.body;
+      const {
+        action_owner,
+        src_trunk_name,
+        disposition,
+        uniqueid,
+        recordfiles
+      } = req.body;
 
       try {
         await Logs.createLog({
@@ -160,7 +166,8 @@ const init = async app => {
             callId: uniqueid,
             senderPhoneNumber: src_trunk_name,
             recipientPhoneNumber: action_owner,
-            integrationId: integration._id
+            integrationId: integration._id,
+            recordFile: recordfiles
           });
         } catch (e) {
           const message = e.message.includes('duplicate')
@@ -196,7 +203,7 @@ const init = async app => {
       if (conversation.state !== disposition) {
         await Conversations.updateOne(
           { callId: uniqueid },
-          { $set: { state: disposition } }
+          { $set: { state: disposition, recordFile: recordfiles } }
         );
 
         try {

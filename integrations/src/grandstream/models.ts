@@ -29,6 +29,7 @@ export interface IConversation {
   state: string;
   integrationId: string;
   callId: string;
+  recordFile: string;
 }
 
 export interface IConversationDocument extends IConversation, Document {}
@@ -40,7 +41,8 @@ export const conversationSchema = new Schema({
   integrationId: String,
   senderPhoneNumber: { type: String, index: true },
   recipientPhoneNumber: { type: String, index: true },
-  callId: { type: String, unique: true }
+  callId: { type: String, unique: true },
+  recordFile: { type: String }
 });
 
 export interface IConversationModel extends Model<IConversationDocument> {}

@@ -111,6 +111,40 @@ export default {
     return null;
   },
 
+  async grandStreamAudio(
+    conv: IConversationDocument,
+    _args,
+    { dataSources, user }: IContext
+  ) {
+    const integration =
+      (await getDocument('integrations', {
+        _id: conv.integrationId
+      })) || {};
+
+    if (integration && integration.kind !== 'grandstream') {
+      return null;
+    }
+
+    if (user.isOwner || user._id === conv.assignedUserId) {
+      try {
+        const response = await dataSources.IntegrationsAPI.fetchApi(
+          '/grandstream/get-audio',
+          {
+            erxesApiId: conv._id,
+            integrationId: integration._id
+          }
+        );
+
+        return response ? response.audioSrc : '';
+      } catch (e) {
+        debugError(e);
+        return null;
+      }
+    }
+
+    return null;
+  },
+
   async tags(conv: IConversationDocument) {
     return getDocumentList('tags', { _id: { $in: conv.tagIds || [] } });
   },

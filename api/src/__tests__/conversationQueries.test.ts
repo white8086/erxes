@@ -147,6 +147,7 @@ describe('conversationQueries', () => {
           postId
         }
         callProAudio
+        grandStreamAudio
         isFacebookTaggedMessage
       }
     }

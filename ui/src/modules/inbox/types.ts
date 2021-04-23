@@ -41,6 +41,7 @@ export interface IConversation {
   idleTime: number;
   facebookPost?: IFacebookPost;
   callProAudio?: string;
+  grandStreamAudio?: string;
   videoCallData?: IVideoCallData;
 
   isFacebookTaggedMessage?: boolean;

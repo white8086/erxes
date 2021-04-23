@@ -346,7 +346,8 @@ const SmallEditor = styled.div`
 `;
 
 const CallLabel = styledTS<{ type: string }>(styled.span)`
-  color: ${props => (props.type === 'answered' ? 'green' : 'red')};
+  color: ${props =>
+    props.type.toLowerCase() === 'answered' ? 'green' : 'red'};
 `;
 
 export {
