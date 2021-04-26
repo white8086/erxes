@@ -260,14 +260,33 @@ const FixedSection = styled.div`
 `;
 
 const SearchInput = styled.div`
+  background-color: #edf1f5;
+  border: 1px solid #edf1f5;
+  border-radius: 35px;
+  height: 32px;
+  transition: 0.3s all;
+  width: '120px';
+  display: flex;
+  padding: 0 ${dimensions.unitSpacing}px;
+  align-items: center;
   position: relative;
 
+  > span {
+    color: ${colors.colorCoreGray};
+    padding-left: ${dimensions.unitSpacing}px;
+  }
+
   input {
-    border: 1px solid ${colors.borderPrimary};
-    padding: 20px 20px 20px 30px;
-    border-radius: 5px;
-    min-width: 500px;
-    background: ${colors.colorWhite};
+    background: 0 0;
+    border: none;
+    padding: 5px ${dimensions.unitSpacing}px;
+    flex: 1;
+    height: 100%;
+    outline: 0;
+
+    &:focus {
+      outline: 0;
+    }
 
     @media (max-width: 1300px) {
       min-width: 260px;
@@ -275,11 +294,12 @@ const SearchInput = styled.div`
   }
 
   i {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 15px;
-    color: ${colors.colorCoreGray};
+    cursor: pointer;
+    position: relative;
+    top: 2px;
+    left: 5px;
+    font-size: 18px;
+    color: ${colors.colorCoreDarkGray};
   }
 `;
 
