@@ -280,11 +280,15 @@ app.get(
         return res.send('Invalid key');
       }
 
-      const response = await readFileRequest(key);
+      const { body, contentType } = await readFileRequest(key);
 
-      res.attachment(key);
+      if (contentType) {
+        res.setHeader('content-type', contentType);
+      } else {
+        res.attachment(key);
+      }
 
-      return res.send(response);
+      return res.send(body);
     },
     (res, e, next) => {
       if (e.message.includes('key does not exist')) {

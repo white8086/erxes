@@ -383,7 +383,7 @@ export const readFileRequest = async (key: string): Promise<any> => {
     // get a file buffer
     const [contents] = await file.download({});
 
-    return contents;
+    return { body: contents, contentType: '' };
   }
 
   if (UPLOAD_SERVICE_TYPE === 'AWS') {
@@ -401,7 +401,10 @@ export const readFileRequest = async (key: string): Promise<any> => {
             return reject(error);
           }
 
-          return resolve(response.Body);
+          return resolve({
+            body: response.Body,
+            contentType: response.ContentType
+          });
         }
       );
     });
@@ -414,7 +417,7 @@ export const readFileRequest = async (key: string): Promise<any> => {
           return reject(error);
         }
 
-        return resolve(response);
+        return resolve({ body: response, contentType: '' });
       });
     });
   }
