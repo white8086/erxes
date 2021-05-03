@@ -5,6 +5,7 @@ import { ISendNotification as ISendNotificationC } from 'erxes-api-utils/lib/req
 import * as fileType from 'file-type';
 import * as admin from 'firebase-admin';
 import * as fs from 'fs';
+import mime = require('mime');
 import * as path from 'path';
 import * as puppeteer from 'puppeteer';
 import * as strip from 'strip';
@@ -412,12 +413,14 @@ export const readFileRequest = async (key: string): Promise<any> => {
 
   if (UPLOAD_SERVICE_TYPE === 'local') {
     return new Promise((resolve, reject) => {
-      fs.readFile(`${uploadsFolderPath}/${key}`, (error, response) => {
+      const path = `${uploadsFolderPath}/${key}`;
+
+      fs.readFile(path, (error, response) => {
         if (error) {
           return reject(error);
         }
 
-        return resolve({ body: response, contentType: '' });
+        return resolve({ body: response, contentType: mime.getType(path) });
       });
     });
   }

@@ -74,6 +74,7 @@
     "jsonwebtoken": "^8.1.0",
     "meteor-random": "^0.0.3",
     "migrate": "^1.6.2",
+    "mime": "^2.5.2",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.31",
     "mongo-uri": "^0.1.2",
