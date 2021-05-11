@@ -116,8 +116,9 @@ const PropertyTableHeader = styled.div`
     width: 33%;
 
     &:last-child {
-      width: 5%;
-      padding: 8px 0;
+      width: 10%;
+      padding: 8px 20px 8px 0;
+      text-align: right;
     }
   }
 `;
@@ -131,8 +132,9 @@ const RowField = styled.div`
   justify-content: center;
 
   &:last-child {
-    width: 5%;
-    padding: 8px 0;
+    width: 10%;
+    padding: 8px 20px 8px 0;
+    text-align: right;
   }
 `;
 
@@ -144,6 +146,36 @@ const PropertyTableRow = styled.div`
     ${RowField} {
       background-color: rgb(245, 245, 245);
     }
+  }
+`;
+
+const FlexRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .flex-item {
+    flex: 1;
+    margin-left: ${dimensions.coreSpacing}px;
+
+    &:first-child {
+      margin: 0;
+    }
+
+    input[type='checkbox'] {
+      display: inline-block;
+      height: auto;
+      width: auto;
+      margin-right: 5px;
+    }
+  }
+
+  button {
+    margin-left: ${dimensions.coreSpacing / 2}px;
+  }
+
+  & + div {
+    margin-top: ${dimensions.coreSpacing / 2}px;
   }
 `;
 
@@ -159,5 +191,6 @@ export {
   LogicIndicator,
   PropertyTableHeader,
   PropertyTableRow,
-  RowField
+  RowField,
+  FlexRow
 };
