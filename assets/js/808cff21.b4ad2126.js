@@ -1,0 +1,1 @@
+(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9417],{8468:function(s){"use strict";s.exports=JSON.parse('{"allTagsPath":"/caseStudies/tags","slug":"telecomunications","name":"telecomunications","count":1,"permalink":"/caseStudies/tags/telecomunications"}')}}]);

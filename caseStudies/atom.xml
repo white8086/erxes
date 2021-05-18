@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://www.erxes.org/caseStudies</id>
+    <title>erxes Inc Blog</title>
+    <updated>2021-05-18T12:48:03.629Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://www.erxes.org/caseStudies"/>
+    <subtitle>erxes Inc Blog</subtitle>
+    <icon>https://www.erxes.org/img/favicon.png</icon>
+    <entry>
+        <title type="html"><![CDATA[A Simple, Secure and Powerful Application for One of the Leading Banks in Mongolia]]></title>
+        <id>a-simple-secure-and-powerful-application-golomt-bank</id>
+        <link href="https://www.erxes.org/caseStudies/a-simple-secure-and-powerful-application-golomt-bank"/>
+        <updated>2021-05-18T12:48:03.629Z</updated>
+        <summary type="html"><![CDATA[Supporting the institution’s growth objectives by centralizing the CRM system with an all-in-one growth marketing tool.]]></summary>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Creating a Holistic Solution for Mongolia’s Largest Conglomerate]]></title>
+        <id>creating-a-holistic-solution-for-a-mongolias-largest-conglomerate</id>
+        <link href="https://www.erxes.org/caseStudies/creating-a-holistic-solution-for-a-mongolias-largest-conglomerate"/>
+        <updated>2021-05-18T12:48:03.629Z</updated>
+        <summary type="html"><![CDATA[With its companies operating separately, this conglomerate was missing opportunities for growth. Learn how they fostered business synergies and a customer centric approach with this “one tool to rule them all.”]]></summary>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Refocusing the Customer Journey with erxes]]></title>
+        <id>refocusing-the-customer-journey-with-erxes</id>
+        <link href="https://www.erxes.org/caseStudies/refocusing-the-customer-journey-with-erxes"/>
+        <updated>2021-05-18T12:48:03.629Z</updated>
+        <summary type="html"><![CDATA[Elevating the customer journey by effectively managing data, customer support, marketing, and sales team with a single tool – erxes.]]></summary>
+    </entry>
+</feed>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>erxes Inc Blog</title>
+        <link>https://www.erxes.org/blog</link>
+        <description>erxes Inc Blog</description>
+        <lastBuildDate>Thu, 02 Apr 2020 00:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Install erxes with a 1-Click App on Heroku]]></title>
+            <link>https://www.erxes.org/blog/install-erxes-on-heroku</link>
+            <guid>install-erxes-on-heroku</guid>
+            <pubDate>Thu, 02 Apr 2020 00:00:00 GMT</pubDate>
+            <description><![CDATA[Today, we’re delighted to announce that erxes is available on Heroku. It will enable teams to run erxes and collaborate in the cloud, thus creating a frictionless developer experience.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Erxes v0.13.0 release information]]></title>
+            <link>https://www.erxes.org/blog/release-0.13.0</link>
+            <guid>release-0.13.0</guid>
+            <pubDate>Sun, 01 Mar 2020 00:00:00 GMT</pubDate>
+            <description><![CDATA[Welcome to the March 2020 release of Erxes. The number of updates and new features are highlighted in this version. Therefore, the breaking change has done in this release. Major features of the 0.13.0 series, compared to release 0.12.0\.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Erxes v0.12.0 release information]]></title>
+            <link>https://www.erxes.org/blog/release-0.12.0</link>
+            <guid>release-0.12.0</guid>
+            <pubDate>Wed, 08 Jan 2020 00:00:00 GMT</pubDate>
+            <description><![CDATA[Erxes 0.12.0 release contains the number of new features, resolved issues and improvements. Therefore, the breaking changes has done in this release. Major features of the 0.12.0 series, compared to release 0.11.2\.]]></description>
+        </item>
+    </channel>
+</rss>

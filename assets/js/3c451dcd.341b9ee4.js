@@ -1,0 +1,1 @@
+(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[9412],{1106:function(e){"use strict";e.exports=JSON.parse('{"allTagsPath":"/interviews/tags","slug":"education","name":"education","count":2,"permalink":"/interviews/tags/education"}')}}]);

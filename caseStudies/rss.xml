@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>erxes Inc Blog</title>
+        <link>https://www.erxes.org/caseStudies</link>
+        <description>erxes Inc Blog</description>
+        <lastBuildDate>Tue, 18 May 2021 12:48:03 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[A Simple, Secure and Powerful Application for One of the Leading Banks in Mongolia]]></title>
+            <link>https://www.erxes.org/caseStudies/a-simple-secure-and-powerful-application-golomt-bank</link>
+            <guid>a-simple-secure-and-powerful-application-golomt-bank</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[Supporting the institution’s growth objectives by centralizing the CRM system with an all-in-one growth marketing tool.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Creating a Holistic Solution for Mongolia’s Largest Conglomerate]]></title>
+            <link>https://www.erxes.org/caseStudies/creating-a-holistic-solution-for-a-mongolias-largest-conglomerate</link>
+            <guid>creating-a-holistic-solution-for-a-mongolias-largest-conglomerate</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[With its companies operating separately, this conglomerate was missing opportunities for growth. Learn how they fostered business synergies and a customer centric approach with this “one tool to rule them all.”]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Refocusing the Customer Journey with erxes]]></title>
+            <link>https://www.erxes.org/caseStudies/refocusing-the-customer-journey-with-erxes</link>
+            <guid>refocusing-the-customer-journey-with-erxes</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[Elevating the customer journey by effectively managing data, customer support, marketing, and sales team with a single tool – erxes.]]></description>
+        </item>
+    </channel>
+</rss>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>erxes Inc Blog</title>
+        <link>https://www.erxes.org/interviews</link>
+        <description>erxes Inc Blog</description>
+        <lastBuildDate>Tue, 18 May 2021 12:48:03 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <item>
+            <title><![CDATA[Monetization While Balancing Open and Closed Source Projects with Sanket Sahu]]></title>
+            <link>https://www.erxes.org/interviews/closed-source-projects-with-sanket-sahu</link>
+            <guid>closed-source-projects-with-sanket-sahu</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[Today, erxes had the opportunity to chat with Sanket Sahu about his involvement in various open and closed source projects. His project NativeBase is currently used by over 37,000 projects. Sanket uses a very unique approach to monetization and balancing multiple projects at once. So let’s jump into the interview to learn more!]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Increasing Growth by Building a Community with Norbert Sendetzky]]></title>
+            <link>https://www.erxes.org/interviews/increasing-growth-by-building-community</link>
+            <guid>increasing-growth-by-building-community</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[At erxes, we’re dedicated to supporting open source projects grow. We do this in a couple of different ways. First, we help open source projects grow through the use of our own own open source marketing platform. Secondly, we work hard to educate open source project founders and contributors on a wide range of topics relating to marketing open source projects.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Debunking the Myth of a Single Creator with Justin Cappos]]></title>
+            <link>https://www.erxes.org/interviews/myth-of-a-single-creator-of-an-open-source-project</link>
+            <guid>myth-of-a-single-creator-of-an-open-source-project</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[Today, erxes had the opportunity to chat with Justin Cappos, professor in the Computer Science and Engineering department at New York University. We talked about his involvement in various open source projects, including TUF, a project aimed at helping developers maintain the security of their software update systems.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[All Things Open Source and Preparing for a Project Launch with Sandoche Adittane]]></title>
+            <link>https://www.erxes.org/interviews/project-launch-with-sandoche-adittane</link>
+            <guid>project-launch-with-sandoche-adittane</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[We had the opportunity to chat with Sandoche Adittane about his experiences building and promoting both open and closed source projects online. He has a lot of projects under his belt. You may know him as the creator of darkmode.js or most recently, as the maker of Kanbanote, Kanban boards for Evernote or git.news, a list of trending GitHub repos.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Starting an Open Source Project with No Corporate Backing with Ben Gubler]]></title>
+            <link>https://www.erxes.org/interviews/starting-an-open-source-project-with-no-corporate-funding</link>
+            <guid>starting-an-open-source-project-with-no-corporate-funding</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[At Erxes, we’re obsessed with helping open source projects grow. We do this in a couple of different ways. First, we help open source projects grow through the use of our own open source marketing platform.]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Having Targeted Goals in Open Source with Diana Chen]]></title>
+            <link>https://www.erxes.org/interviews/targeted-goals-for-growth-in-open-source</link>
+            <guid>targeted-goals-for-growth-in-open-source</guid>
+            <pubDate>Tue, 18 May 2021 12:48:03 GMT</pubDate>
+            <description><![CDATA[At erxes, we’re dedicated to supporting open source projects grow. We do this in a couple of different ways. First, we help open source projects grow through the use of our own own open source marketing platform. Secondly, we work hard to educate open source project founders and contributors on a wide range of topics relating to marketing open source projects.]]></description>
+        </item>
+    </channel>
+</rss>
