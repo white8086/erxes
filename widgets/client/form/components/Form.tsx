@@ -115,7 +115,22 @@ class Form extends React.Component<Props, State> {
   };
 
   onSubmit = () => {
-    this.props.onSubmit(this.state.doc);
+    const doc: any = {};
+
+    for (const key of Object.keys(this.state.doc)) {
+      const field = this.state.doc[key];
+
+      doc[key] = field;
+
+      if (field.type === 'multiSelect' || field.type === 'check') {
+        doc[key] = {
+          ...field,
+          value: String(field.value).replace(new RegExp(',,', 'g'), ', ')
+        };
+      }
+    }
+
+    this.props.onSubmit(doc);
   };
 
   canChangePage = () => {
@@ -172,7 +187,8 @@ class Form extends React.Component<Props, State> {
         type: field.type,
         validation: field.validation,
         value,
-        isHidden
+        isHidden,
+        column: field.column
       };
     });
 
@@ -291,7 +307,7 @@ class Form extends React.Component<Props, State> {
       }
 
       this.showField(field._id);
-      
+
       return (
         <Field
           key={field._id}
