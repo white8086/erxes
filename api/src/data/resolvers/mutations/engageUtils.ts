@@ -312,11 +312,11 @@ const sendEmailOrSms = async (
         await sendQueueMessage({ action, data });
       }
 
-      console.log('sssssssssssssssssss 5555.333');
-
       await removeKey(`${engageMessage._id}_customers_items_mapping`);
     }
   };
+
+  console.log('sssssssssssssssssss 5555.333');
 
   const customersItemsMapping = JSON.parse(
     (await get(`${engageMessage._id}_customers_items_mapping`)) || '{}'
@@ -368,12 +368,15 @@ const sendEmailOrSms = async (
     fieldsOption
   ) as any).stream();
 
+  console.log('sssssssssssssssssss 5555.4444');
+
   return new Promise((resolve, reject) => {
     const pipe = customersStream.pipe(customerTransformerStream);
 
     pipe.on('finish', async () => {
       try {
         await onFinishPiping();
+        console.log('sssssssssssssssssss 5555.5555');
       } catch (e) {
         return reject(e);
       }
