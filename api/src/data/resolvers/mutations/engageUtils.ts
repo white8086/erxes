@@ -316,7 +316,7 @@ const sendEmailOrSms = async (
         await sendQueueMessage({ action, data });
       }
 
-      console.log('sssssssssssssssssss 5555.6666');
+      console.log('sssssssssssssssssss 5555.6666', engageMessage._id);
 
       await removeKey(`${engageMessage._id}_customers_items_mapping`);
 
