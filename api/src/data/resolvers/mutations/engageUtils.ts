@@ -234,8 +234,6 @@ const sendEmailOrSms = async (
   const emailConf = engageMessage.email ? engageMessage.email : { content: '' };
   const emailContent = emailConf.content || '';
 
-  console.log('sssssssssssssssssss 5555.111');
-
   const { customerFields } = await replaceEditorAttributes({
     content: emailContent
   });
@@ -255,6 +253,8 @@ const sendEmailOrSms = async (
       engageMessage.scheduleDate &&
       engageMessage.scheduleDate.type === 'minute';
 
+    console.log('sssssssssssssssssss 5555.3333');
+
     if (
       !(
         engageMessage.kind === MESSAGE_KINDS.AUTO &&
@@ -270,6 +270,8 @@ const sendEmailOrSms = async (
         }
       });
     }
+
+    console.log('sssssssssssssssssss 5555.4444');
 
     if (
       engageMessage.scheduleDate &&
@@ -292,6 +294,8 @@ const sendEmailOrSms = async (
         kind: engageMessage.kind
       };
 
+      console.log('sssssssssssssssssss 5555.5555');
+
       if (engageMessage.method === METHODS.EMAIL && engageMessage.email) {
         const { replacedContent } = await replaceEditorAttributes({
           customerFields,
@@ -312,11 +316,11 @@ const sendEmailOrSms = async (
         await sendQueueMessage({ action, data });
       }
 
+      console.log('sssssssssssssssssss 5555.6666');
+
       await removeKey(`${engageMessage._id}_customers_items_mapping`);
     }
   };
-
-  console.log('sssssssssssssssssss 5555.333');
 
   const customersItemsMapping = JSON.parse(
     (await get(`${engageMessage._id}_customers_items_mapping`)) || '{}'
@@ -368,15 +372,13 @@ const sendEmailOrSms = async (
     fieldsOption
   ) as any).stream();
 
-  console.log('sssssssssssssssssss 5555.4444');
-
   return new Promise((resolve, reject) => {
     const pipe = customersStream.pipe(customerTransformerStream);
 
     pipe.on('finish', async () => {
       try {
         await onFinishPiping();
-        console.log('sssssssssssssssssss 5555.5555');
+        console.log('sssssssssssssssssss 5555.9999');
       } catch (e) {
         return reject(e);
       }
