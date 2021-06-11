@@ -42,8 +42,6 @@ const engageMutations = {
     doc: IEngageMessage,
     { user, docModifier }: IContext
   ) {
-    console.log('sssssssssssssssssss 1111');
-
     checkCampaignDoc(doc);
 
     // fromUserId is not required in sms engage, so set it here
@@ -51,17 +49,11 @@ const engageMutations = {
       doc.fromUserId = user._id;
     }
 
-    console.log('sssssssssssssssssss 2222');
-
     const engageMessage = await EngageMessages.createEngageMessage(
       docModifier({ ...doc, createdBy: user._id })
     );
 
-    console.log('sssssssssssssssssss 3333');
-
     await sendToWebhook('create', 'engageMessages', engageMessage);
-
-    console.log('sssssssssssssssssss 4444');
 
     await send(engageMessage);
 

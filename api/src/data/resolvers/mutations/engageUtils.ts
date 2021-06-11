@@ -234,11 +234,15 @@ const sendEmailOrSms = async (
   const emailConf = engageMessage.email ? engageMessage.email : { content: '' };
   const emailContent = emailConf.content || '';
 
+  console.log('sssssssssssssssssss 5555.111');
+
   const { customerFields } = await replaceEditorAttributes({
     content: emailContent
   });
 
   const onFinishPiping = async () => {
+    console.log('sssssssssssssssssss 5555.222');
+
     if (
       engageMessage.kind === MESSAGE_KINDS.MANUAL &&
       customerInfos.length === 0
@@ -307,6 +311,8 @@ const sendEmailOrSms = async (
 
         await sendQueueMessage({ action, data });
       }
+
+      console.log('sssssssssssssssssss 5555.333');
 
       await removeKey(`${engageMessage._id}_customers_items_mapping`);
     }
