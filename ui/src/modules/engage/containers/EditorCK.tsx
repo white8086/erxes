@@ -61,8 +61,6 @@ const generateAttributes = (
     ...generateItemCustomFields(itemTypeFields.task)
   ];
 
-  console.log(itemTypeFields);
-
   return {
     items,
     title: 'Attributes',
