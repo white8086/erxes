@@ -629,8 +629,9 @@ export const replaceEditorAttributes = async (args: {
       value: item.description || ''
     });
 
-    console.log('ssssssssssss', new Date(item.closeDate));
-    console.log('ssssssssssss', new Date(item.closeDate).toDateString());
+    console.log('ssssssssssss', item, item.createdAt);
+    console.log('ssssssssssss', new Date(item.createdAt));
+    console.log('ssssssssssss', new Date(item.createdAt).toDateString());
 
     replacers.push({
       key: '{{ itemCloseDate }}',
