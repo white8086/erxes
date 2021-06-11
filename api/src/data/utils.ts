@@ -628,6 +628,8 @@ export const replaceEditorAttributes = async (args: {
       key: '{{ itemDescription }}',
       value: item.description || ''
     });
+    console.log('mmmmmmmm', item, item.closeDate, typeof item.closeDate);
+
     replacers.push({
       key: '{{ itemCloseDate }}',
       value: item.closeDate ? item.closeDate.toDateString() : ''
