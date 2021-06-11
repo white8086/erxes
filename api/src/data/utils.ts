@@ -634,7 +634,7 @@ export const replaceEditorAttributes = async (args: {
     });
     replacers.push({
       key: '{{ itemCreatedAt }}',
-      value: item.createdAt ? item.createdA.toLocaleString() : ''
+      value: item.createdAt ? item.createdAt.toLocaleString() : ''
     });
     replacers.push({
       key: '{{ itemModifiedAt }}',
