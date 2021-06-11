@@ -239,8 +239,6 @@ const sendEmailOrSms = async (
   });
 
   const onFinishPiping = async () => {
-    console.log('sssssssssssssssssss 5555.222');
-
     if (
       engageMessage.kind === MESSAGE_KINDS.MANUAL &&
       customerInfos.length === 0
@@ -252,8 +250,6 @@ const sendEmailOrSms = async (
     const MINUTELY =
       engageMessage.scheduleDate &&
       engageMessage.scheduleDate.type === 'minute';
-
-    console.log('sssssssssssssssssss 5555.3333');
 
     if (
       !(
@@ -270,8 +266,6 @@ const sendEmailOrSms = async (
         }
       });
     }
-
-    console.log('sssssssssssssssssss 5555.4444');
 
     if (
       engageMessage.scheduleDate &&
@@ -293,8 +287,6 @@ const sendEmailOrSms = async (
         title: engageMessage.title,
         kind: engageMessage.kind
       };
-
-      console.log('sssssssssssssssssss 5555.5555');
 
       if (engageMessage.method === METHODS.EMAIL && engageMessage.email) {
         const { replacedContent } = await replaceEditorAttributes({
@@ -380,7 +372,6 @@ const sendEmailOrSms = async (
     pipe.on('finish', async () => {
       try {
         await onFinishPiping();
-        console.log('sssssssssssssssssss 5555.9999');
       } catch (e) {
         return reject(e);
       }

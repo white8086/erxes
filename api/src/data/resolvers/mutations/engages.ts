@@ -57,8 +57,6 @@ const engageMutations = {
 
     await send(engageMessage);
 
-    console.log('sssssssssssssssssss 5555');
-
     await putCreateLog(
       {
         type: MODULE_NAMES.ENGAGE,
@@ -73,8 +71,6 @@ const engageMutations = {
       },
       user
     );
-
-    console.log('sssssssssssssssssss 6666');
 
     return engageMessage;
   },
