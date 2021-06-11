@@ -319,6 +319,8 @@ const sendEmailOrSms = async (
       console.log('sssssssssssssssssss 5555.6666');
 
       await removeKey(`${engageMessage._id}_customers_items_mapping`);
+
+      console.log('sssssssssssssssssss 5555.7777');
     }
   };
 
