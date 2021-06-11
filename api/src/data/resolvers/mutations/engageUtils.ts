@@ -313,7 +313,7 @@ const sendEmailOrSms = async (
   };
 
   const customersItemsMapping = JSON.parse(
-    (await get(`${engageMessage._id}_customers_items_mapping`)) || {}
+    (await get(`${engageMessage._id}_customers_items_mapping`)) || '{}'
   );
 
   const customerTransformerStream = new Transform({
