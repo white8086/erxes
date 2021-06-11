@@ -84,7 +84,7 @@ export const generateCustomerSelector = async ({
           'name',
           'description',
           'closeDate',
-          'createAt',
+          'createdAt',
           'modifiedAt',
           'customFieldsData'
         ];
