@@ -629,21 +629,19 @@ export const replaceEditorAttributes = async (args: {
       value: item.description || ''
     });
 
-    console.log('ssssssssssss', item, item.createdAt);
-    console.log('ssssssssssss', new Date(item.createdAt));
-    console.log('ssssssssssss', new Date(item.createdAt).toDateString());
-
     replacers.push({
       key: '{{ itemCloseDate }}',
-      value: item.closeDate ? new Date(item.closeDate).toDateString() : ''
+      value: item.closeDate ? new Date(item.closeDate).toLocaleDateString() : ''
     });
     replacers.push({
       key: '{{ itemCreatedAt }}',
-      value: item.createdAt ? new Date(item.createdAt).toDateString() : ''
+      value: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''
     });
     replacers.push({
       key: '{{ itemModifiedAt }}',
-      value: item.modifiedAt ? new Date(item.modifiedAt).toDateString() : ''
+      value: item.modifiedAt
+        ? new Date(item.modifiedAt).toLocaleDateString()
+        : ''
     });
 
     const products = await generateProducts(item.productsData);
