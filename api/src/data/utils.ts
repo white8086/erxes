@@ -628,11 +628,17 @@ export const replaceEditorAttributes = async (args: {
       key: '{{ itemDescription }}',
       value: item.description || ''
     });
-    replacers.push({ key: '{{ itemCloseDate }}', value: item.closeDate || '' });
-    replacers.push({ key: '{{ itemCreatedAt }}', value: item.createdAt || '' });
+    replacers.push({
+      key: '{{ itemCloseDate }}',
+      value: item.closeDate ? item.closeDate.toLocaleString() : ''
+    });
+    replacers.push({
+      key: '{{ itemCreatedAt }}',
+      value: item.createdAt ? item.createdA.toLocaleString() : ''
+    });
     replacers.push({
       key: '{{ itemModifiedAt }}',
-      value: item.modifiedAt || ''
+      value: item.modifiedAt ? item.modifiedAt.toLocaleString() : ''
     });
 
     const products = await generateProducts(item.productsData);
