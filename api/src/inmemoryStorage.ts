@@ -17,9 +17,9 @@ export const initMemoryStorage = () => {
   });
 };
 
-export const removeKey = (key: string) => {
+export const removeKey = async (key: string) => {
   try {
-    return client.removeKey(key);
+    return await client.removeKey(key);
   } catch (e) {
     debugError(
       `For removeKey of inmemoryStorage, key: ${key}. Error: ${e.message}`
