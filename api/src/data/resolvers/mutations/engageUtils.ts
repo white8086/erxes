@@ -43,6 +43,7 @@ export const generateCustomerSelector = async ({
 }): Promise<any> => {
   // find matched customers
   let customerQuery: any = {};
+  let customersItemsMapping: { [key: string]: any } = {};
 
   if (customerIds && customerIds.length > 0) {
     customerQuery = { _id: { $in: customerIds } };
@@ -78,8 +79,6 @@ export const generateCustomerSelector = async ({
         engageId &&
         ['company', 'deal', 'task', 'ticket'].includes(segment.contentType)
       ) {
-        let customersItemsMapping: { [key: string]: any } | undefined = {};
-
         const returnFields = [
           'name',
           'description',
@@ -121,13 +120,6 @@ export const generateCustomerSelector = async ({
             });
           }
         }
-
-        await set(
-          `${engageId}_customers_items_mapping`,
-          JSON.stringify(customersItemsMapping)
-        );
-
-        customersItemsMapping = undefined;
       }
 
       customerIdsBySegments = [...customerIdsBySegments, ...cIds];
@@ -135,6 +127,12 @@ export const generateCustomerSelector = async ({
 
     customerQuery = { _id: { $in: customerIdsBySegments } };
   }
+
+  await set(
+    `${engageId}_customers_items_mapping`,
+    JSON.stringify(customersItemsMapping)
+  );
+  customersItemsMapping = {};
 
   return {
     ...customerQuery,
@@ -314,6 +312,8 @@ const sendEmailOrSms = async (
         await removeKey(key);
       }
     }
+
+    await removeKey(`${engageMessage._id}_customers_items_mapping`);
   };
 
   const customersItemsMapping = JSON.parse(
