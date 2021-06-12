@@ -132,6 +132,7 @@ export const generateCustomerSelector = async ({
     `${engageId}_customers_items_mapping`,
     JSON.stringify(customersItemsMapping)
   );
+
   customersItemsMapping = {};
 
   return {
@@ -304,12 +305,6 @@ const sendEmailOrSms = async (
         data.customers = chunk;
 
         await sendQueueMessage({ action, data });
-      }
-
-      const key = `${engageMessage._id}_customers_items_mapping`;
-
-      if (await get(key)) {
-        await removeKey(key);
       }
     }
 
