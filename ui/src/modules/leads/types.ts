@@ -94,3 +94,11 @@ export type IntegrationsCount = {
 export type CountQueryResponse = {
   integrationsTotalCount: IntegrationsCount;
 } & QueryResponse;
+
+export type LeadChartData = {
+  text: string;
+  description?: string;
+  type: string;
+  total: number;
+  value: { [key: string]: string };
+};

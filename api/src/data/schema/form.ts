@@ -21,6 +21,14 @@ export const types = `
 
     fields: [Field]
   }
+
+  type FormChartData {
+    text: String
+    description: String
+    type: String
+    value: JSON
+    total: Int
+  }
 `;
 
 const commonFields = `
@@ -40,6 +48,7 @@ const commonFormSubmissionFields = `
 
 export const queries = `
   formDetail(_id: String!): Form
+  formStatistics(_id: String!): [FormChartData]
   forms: [Form]
 `;
 

@@ -92,10 +92,23 @@ const forms = `
   }
 `;
 
+const formStatistics = `
+  query formStatistics($_id: String!) {
+    formStatistics(_id: $_id) {
+      text
+      description
+      type
+      total
+      value
+    }
+  }
+`;
+
 export default {
   integrations,
   integrationDetail,
   integrationsTotalCount,
   tags,
-  forms
+  forms,
+  formStatistics
 };

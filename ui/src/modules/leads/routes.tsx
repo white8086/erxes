@@ -15,6 +15,10 @@ const List = asyncComponent(() =>
   import(/* webpackChunkName: "List - Form" */ './containers/List')
 );
 
+const LeadDetail = asyncComponent(() =>
+  import(/* webpackChunkName: "CreateLead" */ './containers/LeadDetail')
+);
+
 const forms = history => {
   const { location } = history;
 
@@ -40,6 +44,19 @@ const editLead = ({ match, location }) => {
   );
 };
 
+const leadDetail = ({ match, location }) => {
+  const { contentTypeId, formId } = match.params;
+  const queryParams = queryString.parse(location.search);
+
+  return (
+    <LeadDetail
+      queryParams={queryParams}
+      formId={formId}
+      contentTypeId={contentTypeId}
+    />
+  );
+};
+
 const routes = () => {
   return (
     <React.Fragment>
@@ -50,6 +67,13 @@ const routes = () => {
         exact={true}
         path="/forms/create"
         component={createLead}
+      />
+
+      <Route
+        key="/forms/detail/:contentTypeId?/:formId?"
+        exact={true}
+        path="/forms/detail/:contentTypeId?/:formId?"
+        component={leadDetail}
       />
 
       <Route

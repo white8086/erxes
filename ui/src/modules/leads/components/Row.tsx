@@ -43,6 +43,20 @@ class Row extends React.Component<Props> {
     );
   }
 
+  renderDetailAction(integration) {
+    const { formId } = integration;
+
+    return (
+      <Link to={`/forms/detail/${integration._id}/${formId}`}>
+        <Button btnStyle="link">
+          <Tip text={__('Show')} placement="top">
+            <Icon icon="eye" />
+          </Tip>
+        </Button>
+      </Link>
+    );
+  }
+
   renderEditAction(integration) {
     const trigger = (
       <Button btnStyle="link">
@@ -228,6 +242,7 @@ class Row extends React.Component<Props> {
         <td>
           <ActionButtons>
             {this.manageAction(integration)}
+            {this.renderDetailAction(integration)}
             {this.renderEditAction(integration)}
             {this.renderArchiveAction()}
             {this.renderUnarchiveAction()}
