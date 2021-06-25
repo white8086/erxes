@@ -530,6 +530,20 @@ export const replaceEditorAttributes = async (args: {
 
   const customFieldsData = customer.customFieldsData || [];
 
+  const formRegex = /(?:^|\s){{ #form,(.*?)(?:\s|$)/g;
+  const match = formRegex.exec(replacedContent);
+
+  if (match && match[1]) {
+    const codes = match[1].split(',');
+    if (codes.length > 1) {
+      replacedContent = replacedContent.replace(
+        formRegex,
+        `<div data-erxes-embed="${codes[0]}" data-erxes-brand="${codes[1]}" style="height:300px"></div>
+        `
+      );
+    }
+  }
+
   if (!customerFields || customerFields.length === 0) {
     const possibleCustomerFields = await fieldsCombinedByContentType({
       contentType: 'customer'

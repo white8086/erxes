@@ -50,9 +50,9 @@ const getInstallCode = (brandCode: string, formCode: string) => {
   `;
 };
 
-const getEmbedCode = (formCode: string) => {
+const getEmbedCode = (formCode: string, brandCode: string) => {
   return `
-    <div data-erxes-embed="${formCode}" style="width:900px;height:300px"></div>
+    <div data-erxes-embed="${formCode}" data-erxes-brand="${brandCode}" style="height:300px"></div>
   `;
 };
 
@@ -80,7 +80,7 @@ class Manage extends React.Component<Props, State> {
         code = getInstallCode(brand.code, form.code || '');
       }
 
-      embedCode = getEmbedCode(form.code || '');
+      embedCode = getEmbedCode(form.code || '', brand.code);
       buttonCode = getButtonCode(form.code || '');
     }
 

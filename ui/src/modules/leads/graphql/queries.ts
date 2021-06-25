@@ -104,11 +104,32 @@ const formStatistics = `
   }
 `;
 
+const leadIntegrations = `
+  query leadIntegrations($perPage: Int, $page: Int, $kind: String) {
+    integrations(perPage: $perPage, page: $page, kind: $kind) {
+      _id
+      name
+      code
+      kind
+      brand {
+        _id
+        name
+        code
+      }
+      form {
+        _id
+        code
+      }
+    }
+  }
+`;
+
 export default {
   integrations,
   integrationDetail,
   integrationsTotalCount,
   tags,
   forms,
-  formStatistics
+  formStatistics,
+  leadIntegrations
 };

@@ -28,13 +28,14 @@ class EmailStatistics extends React.Component<Props> {
             {Object.keys(data.value).map((key, i) => {
               const count = data.value[key] || '';
 
+              const percentage = (parseInt(count, 10) / data.total) * 100;
               return (
                 <div key={`${key}_${i}`}>
                   <h4>
-                    {key} ({count})
+                    {key} ({percentage.toFixed(2)}%)
                   </h4>
                   <ProgressBar
-                    percentage={(parseInt(count, 10) / data.total) * 100}
+                    percentage={percentage}
                     color="#3B85F4"
                     height="8px"
                   />

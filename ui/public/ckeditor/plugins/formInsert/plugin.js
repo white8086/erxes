@@ -1,27 +1,27 @@
-CKEDITOR.plugins.add('strinsert', {
+CKEDITOR.plugins.add('formInsert', {
   requires: ['richcombo'],
   init: function(editor) {
     // init the default config
     var defaultConfig = {
-      format: '{{ %string% }}',
+      format: ' #form,%string% ',
       items: []
     };
 
     // merge default config with the passed
     var config = CKEDITOR.tools.extend(
       defaultConfig,
-      editor.config.strinsert || {},
+      editor.config.formInsert || {},
       true
     );
 
     // Gets the list of insertable strings from the settings.
     var strings = config.items;
     // add the menu to the editor
-    editor.ui.addRichCombo('strinsert', {
-      name: 'strinsert',
-      label: config.label || 'Insert',
-      title: config.title || 'Insert content',
-      voiceLabel: config.voice || 'Insert content',
+    editor.ui.addRichCombo('formInsert', {
+      name: 'formInsert',
+      label: config.label || 'Insert form',
+      title: config.title || 'Insert form',
+      voiceLabel: config.voice || 'Insert form',
       className: 'cke_format',
       multiSelect: false,
       panel: {
@@ -52,6 +52,7 @@ CKEDITOR.plugins.add('strinsert', {
               '%string%',
               string.value
             );
+
             this.add(formattedValue, string.name, string.label);
           }
         }
