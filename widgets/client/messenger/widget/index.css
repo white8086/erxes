@@ -14,7 +14,7 @@
   right: -300px;
   bottom: -242px;
   z-index: -1;
-  background: url('https://s3.amazonaws.com/erxes/radial06.png');
+  background: url("https://s3.amazonaws.com/erxes/radial06.png");
   background-position: 100% 100%;
   background-repeat: no-repeat;
   background-size: contain;
@@ -31,7 +31,7 @@
   z-index: 2147483647;
 }
 
-.erxes-messenger-hidden>iframe {
+.erxes-messenger-hidden > iframe {
   width: 72px;
   height: 72px;
   max-width: none;
@@ -49,7 +49,7 @@
 }
 
 .erxes-messenger-shown:after {
-  opacity: .9 !important;
+  opacity: 0.9 !important;
   right: -20px !important;
   bottom: -20px !important;
 }
@@ -58,8 +58,8 @@
   max-height: 310px;
 }
 
-.erxes-messenger-shown>iframe,
-.erxes-notifier-shown>iframe {
+.erxes-messenger-shown > iframe,
+.erxes-notifier-shown > iframe {
   width: 100% !important;
   height: 100% !important;
   max-width: none;
@@ -75,7 +75,7 @@
   max-height: 100%;
 }
 
-@media only screen and (max-width: 420px) {
+@media only screen and (max-width: 480px) {
   #erxes-messenger-container {
     width: 100%;
     max-height: none;

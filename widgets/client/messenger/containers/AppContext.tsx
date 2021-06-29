@@ -211,7 +211,7 @@ export class AppProvider extends React.Component<{}, IState> {
 
   toggle = (isVisible?: boolean) => {
     const { activeRoute } = this.state;
-
+    console.log("toggle", isVisible);
     // notify parent window launcher state
     postMessage("fromMessenger", "messenger", {
       isVisible: !isVisible,

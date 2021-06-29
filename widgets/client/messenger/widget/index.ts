@@ -5,7 +5,7 @@ import {
   generateIntegrationUrl,
   getStorage,
   listenForCommonRequests,
-  setErxesProperty
+  setErxesProperty,
 } from "../../widgetUtils";
 
 declare const window: any;
@@ -34,7 +34,7 @@ function renewViewPort() {
   if (viewportMeta) {
     document.getElementsByTagName("head")[0].removeChild(viewportMeta);
   }
-
+  console.log("renew");
   newViewportMeta = document.createElement("meta");
   newViewportMeta.name = "viewport";
   newViewportMeta.content =
@@ -46,7 +46,7 @@ function revertViewPort() {
   if (newViewportMeta) {
     document.getElementsByTagName("head")[0].removeChild(newViewportMeta);
   }
-
+  console.log("revert");
   if (viewportMeta) {
     document.getElementsByTagName("head")[0].appendChild(viewportMeta);
   }
@@ -102,10 +102,11 @@ iframe.onload = async () => {
   const setting = window.erxesSettings.messenger;
 
   setErxesProperty("showMessenger", () => {
+    console.log("show");
     contentWindow.postMessage(
       {
         fromPublisher: true,
-        action: "showMessenger"
+        action: "showMessenger",
       },
       "*"
     );
@@ -115,7 +116,7 @@ iframe.onload = async () => {
     {
       fromPublisher: true,
       setting,
-      storage: getStorage()
+      storage: getStorage(),
     },
     "*"
   );
@@ -125,6 +126,7 @@ iframe.onload = async () => {
 window.addEventListener("message", async (event: MessageEvent) => {
   const data = event.data;
   const { isVisible, message, isSmallContainer } = data;
+  console.log("eventDataaa", data);
 
   listenForCommonRequests(event, iframe);
 
