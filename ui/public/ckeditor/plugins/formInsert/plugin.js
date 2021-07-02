@@ -3,7 +3,8 @@ CKEDITOR.plugins.add('formInsert', {
   init: function(editor) {
     // init the default config
     var defaultConfig = {
-      format: ' #form,%string% ',
+      format:
+        '<div data-erxes-embed="%formCode%" data-erxes-brand="%brandCode%"></div>',
       items: []
     };
 
@@ -48,12 +49,15 @@ CKEDITOR.plugins.add('formInsert', {
               string.label = string.name;
             }
 
-            var formattedValue = config.format.replace(
-              '%string%',
-              string.value
-            );
+            const codes = string.value.split(',');
 
-            this.add(formattedValue, string.name, string.label);
+            if (codes.length === 2) {
+              this.add(
+                `<div data-erxes-embed="${codes[0]}" data-erxes-brand="${codes[1]}" style="margin-bottom: 12px"></div>`,
+                string.name,
+                string.label
+              );
+            }
           }
         }
       },

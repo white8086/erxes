@@ -1,6 +1,5 @@
 import Button from 'modules/common/components/Button';
-import EditorCK from 'modules/common/components/EditorCK';
-import { SmallLoader } from 'modules/common/components/ButtonMutate';
+import EditorCK from 'modules/common/containers/EditorCK';
 import FormControl from 'modules/common/components/form/Control';
 import Form from 'modules/common/components/form/Form';
 import FormGroup from 'modules/common/components/form/Group';
@@ -21,8 +20,6 @@ type Props = {
   renderButton: (props: IButtonMutateProps) => JSX.Element;
   closeModal: () => void;
   topics: ITopic[];
-  formItems?: any;
-  loading: boolean;
 };
 
 type State = {
@@ -168,7 +165,7 @@ class ArticleForm extends React.Component<Props, State> {
   }
 
   renderContent = (formProps: IFormProps) => {
-    const { article, renderButton, closeModal, formItems } = this.props;
+    const { article, renderButton, closeModal } = this.props;
     const { reactionChoices, content } = this.state;
 
     const { isSubmitted, values } = formProps;
@@ -248,7 +245,6 @@ class ArticleForm extends React.Component<Props, State> {
             isSubmitted={isSubmitted}
             height={300}
             name={`knowledgeBase_${article ? article._id : 'create'}`}
-            formItems={formItems}
           />
         </FormGroup>
 
@@ -276,10 +272,6 @@ class ArticleForm extends React.Component<Props, State> {
   };
 
   render() {
-    if (this.props.loading) {
-      return <SmallLoader />;
-    }
-
     return <Form renderContent={this.renderContent} />;
   }
 }

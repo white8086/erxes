@@ -662,7 +662,8 @@ export const fieldFactory = async (params: IFieldFactoryInput) => {
     isDefinedByErxes:
       params.isDefinedByErxes === undefined || params.isDefinedByErxes === null
         ? false
-        : params.isDefinedByErxes
+        : params.isDefinedByErxes,
+    options: params.options || []
   });
 };
 
