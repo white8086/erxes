@@ -286,6 +286,13 @@ class Settings extends React.PureComponent {
               'scriptsAll',
               ['showScripts', 'manageScripts']
             )}
+            {this.renderBox(
+              'All templates',
+              '/images/icons/erxes-10.svg',
+              '/settings/all-templates',
+              'allTemplates',
+              ['manageResponseTemplate', 'showResponseTemplates']
+            )}
           </div>
         </Row>
         <Divider />
