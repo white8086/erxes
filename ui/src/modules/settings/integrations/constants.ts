@@ -87,6 +87,7 @@ export const INTEGRATION_KINDS = {
   WHATSAPP: 'whatsapp',
   TELNYX: 'telnyx',
   WEBHOOK: 'webhook',
+  OUTGOING_WEBHOOK: 'outgoing-webhook',
   ALL: [
     { text: 'Messenger', value: 'messenger' },
     { text: 'Forms', value: 'lead' },
@@ -97,6 +98,7 @@ export const INTEGRATION_KINDS = {
     { text: 'Facebook Post', value: 'facebook-post' },
     { text: 'Gmail', value: 'gmail' },
     { text: 'Webhook', value: 'webhook' },
+    { text: 'Outgoing webhook', value: 'outgoing-webhook' },
     { text: 'Callpro', value: 'callpro' },
     { text: 'Chatfuel', value: 'chatfuel' },
 
@@ -367,6 +369,16 @@ export const INTEGRATIONS = [
     kind: 'webhook',
     logo: '/images/integrations/webhook.png',
     createModal: 'webhook',
+    category: 'All integrations, For support teams, Conversation'
+  },
+  {
+    name: 'Outgoing webhook',
+    description: 'Configure outgoing webhooks',
+    inMessenger: false,
+    isAvailable: true,
+    kind: 'outgoing-webhook',
+    logo: '/images/integrations/webhook.png',
+    createModal: 'outgoing-webhook',
     category: 'All integrations, For support teams, Conversation'
   }
 ];
