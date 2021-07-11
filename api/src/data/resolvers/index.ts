@@ -48,6 +48,7 @@ import Task from './tasks';
 import Ticket from './tickets';
 import User from './user';
 import UsersGroup from './usersGroup';
+import BrandData from './brandData';
 
 const resolvers: any = {
   ...customScalars,
@@ -62,6 +63,7 @@ const resolvers: any = {
   Checklist,
   Customer,
   Company,
+  BrandData,
   Segment,
   EngageMessage,
   DeliveryReport,

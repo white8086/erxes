@@ -1,6 +1,12 @@
 import { conformityQueryFields } from './common';
 
 export const types = `
+  type BrandData {
+    brandId: String
+    brandName: String
+    data: JSON
+  }
+
   type Company {
     _id: String!
 
@@ -33,6 +39,7 @@ export const types = `
     tagIds: [String]
 
     customFieldsData: JSON
+    brandData: [BrandData]
 
     customers: [Customer]
     getTags: [Tag]

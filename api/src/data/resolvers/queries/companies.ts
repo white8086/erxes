@@ -88,7 +88,9 @@ const companyQueries = {
   /**
    * Get one company
    */
-  companyDetail(_root, { _id }: { _id: string }) {
+  async companyDetail(_root, { _id }: { _id: string }) {
+    const c = await Companies.findOne({ _id });
+    console.log(c);
     return Companies.findOne({ _id });
   }
 };

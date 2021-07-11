@@ -5,6 +5,7 @@ import Sidebar from 'modules/layout/components/Sidebar';
 import { IField } from 'modules/settings/properties/types';
 import React from 'react';
 import BasicInfoSection from '../common/BasicInfoSection';
+import BrandDataSection from './BrandDataSection';
 
 type Props = {
   company: ICompany;
@@ -13,6 +14,25 @@ type Props = {
 };
 
 class LeftSidebar extends React.Component<Props> {
+  renderBrandData() {
+    const { company } = this.props;
+    const data = company.brandData || [];
+
+    if (data.length === 0) {
+      return null;
+    }
+
+    // for (const bData of brandData) {
+
+    // }
+
+    return data.map(e => (
+      <>
+        <BrandDataSection brandData={e} />{' '}
+      </>
+    ));
+  }
+
   render() {
     const { company, taggerRefetchQueries, fields } = this.props;
 
@@ -25,6 +45,7 @@ class LeftSidebar extends React.Component<Props> {
           type="company"
           refetchQueries={taggerRefetchQueries}
         />
+        {this.renderBrandData()}
       </Sidebar>
     );
   }

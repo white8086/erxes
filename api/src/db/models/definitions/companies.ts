@@ -5,6 +5,11 @@ import { COMPANY_SELECT_OPTIONS } from './constants';
 
 import { field, schemaWrapper } from './utils';
 
+export interface IBrandData {
+  brandId: string;
+  data?: ICustomField[];
+}
+
 export interface ICompany {
   scopeBrandIds?: string[];
   primaryName?: string;
@@ -35,6 +40,8 @@ export interface ICompany {
   website?: string;
   code?: string;
   location?: string;
+
+  brandData?: IBrandData;
 }
 
 export interface ICompanyDocument extends ICompany, Document {
@@ -48,6 +55,17 @@ export interface ICompanyDocument extends ICompany, Document {
 const getEnum = (fieldName: string): string[] => {
   return COMPANY_SELECT_OPTIONS[fieldName].map(option => option.value);
 };
+
+const brandDataSchema = new Schema(
+  {
+    brandId: field({ type: String }),
+    data: field({
+      type: [customFieldSchema],
+      optional: true
+    })
+  },
+  { _id: false }
+);
 
 export const companySchema = schemaWrapper(
   new Schema({
@@ -180,6 +198,13 @@ export const companySchema = schemaWrapper(
       optional: true,
       label: 'Custom fields data'
     }),
+
+    brandData: field({
+      type: [brandDataSchema],
+      optional: true,
+      label: 'Brand data'
+    }),
+
     searchText: field({ type: String, optional: true, index: true }),
     code: field({ type: String, label: 'Code', optional: true }),
     location: field({ type: String, optional: true, label: 'Location' })
