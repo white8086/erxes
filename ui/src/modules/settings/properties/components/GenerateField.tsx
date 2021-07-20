@@ -239,14 +239,14 @@ export default class GenerateField extends React.Component<Props, State> {
 
     };
 
-    return (<SelectCustomers
-      label="Filter by customers"
-      name="customerIds"
-      multi={false}
-      initialValue={value}
-      // queryParams={queryParams}      
-      onSelect={onSelect}
-    />
+    return (
+      <SelectCustomers
+        label="Filter by customers"
+        name="customerIds"
+        multi={false}
+        initialValue={value}
+        onSelect={onSelect}
+      />
     );
   }
 
