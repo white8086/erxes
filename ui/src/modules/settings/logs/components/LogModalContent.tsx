@@ -22,7 +22,7 @@ type Props = {
   schemaLabelMaps: ILogDesc[];
 };
 
-export default class LogModal extends React.Component<Props> {
+export default class Log extends React.Component<Props> {
   private extraDesc: any[] = [];
 
   constructor(props: Props) {
@@ -59,11 +59,9 @@ export default class LogModal extends React.Component<Props> {
       if (typeof elem === 'object') {
         const sub: JSX.Element[] = this.buildListFromObject(elem);
 
-        list.push(
-          <li className="modal-li" key={Math.random()}>
-            {sub}({index + 1})
-          </li>
-        );
+        list.push(<li key={Math.random()}>{index + 1}:</li>);
+        list.push(<ul key={Math.random()}>{sub}</ul>);
+        // list.push(<li className="modal-li" key={Math.random()}>{sub}({index + 1})</li>);
       }
     });
 
@@ -213,17 +211,14 @@ export default class LogModal extends React.Component<Props> {
       // <Col sm={6}>
       <LogBox color={color}>
         <div>
-          <Icon
-            style={{ marginRight: '5px' }}
-            icon={iconType}
-            size={15}
-            color={color}
-          />
+          <span className="icon">
+            <Icon icon={iconType} size={15} color={color} />
+          </span>
           <TextInfo textStyle={cls} hugeness="big">
             {label}
           </TextInfo>
         </div>
-        {this.prettyJSON(data)}
+        <div className="field-all">{this.prettyJSON(data)}</div>
       </LogBox>
     );
   }
@@ -231,7 +226,7 @@ export default class LogModal extends React.Component<Props> {
   render() {
     const { log } = this.props;
 
-    console.log(log);
+    console.log(log.removedData);
 
     if (!log) {
       return null;
