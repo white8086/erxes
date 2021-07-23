@@ -95,7 +95,7 @@ a:hover {
 }
 
 .modal-content {
-  border-radius: 2px;
+  border-radius: 5px;
   border: 0;
   box-shadow: 0 2px 10px -3px rgba(0, 0, 0, 0.5);
   background: ${colors.bgLight};
@@ -104,7 +104,7 @@ a:hover {
 .modal-header {
   padding: 15px 40px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 5px;
   background: #673FBD;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -1151,11 +1151,8 @@ a:hover {
   }
 
   .modal-items-list {
-    height: auto;
-    width: 100%;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
   }
 `;
 
