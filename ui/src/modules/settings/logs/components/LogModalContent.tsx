@@ -61,7 +61,6 @@ export default class Log extends React.Component<Props> {
 
         list.push(<li key={Math.random()}>{index + 1}:</li>);
         list.push(<ul key={Math.random()}>{sub}</ul>);
-        // list.push(<li className="modal-li" key={Math.random()}>{sub}({index + 1})</li>);
       }
     });
 
@@ -226,8 +225,6 @@ export default class Log extends React.Component<Props> {
   render() {
     const { log } = this.props;
 
-    console.log(log.removedData);
-
     if (!log) {
       return null;
     }
@@ -235,29 +232,25 @@ export default class Log extends React.Component<Props> {
     return (
       <>
         <div className="modal-items-list">
-          {log.oldData !== '{}' &&
-            this.renderData(
-              log.oldData,
-              'Before any changes',
-              'default',
-              'history'
-            )}
-          {log.addedData !== '{}' &&
-            this.renderData(log.addedData, 'Added fields', 'success', 'add')}
-          {log.changedData !== '{}' &&
-            this.renderData(
-              log.changedData,
-              'Changed fields',
-              'warning',
-              'edit'
-            )}
-          {log.removedData !== '{}' &&
-            this.renderData(
-              log.removedData,
-              'Removed fields',
-              'danger',
-              'trash'
-            )}
+          {this.renderData(
+            log.oldData,
+            'Before any changes',
+            'default',
+            'history'
+          )}
+          {this.renderData(log.addedData, 'Added fields', 'success', 'add')}
+          {this.renderData(
+            log.changedData,
+            'Changed fields',
+            'warning',
+            'edit'
+          )}
+          {this.renderData(
+            log.removedData,
+            'Removed fields',
+            'danger',
+            'trash'
+          )}
         </div>
       </>
     );
@@ -267,4 +260,3 @@ export default class Log extends React.Component<Props> {
     this.extraDesc = [];
   }
 }
-// style={{display: 'flex', flexWrap: 'wrap'}}
