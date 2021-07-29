@@ -47,6 +47,7 @@ function Brands({ history, counts, brands, loading, emptyText }: IProps) {
       title={__('Filter by brand')}
       collapsible={brands.length > 5}
       name="showFilterByBrand"
+      accordion={true}
     >
       <DataWithLoader
         data={data}
