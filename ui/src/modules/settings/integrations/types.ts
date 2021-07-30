@@ -175,6 +175,7 @@ export type QueryVariables = {
 
 export type IntegrationTypes =
   | 'facebook'
+  | 'instagram'
   | 'gmail'
   | 'nylas-gmail'
   | 'nylas-exchange'

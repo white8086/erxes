@@ -359,7 +359,8 @@ const integrationMutations = {
           'smooch-twilio',
           'whatsapp',
           'telnyx',
-          'webhook'
+          'webhook',
+          'instagram'
         ].includes(integration.kind)
       ) {
         await dataSources.IntegrationsAPI.removeIntegration({

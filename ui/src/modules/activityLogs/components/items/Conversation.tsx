@@ -186,6 +186,11 @@ class Conversation extends React.Component<Props, { toggleMessage: boolean }> {
         kind = 'email';
         item = 'by imap';
         break;
+
+      case 'instagram':
+        action = 'message';
+        item = 'by Instagram Messenger';
+        break;
     }
 
     if (condition === 'comment') {

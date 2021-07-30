@@ -15,6 +15,7 @@ export const debugWhatsapp = debug('erxes-integrations:whatsapp');
 export const debugExternalRequests = debug(
   'erxes-integrations:external-requests'
 );
+export const debugInstagram = debug('erxes-integrations:instagram');
 export const debugDaily = debug('erxes-integrations:daily');
 export const debugSmooch = debug('erxes-integrations:smooch');
 export const debugTelnyx = debug('erxes-integrations:telnyx');

@@ -140,7 +140,10 @@ class Facebook extends React.Component<Props, State> {
   renderContent = (formProps: IFormProps) => {
     const { renderButton } = this.props;
     const { values, isSubmitted } = formProps;
-    const { onRemoveAccount, onAccountSelect } = this.props;
+    const { onRemoveAccount, onAccountSelect, kind } = this.props;
+
+    const addLink =
+      kind === INTEGRATION_KINDS.INSTAGRAM ? 'instalogin' : 'fblogin';
 
     return (
       <>
@@ -149,8 +152,12 @@ class Facebook extends React.Component<Props, State> {
             <FlexItem>
               <LeftItem>
                 <Accounts
-                  kind="facebook"
-                  addLink="fblogin"
+                  kind={
+                    kind === INTEGRATION_KINDS.INSTAGRAM
+                      ? 'instagram'
+                      : 'facebook'
+                  }
+                  addLink={addLink}
                   onSelect={onAccountSelect}
                   onRemove={onRemoveAccount}
                 />
@@ -235,6 +242,13 @@ class Facebook extends React.Component<Props, State> {
       title = __('Facebook Messenger');
       description = __(
         'Connect your Facebook Messenger to start receiving Facebook messages in your team inbox'
+      );
+    }
+
+    if (this.props.kind === INTEGRATION_KINDS.INSTAGRAM) {
+      title = __('Instagram');
+      description = __(
+        'Connect your Instagram to start receiving Instagram messages in your team inbox'
       );
     }
 

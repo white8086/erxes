@@ -66,7 +66,7 @@ const sendConversationToIntegrations = async (
   action?: string,
   facebookMessageTag?: string
 ) => {
-  if (type === 'facebook') {
+  if (type === 'facebook' || type === 'instagram') {
     const regex = new RegExp('<img[^>]* src="([^"]*)"', 'g');
 
     const images: string[] = (doc.content.match(regex) || []).map(m =>
@@ -364,6 +364,11 @@ const conversationMutations = {
     // send reply to facebook
     if (kind === KIND_CHOICES.FACEBOOK_MESSENGER) {
       type = 'facebook';
+      action = 'reply-messenger';
+    }
+
+    if (kind === KIND_CHOICES.INSTAGRAM) {
+      type = 'instagram';
       action = 'reply-messenger';
     }
 

@@ -3,6 +3,7 @@ import { removeAccount, removeCustomers, repairIntegrations } from './helpers';
 
 import messageBroker from 'erxes-message-broker';
 import { handleFacebookMessage } from './facebook/handleFacebookMessage';
+import { handleInstagramMessage } from './instagram/handleInstagramMessage';
 import { Integrations } from './models';
 import { getLineWebhookUrl } from './smooch/api';
 import { sendSms } from './telnyx/api';
@@ -52,6 +53,10 @@ export const initBroker = async server => {
 
       if (type === 'facebook') {
         response = { data: await handleFacebookMessage(parsedObject) };
+      }
+
+      if (type === 'instagram') {
+        response = { data: await handleInstagramMessage(parsedObject) };
       }
 
       response.status = 'success';

@@ -87,6 +87,7 @@ export const INTEGRATION_KINDS = {
   WHATSAPP: 'whatsapp',
   TELNYX: 'telnyx',
   WEBHOOK: 'webhook',
+  INSTAGRAM: 'instagram',
   ALL: [
     { text: 'Messenger', value: 'messenger' },
     { text: 'Forms', value: 'lead' },
@@ -113,7 +114,8 @@ export const INTEGRATION_KINDS = {
     { text: 'Outlook by Nylas', value: 'nylas-outlook' },
     { text: 'Yahoo by Nylas', value: 'nylas-yahoo' },
 
-    { text: 'SMS by Telnyx', value: 'telnyx' }
+    { text: 'SMS by Telnyx', value: 'telnyx' },
+    { text: 'Instagram direct message', value: 'instagram' }
   ]
 };
 
@@ -175,6 +177,19 @@ export const INTEGRATIONS = [
     kind: 'facebook-messenger',
     logo: '/images/integrations/fb-messenger.png',
     createModal: 'facebook-messenger',
+    createUrl: '/settings/integrations/createFacebook',
+    category:
+      'All integrations, For support teams, Messaging, Social media, Conversation'
+  },
+  {
+    name: 'Instagram',
+    description:
+      'Connect and manage Instagram Direct Messages right from your Team Inbox',
+    inMessenger: false,
+    isAvailable: true,
+    kind: 'instagram',
+    logo: '/images/integrations/instagram.png',
+    createModal: 'instagram',
     createUrl: '/settings/integrations/createFacebook',
     category:
       'All integrations, For support teams, Messaging, Social media, Conversation'

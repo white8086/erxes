@@ -61,7 +61,7 @@ class Accounts extends React.Component<Props, { accountId?: string }> {
       return <GoogleButton href="#add" onClick={onAdd} />;
     }
 
-    if (kind === 'facebook') {
+    if (kind === 'facebook' || kind === 'instagram') {
       return (
         <FacebookButton onClick={onAdd}>
           <Icon icon="facebook-official" />

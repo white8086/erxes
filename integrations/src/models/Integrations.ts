@@ -10,6 +10,7 @@ export interface IIntegration {
   nylasBillingState?: string;
   erxesApiId: string;
   facebookPageIds?: string[];
+  instagramPageIds?: string[];
   facebookPageTokensMap?: { [key: string]: string };
   email: string;
   googleAccessToken?: string;
@@ -62,6 +63,11 @@ export const integrationSchema = new Schema({
   nylasAccountId: String,
   nylasBillingState: String,
   facebookPageIds: field({
+    type: [String],
+    label: 'Facebook page ids',
+    optional: true
+  }),
+  instagramPageIds: field({
     type: [String],
     label: 'Facebook page ids',
     optional: true

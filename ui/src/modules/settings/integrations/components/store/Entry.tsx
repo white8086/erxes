@@ -86,6 +86,14 @@ function renderCreate(createUrl, kind) {
     );
   }
 
+  if (kind === INTEGRATION_KINDS.INSTAGRAM) {
+    return (
+      <Link to={`${createUrl}?kind=${INTEGRATION_KINDS.INSTAGRAM}`}>
+        + {__('Add')}
+      </Link>
+    );
+  }
+
   if (kind === INTEGRATION_KINDS.MESSENGER) {
     return <Link to={createUrl}>+ {__('Add')}</Link>;
   }

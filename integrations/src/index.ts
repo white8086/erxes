@@ -30,6 +30,7 @@ import initTwitter from './twitter/controller';
 import userMiddleware from './userMiddleware';
 import initDaily from './videoCall/controller';
 import initWhatsapp from './whatsapp/controller';
+import initInstagram from './instagram/controller';
 
 const app = express();
 
@@ -121,7 +122,11 @@ app.get('/accounts', async (req, res) => {
     kind = kind.split('-')[1];
   }
 
-  const selector = { kind };
+  let selector = { kind } as { kind?: string; allowedInstagram?: boolean };
+
+  if (kind === 'instagram') {
+    selector = { kind: 'facebook', allowedInstagram: true };
+  }
 
   const accounts = await Accounts.find(selector);
 
@@ -185,6 +190,9 @@ initSmooch(app);
 
 // init telnyx
 initTelnyx(app);
+
+// init instagram
+initInstagram(app);
 
 // Error handling middleware
 app.use((error, _req, res, _next) => {

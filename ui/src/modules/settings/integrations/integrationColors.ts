@@ -14,5 +14,6 @@ export const INTEGRATIONS_COLORS = {
   telegram: colors.socialTelegram,
   viber: colors.socialViber,
   line: colors.socialLine,
-  'facebook-messenger': colors.socialFacebookMessenger
+  'facebook-messenger': colors.socialFacebookMessenger,
+  instagram: colors.socialFacebook
 };

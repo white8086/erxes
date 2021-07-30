@@ -23,6 +23,7 @@ export interface IAccount {
   googleAccessToken?: string;
   nylasAccountId?: string;
   nylasBillingState?: string;
+  allowedInstagram?: boolean;
 }
 
 export interface IAccountDocument extends IAccount, Document {}
@@ -96,6 +97,10 @@ export const accountSchema = new Schema({
   },
   nylasBillingState: {
     type: String,
+    optional: true
+  },
+  allowedInstagram: {
+    type: Boolean,
     optional: true
   }
 });

@@ -7,6 +7,7 @@ import Facebook from 'modules/settings/integrations/components/facebook/Form';
 import { mutations, queries } from 'modules/settings/integrations/graphql';
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import { INTEGRATION_KINDS } from '../../constants';
 import { IPages } from '../../types';
 import { getRefetchQueries } from '../utils';
 
@@ -32,6 +33,13 @@ class FacebookContainer extends React.Component<FinalProps, State> {
   }
 
   onAccountSelect = (accountId?: string) => {
+    const { kind } = this.props;
+
+    const path =
+      kind === INTEGRATION_KINDS.INSTAGRAM
+        ? '/instagram/get-accounts'
+        : '/facebook/get-pages';
+
     if (!accountId) {
       return this.setState({ pages: [], accountId: '' });
     }
@@ -42,7 +50,7 @@ class FacebookContainer extends React.Component<FinalProps, State> {
       .query({
         query: gql(queries.fetchApi),
         variables: {
-          path: '/facebook/get-pages',
+          path,
           params: { accountId }
         }
       })
