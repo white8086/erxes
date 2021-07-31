@@ -36,11 +36,13 @@ class FieldConditions extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
+    const condition = this.props.condition || {
+      condition: 'OR',
+      fieldConditions: []
+    };
+
     this.state = {
-      condition: {
-        condition: 'OR',
-        fieldConditions: []
-      }
+      condition
     };
   }
 

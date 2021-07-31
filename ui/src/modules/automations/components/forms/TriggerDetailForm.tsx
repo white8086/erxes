@@ -39,12 +39,16 @@ class TriggerDetailForm extends React.Component<Props, State> {
       addTrigger,
       activeTrigger,
       closeParentModal,
-      closeModal
+      closeModal,
+      formIntegrations
     } = this.props;
 
     const { activeIntegrationId } = this.state;
 
-    addTrigger(activeTrigger.type, activeIntegrationId);
+    const form = formIntegrations.find(e => e._id === activeIntegrationId);
+    if (form) {
+      addTrigger(activeTrigger.type, form.formId);
+    }
 
     closeParentModal ? closeParentModal() : closeModal();
   };

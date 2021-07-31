@@ -1,17 +1,12 @@
 import { __ } from 'modules/common/utils';
 import React from 'react';
-// import Select from 'react-select-plus';
 import { ModalFooter } from 'modules/common/styles/main';
 import Button from 'modules/common/components/Button';
-// import FormGroup from 'modules/common/components/form/Group';
-// import ControlLabel from 'modules/common/components/form/Label';
 import { IAction, ITrigger } from 'modules/automations/types';
-
-// import GenerateField from 'modules/settings/properties/components/GenerateField';
 import { IField } from 'modules/settings/properties/types';
-// import { SidebarContent } from 'modules/inbox/components/leftSidebar/styles';
-import FieldConditions, { IActionCondition } from './FieldConditions';
+import FieldConditions from './FieldConditions';
 import { ActionForms } from '../actions';
+import BoardItemForm from 'modules/automations/containers/forms/boardItem/BoardItemForm';
 
 type Props = {
   closeModal: () => void;
@@ -31,7 +26,7 @@ type Props = {
 type State = {
   formFields?: IField[];
   queryLoaded: boolean;
-  formFieldConditions?: IActionCondition;
+  config: any;
 };
 
 class TriggerDetailForm extends React.Component<Props, State> {
@@ -40,7 +35,8 @@ class TriggerDetailForm extends React.Component<Props, State> {
 
     this.state = {
       queryLoaded: false,
-      formFields: []
+      formFields: [],
+      config: {}
     };
   }
 
@@ -55,7 +51,7 @@ class TriggerDetailForm extends React.Component<Props, State> {
 
     addAction(currentAction.action.type);
 
-    addActionConfig(this.state.formFieldConditions);
+    addActionConfig(this.state.config);
     closeParentModal ? closeParentModal() : closeModal();
   };
 
@@ -74,24 +70,71 @@ class TriggerDetailForm extends React.Component<Props, State> {
       return null;
     }
 
-    // const onClickItem = () => {
-    //   // if (onClick) {
-    //   //   onClick(field);
-    //   // }
-    // };
-
     const onUpdateCondition = condition => {
-      this.setState({ formFieldConditions: condition });
+      this.setState({ config: condition });
     };
 
     return (
-      <FieldConditions fields={fields} onUpdateCondition={onUpdateCondition} />
+      <FieldConditions
+        fields={fields}
+        condition={currentAction.action.config}
+        onUpdateCondition={onUpdateCondition}
+      />
+    );
+  }
+
+  renderBoardItemForm() {
+    const { currentAction } = this.props;
+    let type = '';
+
+    switch (currentAction.action.type) {
+      case 'createTask':
+        type = 'task';
+        break;
+
+      case 'createDeal':
+        type = 'deal';
+        break;
+
+      case 'createTicket':
+        type = 'ticket';
+        break;
+
+      default:
+        type = '';
+        break;
+    }
+
+    if (!['task', 'deal', 'ticket'].includes(type)) {
+      return null;
+    }
+
+    const config = currentAction.action.config || {};
+
+    const onChange = (key: string, value: string) => {
+      config[key] = value;
+      this.setState({ config });
+    };
+
+    console.log(config);
+
+    const { boardId = '', pipelineId = '', stageId = '', cardName = '' } =
+      currentAction.action.config || {};
+
+    return (
+      <BoardItemForm
+        type={type}
+        boardId={boardId}
+        pipelineId={pipelineId}
+        stageId={stageId}
+        cardName={cardName}
+        onChange={onChange}
+      />
     );
   }
 
   render() {
     const { currentAction, closeModal } = this.props;
-
     const { config = {} } = currentAction.trigger;
 
     if (
@@ -118,7 +161,8 @@ class TriggerDetailForm extends React.Component<Props, State> {
     return (
       <>
         {this.renderFormFields()}
-        <Content action={currentAction.action}></Content>
+        {this.renderBoardItemForm()}
+        <Content action={currentAction.action} />
         <ModalFooter>
           <Button
             btnStyle="simple"

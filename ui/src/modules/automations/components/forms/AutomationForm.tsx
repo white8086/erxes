@@ -137,10 +137,20 @@ class AutomationForm extends React.Component<Props, State> {
   }
 
   onAddActionConfig = config => {
-    const { currentAction } = this.state;
+    const { currentAction, actions } = this.state;
+
+    const actionIndex = actions.findIndex(
+      e => e.id === currentAction.action.id
+    );
+
+    if (actionIndex < 0) {
+      return;
+    }
 
     currentAction.action.config = config;
-    this.setState({ currentAction });
+    actions[actionIndex] = currentAction.action;
+
+    this.setState({ currentAction, actions });
   };
 
   onClickTrigger = (trigger?: ITrigger) => {
