@@ -20,7 +20,7 @@ export interface IAttributeFilter {
 }
 
 export interface ICondition {
-  type: 'property' | 'event' | 'subSegment';
+  type: 'property' | 'event' | 'subSegment' | 'activity';
 
   propertyName?: string;
   propertyOperator?: string;
@@ -30,6 +30,10 @@ export interface ICondition {
   eventOccurence?: 'exactly' | 'atleast' | 'atmost';
   eventOccurenceValue?: number;
   eventAttributeFilters?: IAttributeFilter[];
+
+  activityName?: string;
+  activityOperator?: string;
+  activityValue?: string;
 
   subSegmentId?: string;
 }

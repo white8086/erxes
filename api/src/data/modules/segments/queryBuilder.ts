@@ -233,6 +233,7 @@ export const generateQueryBySegment = async (args: {
 
   const propertyConditions: ICondition[] = [];
   const eventConditions: ICondition[] = [];
+  const activityConditions: ICondition[] = [];
 
   for (const condition of segment.conditions) {
     if (condition.type === 'property') {
@@ -241,6 +242,10 @@ export const generateQueryBySegment = async (args: {
 
     if (condition.type === 'event') {
       eventConditions.push(condition);
+    }
+
+    if (condition.type === 'activity') {
+      activityConditions.push(condition);
     }
 
     if (condition.type === 'subSegment' && condition.subSegmentId) {
@@ -373,6 +378,69 @@ export const generateQueryBySegment = async (args: {
     }
   }
 
+  const activityPositive: any = [
+    {
+      term: {
+        contentType: 'customer'
+      }
+    }
+  ];
+
+  const activityNegative: any = [];
+
+  for (const condition of activityConditions) {
+    if (
+      !condition.activityName ||
+      !condition.activityOperator ||
+      !condition.activityValue
+    ) {
+      continue;
+    }
+
+    const [positiveQuery, negativeQuery] = elkConvertConditionToQuery({
+      field: condition.activityName,
+      operator: condition.activityOperator,
+      value: condition.activityValue
+    });
+
+    if (positiveQuery) {
+      activityPositive.push(positiveQuery);
+    }
+
+    if (negativeQuery) {
+      activityNegative.push(negativeQuery);
+    }
+  }
+
+  let idsByActivities = [];
+
+  if (activityPositive.length > 0 || activityNegative.length > 0) {
+    const activitiesResponse = await fetchElk({
+      action: 'search',
+      index: 'activity',
+      body: {
+        _source: 'contentId',
+        query: {
+          bool: {
+            must: activityPositive,
+            must_not: activityNegative
+          }
+        }
+      },
+      defaultValue: { hits: { hits: [] } }
+    });
+
+    idsByActivities = activitiesResponse.hits.hits
+      .map(hit => hit._source.contentTypeId)
+      .filter(_id => _id);
+
+    propertiesPositive.push({
+      terms: {
+        _id: idsByActivities
+      }
+    });
+  }
+
   selectorPositiveList.push(...propertiesPositive);
   selectorNegativeList.push(...propertiesNegative);
 };
@@ -428,7 +496,13 @@ function elkConvertConditionToQuery(args: {
   operator: string;
   value: string;
 }) {
-  const { field, type, operator, value } = args;
+  const { type, operator, value } = args;
+
+  let field = args.field;
+
+  if (field.includes('activity')) {
+    field = field.replace('activity_', '');
+  }
 
   const fixedValue = (value || '').includes('now')
     ? value
