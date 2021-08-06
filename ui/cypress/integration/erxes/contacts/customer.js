@@ -3,20 +3,20 @@ import {
   fakeName,
   waitElm,
   waitTilDisappear,
-  waitAndClick,
-} from "../utils";
+  waitAndClick
+} from '../utils';
 
 SignIn;
 
-context("Contacts", () => {
+context('Contacts', () => {
   beforeEach(() => {
-    cy.visit("/");
+    cy.visit('/');
   });
 
-  it("Customer", () => {
+  it('Customer', () => {
     cy.signIn();
 
-    cy.visit("/contacts/customer");
+    cy.visit('/contacts/customer');
 
     waitElm('button[icon="plus-circle"]');
     cy.get('button[icon="plus-circle"]').click();
@@ -25,23 +25,18 @@ context("Contacts", () => {
 
     cy.get('input[name="firstName"]').type(random);
 
-    cy.get("div .Select-placeholder")
-      .contains("Enter an email")
+    cy.get('div .Select-placeholder')
+      .contains('Enter an email')
       .click()
-      .type(random + "@nmma.co");
-    waitAndClick("div .Select-menu-outer");
+      .type(random + '@nmma.co');
+    waitAndClick('div .Select-menu-outer');
 
     cy.get('button[type="submit"]')
       .eq(0)
       .click();
     waitTilDisappear('button[type="submit"]');
 
-    cy.get("#customers")
-      .children()
-      .eq(0)
-      .children()
-      .eq(0)
-      .click();
+    cy.get('#customersCheckBox').click();
 
     cy.get('button[icon="tag-alt"]').click();
 
