@@ -104,6 +104,9 @@ jobs:
         REACT_APP_API_SUBSCRIPTION_URL: ws://localhost:3300/subscriptions
 
     - name: Cypress run
+      uses: actions/checkout@v2
+      with:
+        record: true
       run: |
         cd ui
         yarn install
