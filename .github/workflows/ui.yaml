@@ -108,7 +108,9 @@ jobs:
         cd ui
         yarn install
         yarn record-cypress
-
+      env: 
+        CYPRESS_RECORD_KEY: ${ {secrets.CYPRESS_RECORD_KEY} }
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Build
       run: |
         cd ui
