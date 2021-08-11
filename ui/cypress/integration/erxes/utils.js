@@ -29,6 +29,9 @@ export const SignIn = Cypress.Commands.add('signIn', () => {
   cy.get('input[name=email]').type(email);
   cy.get('input[name=password]').type(`${password}{enter}`);
 
+  cy.url().should('include', '/?signedIn');
+  cy.url().should('include', '/inbox');
+
   cy.getCookie('auth-token').should('exist');
 
   waitAndClick('button[id="robot-get-started"]')
