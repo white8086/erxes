@@ -104,14 +104,11 @@ jobs:
         REACT_APP_API_SUBSCRIPTION_URL: ws://localhost:3300/subscriptions
 
     - name: Cypress run
-      uses: cypress-io/github-action@v2 
+      uses: cypress-io/github-action@v2
       with:
-          start: yarn start:ci
-          wait-on: 'http://localhost:3000'
-          wait-on-timeout: 120
-          browser: chrome
+          build: yarn run build
+          start: yarn start
           record: true
-          spec: ui/cypress/integration/*
       env: 
         CYPRESS_RECORD_KEY: ${ {secrets.CYPRESS_RECORD_KEY} }
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
