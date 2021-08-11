@@ -106,7 +106,6 @@ jobs:
     - name: Cypress run
       uses: cypress-io/github-action@v2
       with:
-          build: yarn run build
           start: yarn start
           record: true
       env: 
