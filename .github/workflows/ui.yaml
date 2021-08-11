@@ -109,7 +109,7 @@ jobs:
         record: true
         working-directory: ui
       env: 
-        CYPRESS_RECORD_KEY: ${ {secrets.CYPRESS_RECORD_KEY} }
+        CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Build
       run: |
