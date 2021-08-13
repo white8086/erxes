@@ -30,11 +30,6 @@ export const SignIn = Cypress.Commands.add('signIn', () => {
   cy.get('input[name=password]').type(`${password}{enter}`);
 
   cy.url().should('include', '/?signedIn');
-
-  cy.reload()
-
-  cy.wait(5000)
-
   cy.url().should('include', '/inbox');
 
   cy.getCookie('auth-token').should('exist');
