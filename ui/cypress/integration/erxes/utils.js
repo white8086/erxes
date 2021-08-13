@@ -16,7 +16,7 @@ export const fakeNameCustomer = () => {
   return result;
 }
 
-export const SignIn = Cypress.Commands.add('signIn', () => {
+export const SignIn = Cypress.Commands.add('signIn', function() {
   cy.on('uncaught:exception', (err, runnable) => {
     // returning false here prevents Cypress from
     // failing the test
