@@ -16,7 +16,7 @@ export const fakeNameCustomer = () => {
   return result;
 }
 
-export const SignIn = Cypress.Commands.add('signIn', function() {
+export const SignIn = Cypress.Commands.add('signIn', () => {
   cy.on('uncaught:exception', (err, runnable) => {
     // returning false here prevents Cypress from
     // failing the test
@@ -29,7 +29,6 @@ export const SignIn = Cypress.Commands.add('signIn', function() {
   cy.get('input[name=email]').type(email);
   cy.get('input[name=password]').type(`${password}{enter}`);
 
-  cy.url().should('include', '/?signedIn');
   cy.url().should('include', '/inbox');
 
   cy.getCookie('auth-token').should('exist');
