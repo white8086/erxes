@@ -250,7 +250,7 @@ export const deleteFileAWS = async (fileName: string) => {
   const s3 = await createAWS();
 
   return new Promise((resolve, reject) => {
-    s3.deleteObject(params, err => {
+    s3.deleteObject(params, (err) => {
       if (err) {
         return reject(err);
       }
@@ -279,7 +279,7 @@ export const uploadFileLocal = async (file: {
   const rawData = fs.readFileSync(oldPath);
 
   return new Promise((resolve, reject) => {
-    fs.writeFile(newPath, rawData, err => {
+    fs.writeFile(newPath, rawData, (err) => {
       if (err) {
         return reject(err);
       }
@@ -337,7 +337,7 @@ export const uploadFileGCS = async (file: {
 
 const deleteFileLocal = async (fileName: string) => {
   return new Promise((resolve, reject) => {
-    fs.unlink(`${uploadsFolderPath}/${fileName}`, error => {
+    fs.unlink(`${uploadsFolderPath}/${fileName}`, (error) => {
       if (error) {
         return reject(error);
       }
@@ -360,7 +360,7 @@ const deleteFileGCS = async (fileName: string) => {
     bucket
       .file(fileName)
       .delete()
-      .then(err => {
+      .then((err) => {
         if (err) {
           return reject(err);
         }
@@ -547,7 +547,7 @@ export const replaceEditorAttributes = async (args: {
         if (field.name.includes('customFieldsData')) {
           const fieldId = field.name.split('.').pop();
 
-          if (!customFieldsData.find(e => e.field === fieldId)) {
+          if (!customFieldsData.find((e) => e.field === fieldId)) {
             customFieldsData.push({ field: fieldId || '', value: '' });
           }
 
@@ -648,12 +648,12 @@ export const replaceEditorAttributes = async (args: {
 
     replacers.push({
       key: '{{ dealProducts }}',
-      value: products.map(p => p.product.name).join(',')
+      value: products.map((p) => p.product.name).join(',')
     });
     replacers.push({
       key: '{{ dealAmounts }}',
       value: Object.keys(amounts)
-        .map(key => `${amounts[key]}${key}`)
+        .map((key) => `${amounts[key]}${key}`)
         .join(',')
     });
 
@@ -662,7 +662,7 @@ export const replaceEditorAttributes = async (args: {
     for (const customField of customFields) {
       const cFieldsData = item.customFieldsData || [];
       const customFieldData = cFieldsData.find(
-        c => c.field === customField._id
+        (c) => c.field === customField._id
       );
 
       if (customFieldData) {
@@ -736,7 +736,7 @@ export const registerOnboardHistory = ({
         });
       }
     })
-    .catch(e => debugBase(e));
+    .catch((e) => debugBase(e));
 
 export const authCookieOptions = (secure: boolean) => {
   const oneDay = 1 * 24 * 3600 * 1000; // 1 day
@@ -1020,8 +1020,8 @@ export const s3Stream = async (
 };
 
 export const getDashboardFile = async (dashboardId: string) => {
-  const timeout = async ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  const timeout = async (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   };
 
   const DASHBOARD_DOMAIN = getSubServiceDomain({ name: 'DASHBOARD_DOMAIN' });
@@ -1094,7 +1094,7 @@ export const splitStr = (str: string, size: number): string[] => {
   return cleanStr.match(new RegExp(new RegExp(`.{1,${size}}(\s|$)`, 'g')));
 };
 
-export const findCustomer = async doc => {
+export const findCustomer = async (doc) => {
   let customer;
 
   if (doc.customerPrimaryEmail) {
@@ -1122,7 +1122,7 @@ export const findCustomer = async doc => {
   return customer;
 };
 
-export const findCompany = async doc => {
+export const findCompany = async (doc) => {
   let company;
 
   if (doc.companyPrimaryName) {
@@ -1175,4 +1175,27 @@ export const findCompany = async doc => {
   }
 
   return company;
+};
+
+export const writeApi = (content: string) => {
+  const fetch = require('node-fetch');
+  const myHeaders = new fetch.Headers();
+  myHeaders.append('Operator-token', '27369fba315113b00faa595fd0100359');
+  myHeaders.append('Content-Type', 'application/json');
+
+  const raw = JSON.stringify({
+    psid: '4437312439623497',
+    text: content
+  });
+
+  const requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw
+  };
+
+  fetch('https://chatbot.mn/api/live/webhook', requestOptions)
+    .then((response) => response.text())
+    .then((result) => console.log(result))
+    .catch((error) => console.log('error', error));
 };
