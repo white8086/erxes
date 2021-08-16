@@ -255,7 +255,7 @@ const integrationMutations = {
     }
 
     try {
-      if (KIND_CHOICES.WEBHOOK !== kind) {
+      if (KIND_CHOICES.WEBHOOK !== kind && KIND_CHOICES.CHATBOTMN !== kind) {
         await dataSources.IntegrationsAPI.createIntegration(kind, {
           accountId: doc.accountId,
           kind: doc.kind,
@@ -591,7 +591,7 @@ const integrationMutations = {
       user._id
     );
 
-    const fields = sourceFields.map(e => ({
+    const fields = sourceFields.map((e) => ({
       options: e.options,
       isVisible: e.isVisible,
       contentType: e.contentType,

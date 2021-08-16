@@ -104,6 +104,7 @@ export const KIND_CHOICES = {
   WHATSAPP: 'whatsapp',
   TELNYX: 'telnyx',
   WEBHOOK: 'webhook',
+  CHATBOTMN: 'chatbotmn',
   ALL: [
     'messenger',
     'lead',
@@ -125,7 +126,8 @@ export const KIND_CHOICES = {
     'smooch-twilio',
     'whatsapp',
     'telnyx',
-    'webhook'
+    'webhook',
+    'chatbotmn'
   ]
 };
 
@@ -153,7 +155,8 @@ export const INTEGRATION_NAMES_MAP = {
   'nylas-yahoo': 'Yahoo by Nylas',
   'twitter-dm': 'Twitter dm',
 
-  telnyx: 'SMS by Telnyx'
+  telnyx: 'SMS by Telnyx',
+  chatbotmn: 'Chatbot.mn'
 };
 
 // messenger data availability constants
@@ -713,7 +716,7 @@ export const CUSTOMER_SELECT_OPTIONS = {
 
 export const DEFAULT_CONSTANT_VALUES = {
   sex_choices: DEFAULT_SEX_CHOICES,
-  company_industry_types: DEFAULT_COMPANY_INDUSTRY_TYPES.map(v => ({
+  company_industry_types: DEFAULT_COMPANY_INDUSTRY_TYPES.map((v) => ({
     label: v,
     value: v
   })),

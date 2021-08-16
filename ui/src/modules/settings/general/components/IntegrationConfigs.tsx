@@ -203,6 +203,11 @@ class IntegrationConfigs extends React.Component<Props, State> {
         <CollapseContent title="Telnyx SMS">
           {this.renderItem('TELNYX_API_KEY')}
         </CollapseContent>
+
+        <CollapseContent title="Chatbot.mn">
+          {this.renderItem('CHATBOT_USERNAME')}
+          {this.renderItem('CHATBOT_PASSWORD')}
+        </CollapseContent>
       </ContentBox>
     );
   };

@@ -86,6 +86,7 @@ export const INTEGRATION_KINDS = {
   SMOOCH_TWILIO: 'smooch-twilio',
   WHATSAPP: 'whatsapp',
   TELNYX: 'telnyx',
+  CHATBOTMN: 'chatbotmn',
   WEBHOOK: 'webhook',
   ALL: [
     { text: 'Messenger', value: 'messenger' },
@@ -113,7 +114,8 @@ export const INTEGRATION_KINDS = {
     { text: 'Outlook by Nylas', value: 'nylas-outlook' },
     { text: 'Yahoo by Nylas', value: 'nylas-yahoo' },
 
-    { text: 'SMS by Telnyx', value: 'telnyx' }
+    { text: 'SMS by Telnyx', value: 'telnyx' },
+    { text: 'Chatbot.mn', value: 'chatbotmn' }
   ]
 };
 
@@ -367,6 +369,17 @@ export const INTEGRATIONS = [
     kind: 'webhook',
     logo: '/images/integrations/incoming-webhook.png',
     createModal: 'webhook',
+    category:
+      'All integrations, For support teams, Conversation, Marketing automation'
+  },
+  {
+    name: 'Chatbot.mn',
+    description: 'Configure chatbot for a facebook page',
+    inMessenger: false,
+    isAvailable: true,
+    kind: 'chatbotmn',
+    logo: '/images/integrations/chatbot.png',
+    createModal: 'chatbotmn',
     category:
       'All integrations, For support teams, Conversation, Marketing automation'
   }

@@ -9,6 +9,7 @@ import { INTEGRATION_KINDS } from '../../constants';
 import IntegrationForm from '../../containers/common/IntegrationForm';
 import LineForm from '../../containers/line/Form';
 import TelnyxForm from '../../containers/telnyx/TelnyxForm';
+import ChatbotMnForm from '../../containers/chatbotMn/ChatbotMnForm';
 import Twitter from '../../containers/twitter/Twitter';
 import { Box, IntegrationItem, Ribbon, Type } from './styles';
 
@@ -148,6 +149,14 @@ function renderCreate(createUrl, kind) {
 
     return (
       <ModalTrigger title="Add telnyx" trigger={trigger} content={content} />
+    );
+  }
+
+  if (kind === INTEGRATION_KINDS.CHATBOTMN) {
+    const content = props => <ChatbotMnForm {...props} />;
+
+    return (
+      <ModalTrigger title="Add chatbot.mn" trigger={trigger} content={content} />
     );
   }
 

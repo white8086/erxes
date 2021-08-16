@@ -167,7 +167,10 @@ export const KEY_LABELS = {
   company_industry_types: 'Company industry types',
   social_links: 'Social links',
 
-  NOTIFICATION_DATA_RETENTION: 'Notification data retention'
+  NOTIFICATION_DATA_RETENTION: 'Notification data retention',
+
+  CHATBOT_USERNAME: 'Chatbot system username for API',
+  CHATBOT_PASSWORD: 'Chatbot system password for API'
 };
 
 export const FILE_MIME_TYPES = [
