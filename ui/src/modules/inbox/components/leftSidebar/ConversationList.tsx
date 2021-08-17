@@ -30,6 +30,8 @@ export default class ConversationList extends React.Component<Props> {
       totalCount
     } = this.props;
 
+    console.log('test');
+
     const popupTrigger = (
       <Button icon="processor">{__('Connect Integration')}</Button>
     );
