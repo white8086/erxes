@@ -3,6 +3,7 @@ import * as express from 'express';
 
 import initCallPro from './callpro/controller';
 import initChatfuel from './chatfuel/controller';
+import initChatbot from './chatbotmn/controller';
 import { connect, mongoStatus } from './connection';
 import {
   debugError,
@@ -185,6 +186,9 @@ initSmooch(app);
 
 // init telnyx
 initTelnyx(app);
+
+// init chatbotmn
+initChatbot(app);
 
 // Error handling middleware
 app.use((error, _req, res, _next) => {

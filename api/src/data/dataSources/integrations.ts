@@ -50,6 +50,10 @@ export default class IntegrationsAPI extends RESTDataSource {
     return this.post('/chatfuel/reply', params);
   }
 
+  replyChatbotMn(params) {
+    return this.post('/chatbotmn/reply', params);
+  }
+
   public async sendEmail(kind, params) {
     return this.post(`/${kind}/send`, params);
   }

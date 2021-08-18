@@ -69,13 +69,13 @@ const sendConversationToIntegrations = async (
   if (type === 'facebook') {
     const regex = new RegExp('<img[^>]* src="([^"]*)"', 'g');
 
-    const images: string[] = (doc.content.match(regex) || []).map(m =>
+    const images: string[] = (doc.content.match(regex) || []).map((m) =>
       m.replace(regex, '$1')
     );
 
     const attachments = doc.attachments as any[];
 
-    images.forEach(img => {
+    images.forEach((img) => {
       attachments.push({ type: 'image', url: img });
     });
 
@@ -383,6 +383,11 @@ const conversationMutations = {
     // send reply to whatsapp
     if (kind === KIND_CHOICES.WHATSAPP) {
       requestName = 'replyWhatsApp';
+    }
+
+    // send reply to chatBot
+    if (kind === KIND_CHOICES.CHATBOTMN) {
+      requestName = 'replyChatbotMn';
     }
 
     await sendConversationToIntegrations(
@@ -707,7 +712,7 @@ const conversationMutations = {
 
       const relTypeIds: string[] = [];
 
-      sourceConversationIds.forEach(async conversationId => {
+      sourceConversationIds.forEach(async (conversationId) => {
         const con = await Conversations.getConversation(conversationId);
 
         if (con.customerId) {

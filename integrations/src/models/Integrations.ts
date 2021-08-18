@@ -18,6 +18,7 @@ export interface IIntegration {
   expiration?: string;
   gmailHistoryId?: string;
   chatfuelConfigs?: { [key: string]: string };
+  chatbotmnConfigs?: { [key: string]: string };
   telegramBotToken?: string;
   viberBotToken?: string;
   lineChannelId?: string;
@@ -74,6 +75,10 @@ export const integrationSchema = new Schema({
     default: {}
   }),
   chatfuelConfigs: field({
+    type: Object,
+    default: {}
+  }),
+  chatbotmnConfigs: field({
     type: Object,
     default: {}
   }),
