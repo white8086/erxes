@@ -49,6 +49,7 @@ export default function Carousel({ items }: Props) {
     return (
       <CardItem key={index}>
         {item.picture && <img alt={item.title || ''} src={item.picture} />}
+        {item.video && <iframe title={item.title || ''} src={item.video} />}
         <CardContent>
           {item.title && <h4>{item.title}</h4>}
           {item.subtitle && <p>{item.subtitle}</p>}

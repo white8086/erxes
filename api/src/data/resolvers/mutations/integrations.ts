@@ -254,8 +254,12 @@ const integrationMutations = {
       kind = 'smooch';
     }
 
+    if (kind.includes('chatbotmn')) {
+      kind = 'chatbotmn';
+    }
+
     try {
-      if (KIND_CHOICES.WEBHOOK !== kind && KIND_CHOICES.CHATBOTMN !== kind) {
+      if (KIND_CHOICES.WEBHOOK !== kind) {
         await dataSources.IntegrationsAPI.createIntegration(kind, {
           accountId: doc.accountId,
           kind: doc.kind,
@@ -359,7 +363,8 @@ const integrationMutations = {
           'smooch-twilio',
           'whatsapp',
           'telnyx',
-          'webhook'
+          'webhook',
+          'chatbotmn'
         ].includes(integration.kind)
       ) {
         await dataSources.IntegrationsAPI.removeIntegration({

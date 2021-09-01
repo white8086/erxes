@@ -137,6 +137,7 @@ export interface ICarouselButton {
 export interface ICarouselItem {
   title: string;
   picture?: string;
+  video?: string;
   subtitle?: string;
   buttons?: ICarouselButton[];
 }
