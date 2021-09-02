@@ -366,6 +366,12 @@ export const PROPERTY_GROUPS = [
       { value: 'deal', label: 'Sales pipeline' },
       { value: 'product', label: 'Products & services' }
     ]
+  },
+  {
+    label: 'Team member',
+    value: 'user',
+    description: 'description',
+    types: [{ value: 'user', label: 'Sales pipeline' }]
   }
 ];
 
@@ -507,5 +513,16 @@ export const DEVICE_PROPERTIES_INFO = {
     { field: 'hostName', label: 'Hostname' },
     { field: 'language', label: 'Language' },
     { field: 'agent', label: 'User Agent' }
+  ]
+};
+
+export const USER_PROPERTIES_INFO = {
+  email: 'Email',
+  username: 'Username',
+  code: 'Code',
+  ALL: [
+    { field: 'email', label: 'Email', canHide: false },
+    { field: 'username', label: 'Username' },
+    { field: 'code', label: 'Code' }
   ]
 };
