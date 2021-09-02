@@ -517,12 +517,10 @@ export const DEVICE_PROPERTIES_INFO = {
 };
 
 export const USER_PROPERTIES_INFO = {
-  email: 'Email',
-  username: 'Username',
-  code: 'Code',
+  email: 'Primary email',
+  username: 'User name',
   ALL: [
-    { field: 'email', label: 'Email', canHide: false },
-    { field: 'username', label: 'Username' },
-    { field: 'code', label: 'Code' }
+    { field: 'email', label: 'Primary email', canHide: false },
+    { field: 'username', label: 'User name' }
   ]
 };
