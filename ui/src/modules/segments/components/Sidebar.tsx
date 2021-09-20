@@ -29,8 +29,8 @@ function TagsSidebar() {
         {ListItem('/segments/deal', 'Sales Pipeline')}
         {ListItem('/segments/task', 'Task')}
         {ListItem('/segments/ticket', 'Ticket')}
-        {ListItem('/segments/user', 'Team member')}
         {ListItem('/segments/conversation', 'Conversation')}
+        {ListItem('/segments/user', 'Team member')}
         <li>
           <a
             target="_blank"
