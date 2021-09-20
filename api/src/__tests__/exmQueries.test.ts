@@ -6,7 +6,6 @@ import './setup.ts';
 
 describe('Exm queries', () => {
   afterEach(async () => {
-    // Clearing test data
     await Exms.deleteMany({});
   });
 
