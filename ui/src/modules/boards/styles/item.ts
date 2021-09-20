@@ -75,6 +75,15 @@ export const Footer = styled.div`
   }
 `;
 
+export const LastUpdate = styled.div`
+  margin-top: -18px;
+  font-size: 9px;
+
+  span {
+    font-size: 9px;
+  }
+`;
+
 export const HeaderRow = styled(FlexContent)`
   margin-bottom: 30px;
 `;

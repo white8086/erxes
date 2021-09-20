@@ -1,5 +1,5 @@
 import { PopoverList } from 'modules/common/components/filterableList/styles';
-import { colors } from 'modules/common/styles';
+import { colors, dimensions } from 'modules/common/styles';
 import styled, { css } from 'styled-components';
 import styledTS from 'styled-components-ts';
 import { borderRadius, stageWidth } from './common';
@@ -86,6 +86,17 @@ const Header = styled.div`
   }
 `;
 
+const Body = styled.div`
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  margin: 0 4px;
+
+  &:hover {
+    overflow-y: auto;
+  }
+`;
+
 const HeaderAmount = styled.div`
   min-height: 28px;
 `;
@@ -119,16 +130,38 @@ const Amount = styled.ul`
     }
   }
 `;
+const ListContainer = styled.div`
+  min-height: 200px;
+  border: 1px solid rgb(238, 238, 238);
+  border-radius: ${dimensions.unitSpacing - 4}px;
+  margin: ${dimensions.coreSpacing}px ${dimensions.unitSpacing}px;
+  padding: ${dimensions.unitSpacing}px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0px 0px 20px 2px rgb(0 0 0 / 10%);
+`;
 
-const Body = styled.div`
-  max-height: 100%;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  margin: 0 4px;
+export const ListBody = styled.div`
+  overflow: auto;
+  position: relative;
+  overflow-y: overlay;
+  max-height: 300px;
+  margin-top: ${dimensions.unitSpacing}px;
+`;
 
-  &:hover {
-    overflow-y: auto;
-  }
+export const Footer = styled.div`
+  background: rgb(250, 250, 250);
+  border-top: 1px solid rgb(238, 238, 238);
+  display: flex;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+`;
+
+export const ListStageFooter = styled.div`
+  border-radius: 0 0 3px 3px;
+  background: rgba(101, 105, 223, 0.15);
+  align-self: center;
+  margin-left: auto;
+  width: 200px;
 `;
 
 const AddNew = styled.a`
@@ -175,6 +208,27 @@ export const StageTitle = styled.h4`
   justify-content: space-between;
 `;
 
+export const GroupTitle = styled.div`
+  display: flex;
+
+  p {
+    border-radius: 14px;
+    padding: ${dimensions.unitSpacing - 9}px ${dimensions.unitSpacing - 1}px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-size: 11px;
+    margin-left: ${dimensions.unitSpacing - 5}px;
+    display: inline-block;
+    line-height: 1.32857143;
+    background: rgba(101, 105, 223, 0.15);
+    color: ${colors.textPrimary};
+    border: none;
+    font-weight: 500;
+    -webkit-animation: none;
+    animation: none;
+  }
+`;
+
 export const ActionList = styled(PopoverList)`
   min-width: 160px;
   li a {
@@ -208,5 +262,6 @@ export {
   IndicatorItem,
   StageFooter,
   LoadingContent,
-  StageRoot
+  StageRoot,
+  ListContainer
 };
