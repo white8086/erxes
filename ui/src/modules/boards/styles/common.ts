@@ -40,7 +40,31 @@ export const RootBack = styled.div`
   flex: 1;
   flex-direction: column;
   overflow: hidden;
-  background-color: ${colors.colorSecondary};
+  background-color: ${colors.colorPrimary};
+`;
+
+export const GroupByContent = styled.div`
+  display: flex;
+  font-size: 11px;
+
+  .dropdown {
+    padding: 0 8px;
+
+    .menu {
+      width: auto;
+    }
+  }
+
+  > i {
+    padding 5px 0;
+    margin-right: 5px;
+    color: ${colors.colorCoreGray};
+  }
+
+  span {
+    padding 5px 0;
+    color: ${colors.colorCoreGray};
+  }
 `;
 
 // IItem list
