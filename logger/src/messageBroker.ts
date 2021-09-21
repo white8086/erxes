@@ -110,7 +110,11 @@ export const initBroker = async server => {
 
     try {
       if (action === 'get') {
-        response = { data: await Visitors.getVisitorLog(data.visitorId) };
+        response = { data: await new Promise((resolve) => { setTimeout(async () => {
+           const response = await Visitors.getVisitorLog(data.visitorId)
+
+           resolve(response);
+        }, 500);}) };
       }
 
       response.status = 'success';

@@ -1555,10 +1555,12 @@ export const sendToVisitorLog = async (params: IVisitorLogParams, action) =>
 
 export const getVisitorLog = async visitorId => {
   try {
-    return messageBroker().sendRPCMessage(RABBITMQ_QUEUES.RPC_VISITOR_LOG, {
+    const response = await messageBroker().sendRPCMessage(RABBITMQ_QUEUES.RPC_VISITOR_LOG, {
       action: 'get',
       data: { visitorId }
     });
+
+    return response;
   } catch (e) {
     debugError(
       `Error during getVisitorLog: ${e.message} visitorId: ${visitorId}`
