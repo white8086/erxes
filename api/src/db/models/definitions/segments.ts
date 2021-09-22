@@ -9,8 +9,8 @@ export const CONTENT_TYPES = {
   DEAL: 'deal',
   TASK: 'task',
   TICKET: 'ticket',
-  USER: 'user',
   CONVERSATION: 'conversation',
+  USER: 'user',
 
   ALL: [
     'customer',
@@ -20,8 +20,8 @@ export const CONTENT_TYPES = {
     'deal',
     'task',
     'ticket',
-    'user',
-    'conversation'
+    'conversation',
+    'user'
   ]
 };
 

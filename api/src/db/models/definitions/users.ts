@@ -46,8 +46,8 @@ export interface IUser {
   isSubscribed?: string;
   sessionCode?: string;
   isShowNotification?: boolean;
-  customFieldsData?: ICustomField[];
   score?: number;
+  customFieldsData?: ICustomField[];
 }
 
 export interface IUserDocument extends IUser, Document {
