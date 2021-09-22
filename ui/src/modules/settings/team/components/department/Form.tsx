@@ -43,7 +43,7 @@ export default function DepartmentForm(props: Props) {
           <FormControl
             {...formProps}
             name="title"
-            defaultValue={object.name}
+            defaultValue={object.title}
             autoFocus={true}
             required={true}
           />
@@ -53,7 +53,7 @@ export default function DepartmentForm(props: Props) {
           <FormControl
             {...formProps}
             name="description"
-            defaultValue={object.name}
+            defaultValue={object.description}
             autoFocus={true}
             componentClass="textarea"
           />
@@ -85,8 +85,7 @@ export default function DepartmentForm(props: Props) {
             values: generateDoc(values),
             isSubmitted,
             callback: closeModal,
-            object,
-            confirmationUpdate: true
+            object
           })}
         </ModalFooter>
       </>
