@@ -17,6 +17,7 @@ type Props = ICommonListProps &
   ICommonFormProps & {
     statusChangedMutation: any;
     listQuery: any;
+    totalCountQuery: any;
     renderButton: (props: IButtonMutateProps) => JSX.Element;
   };
 
@@ -52,12 +53,15 @@ class UserListContainer extends React.Component<Props> {
   }
 
   render() {
+    const { totalCountQuery, renderButton } = this.props;
+
     return (
       <UserList
         {...this.props}
         changeStatus={this.changeStatus}
         resendInvitation={this.resendInvitation}
-        renderButton={this.props.renderButton}
+        renderButton={renderButton}
+        totalCount={totalCountQuery.usersTotalCount || 0}
       />
     );
   }
