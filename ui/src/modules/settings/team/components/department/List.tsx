@@ -3,16 +3,30 @@ import React from 'react';
 import Box from 'modules/common/components/Box';
 import { SidebarList } from 'modules/layout/styles';
 import Icon from 'modules/common/components/Icon';
-import Collapse from 'react-bootstrap/Collapse';
 import { __ } from 'modules/common/utils';
 import ModalTrigger from 'modules/common/components/ModalTrigger';
 import Form from '../../containers/department/Form';
+import Item from '../../containers/department/Item';
 
 type Props = {
   listQuery: any;
 };
 
 export default function List({ listQuery }: Props) {
+  const renderChildren = parentId => {
+    const allDepartments = listQuery.data.departments || [];
+
+    const departments = allDepartments.filter(d => d.parentId === parentId);
+
+    return departments.map(department => (
+      <Item
+        key={department._id}
+        department={department}
+        refetch={listQuery.refetch}
+      />
+    ));
+  };
+
   const renderForm = ({ closeModal }) => {
     return <Form closeModal={closeModal} />;
   };
@@ -32,14 +46,12 @@ export default function List({ listQuery }: Props) {
   );
 
   return (
-    <Box title={__('Departments')} name="showTags" extraButtons={extraButtons}>
-      <Collapse>
-        <SidebarList className="no-link">
-          {(listQuery.data.departments || []).map(item => (
-            <li key={item._id}>{item.title}</li>
-          ))}
-        </SidebarList>
-      </Collapse>
+    <Box
+      title={__('Departments')}
+      name="showDepartments"
+      extraButtons={extraButtons}
+    >
+      <SidebarList className="no-link">{renderChildren(null)}</SidebarList>
     </Box>
   );
 }
