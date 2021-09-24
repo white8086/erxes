@@ -49,6 +49,7 @@ import Task from './tasks';
 import Ticket from './tickets';
 import User from './user';
 import UsersGroup from './usersGroup';
+import Automation from './automation';
 import AutomationNote from './automationNote';
 import Department from './departments';
 
@@ -105,8 +106,9 @@ const resolvers: any = {
   CalendarBoard,
   Tag,
   CPTicket,
-  AutomationNote,
-  Department
+  Department,
+  Automation,
+  AutomationNote
 };
 
 export default resolvers;
