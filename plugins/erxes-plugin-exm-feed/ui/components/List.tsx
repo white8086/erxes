@@ -35,6 +35,8 @@ export default function List({ list, deleteItem, totalCount }: Props) {
       </span>
     );
 
+    console.log('item: ', item);
+
     const content = props => {
       return <Form contentType={item.contentType} item={item} {...props} />;
     };
