@@ -201,6 +201,18 @@ export const generateQueryBySegment = async (args: {
     });
   }
 
+  if (['deal', 'task', 'ticket'].includes(contentType)) {
+    const stageIds = await generateConditionStageIds({
+      boardId: segment.boardId,
+      pipelineId: segment.pipelineId,
+      options
+    });
+
+    if (stageIds.length > 0) {
+      propertiesPositive.push({ terms: { stageId: stageIds } });
+    }
+  }
+
   const propertyConditions: ICondition[] = [];
   const eventConditions: ICondition[] = [];
 
@@ -248,7 +260,10 @@ export const generateQueryBySegment = async (args: {
       negativeQuery = negativeQuery;
 
       if (isCardTyped(condition.propertyType)) {
-        const stageIds = await generateConditionStageIds(condition, options);
+        const stageIds = await generateConditionStageIds({
+          boardId: condition.boardId,
+          pipelineId: condition.pipelineId
+        });
 
         if (stageIds.length > 0) {
           positiveQuery = {
@@ -717,25 +732,28 @@ const associationPropertyFilter = async ({
   return [];
 };
 
-const generateConditionStageIds = async (
-  condition: ICondition,
-  options: IOptions
-) => {
+const generateConditionStageIds = async ({
+  boardId,
+  pipelineId,
+  options
+}: {
+  boardId?: string;
+  pipelineId?: string;
+  options?: IOptions;
+}) => {
   let pipelineIds: string[] = [];
 
   if (options && options.pipelineId) {
     pipelineIds = [options.pipelineId];
   }
 
-  if (condition.boardId && !options.pipelineId) {
-    const board = await Boards.getBoard(condition.boardId);
+  if (boardId && (!options || !options.pipelineId)) {
+    const board = await Boards.getBoard(boardId);
 
     const pipelines = await Pipelines.find(
       {
         _id: {
-          $in: condition.pipelineId
-            ? [condition.pipelineId]
-            : board.pipelines || []
+          $in: pipelineId ? [pipelineId] : board.pipelines || []
         }
       },
       { _id: 1 }
