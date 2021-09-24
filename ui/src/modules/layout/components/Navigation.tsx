@@ -55,7 +55,7 @@ class Navigation extends React.Component<IProps> {
       parsedStorageValue = {};
     }
 
-    if (url.includes('?')) {
+    if (url && url.includes('?')) {
       const pathname = url.split('?')[0];
 
       if (!url.includes('perPage') && parsedStorageValue[pathname]) {
