@@ -161,7 +161,6 @@ class ListItemRow extends React.PureComponent<Props> {
               <Details color="#EA475D" items={companies || []} />
             )}
           </td>
-          <td></td>
         </tr>
         {this.renderForm()}
       </>

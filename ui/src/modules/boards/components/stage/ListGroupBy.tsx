@@ -135,7 +135,6 @@ class ListGroupBy extends React.Component<Props> {
                   {groupType !== 'assignee' && <th>{__('Assignee')}</th>}
                   <th>{__('Associated Customer')}</th>
                   <th>{__('Associated Company')}</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody id="groupbylist">
