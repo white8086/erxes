@@ -20,6 +20,7 @@ export const automationFields = `
     icon
     label
     description
+    count
   }
   actions {
     id
@@ -30,6 +31,7 @@ export const automationFields = `
     icon
     label
     description
+    count
   }
   createdAt
   updatedAt
@@ -152,7 +154,7 @@ const historiesParamValue = `
   endDate: $endDate,
 `;
 
-export const automationHistories = `
+const automationHistories = `
   query automationHistories(${historiesParamDef}) {
     automationHistories(${historiesParamValue}) {
       _id
@@ -174,10 +176,27 @@ export const automationHistories = `
   }
 `;
 
+const automationsTotalCount = `
+  query automationsTotalCount($status: String){
+    automationsTotalCount(status: $status){
+      byStatus
+      total
+    }
+  }
+`;
+
+const automationConfigPrievewCount = `
+  query automationConfigPrievewCount($config: JSON){
+    automationConfigPrievewCount(config: $config)
+  }
+`;
+
 export default {
   automations,
   automationsMain,
   automationDetail,
   automationNotes,
-  automationHistories
+  automationHistories,
+  automationsTotalCount,
+  automationConfigPrievewCount
 };

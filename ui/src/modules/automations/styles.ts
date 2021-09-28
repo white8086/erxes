@@ -45,7 +45,7 @@ export const Container = styled.div`
 
     .show-action-menu .custom-menu {
       visibility: visible;
-      top: -35px;
+      top: -28px;
     }
 
     .custom-menu {
@@ -571,6 +571,7 @@ export const Checkbox = styled.div`
 
   > label {
     margin-bottom: 5px;
+    display: block;
   }
 `;
 

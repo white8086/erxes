@@ -50,6 +50,7 @@ import Modal from 'react-bootstrap/Modal';
 import NoteFormContainer from 'modules/automations/containers/forms/NoteForm';
 import TemplateForm from '../../containers/forms/TemplateForm';
 import Histories from 'modules/automations/components/histories/Wrapper';
+import Confirmation from 'modules/automations/containers/forms/Confirmation';
 
 const plumb: any = jsPlumb;
 let instance;
@@ -58,6 +59,10 @@ type Props = {
   automation: IAutomation;
   automationNotes?: IAutomationNote[];
   save: (params: any) => void;
+  id: string;
+  history: any;
+  queryParams: any;
+  previewCount: (item: ITrigger | IAction) => number;
 };
 
 type State = {
@@ -167,7 +172,6 @@ class AutomationForm extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    console.log('why?');
     document.removeEventListener('click', this.handleClickOutside, true);
   }
 
@@ -512,6 +516,14 @@ class AutomationForm extends React.Component<Props, State> {
     `;
   }
 
+  renderCount(item: ITrigger | IAction) {
+    if (item.count) {
+      return item.count;
+    }
+
+    return this.props.previewCount(item);
+  }
+
   renderControl = (key: string, item: ITrigger | IAction, onClick: any) => {
     const idElm = `${key}-${item.id}`;
 
@@ -526,11 +538,12 @@ class AutomationForm extends React.Component<Props, State> {
           </div>
           <div>
             <i class="icon-${item.icon}"></i>
-            ${item.label}
+            ${item.label} (${this.renderCount(item)})
           </div>
         </div>
         <p>${item.description}</p>
         ${this.renderNotes(idElm)}
+  
       </div>
     `);
 
@@ -799,6 +812,24 @@ class AutomationForm extends React.Component<Props, State> {
     );
   }
 
+  renderConfirmation() {
+    const { id, queryParams, history } = this.props;
+    const { triggers, actions } = this.state;
+
+    const when = queryParams.isCreate
+      ? !!id
+      : !!id && (triggers.length !== 0 || actions.length !== 0);
+
+    return (
+      <Confirmation
+        when={when}
+        id={id}
+        history={history}
+        queryParams={queryParams}
+      />
+    );
+  }
+
   renderNoteModal() {
     const { showNoteForm, editNoteForm, activeId } = this.state;
 
@@ -869,6 +900,7 @@ class AutomationForm extends React.Component<Props, State> {
 
     return (
       <>
+        {this.renderConfirmation()}
         <HeightedWrapper>
           <AutomationFormContainer>
             <Wrapper.Header

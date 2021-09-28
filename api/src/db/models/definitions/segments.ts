@@ -57,6 +57,8 @@ export interface ICondition {
 
   pipelineId?: string;
   boardId?: string;
+
+  formId?: string;
 }
 
 export interface IConditionDocument extends ICondition, Document {}
@@ -143,6 +145,11 @@ export const conditionSchema = new Schema(
     boardId: field({
       type: String,
       optional: true
+    }),
+
+    formId: field({
+      type: String,
+      optional: true
     })
   },
   { _id: false }
@@ -170,7 +177,7 @@ export const segmentSchema = schemaWrapper(
 
     conditions: field({ type: [conditionSchema] }),
 
-    boardId: field({ type: String }),
-    pipelineId: field({ type: String })
+    boardId: field({ type: String, optional: true }),
+    pipelineId: field({ type: String, optional: true })
   })
 );

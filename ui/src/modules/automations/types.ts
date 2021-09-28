@@ -11,6 +11,8 @@ export type IAction = {
   isAvailable?: boolean;
   style?: any;
   config?: any;
+
+  count?: number;
 };
 
 export type ITrigger = {
@@ -22,6 +24,8 @@ export type ITrigger = {
   actionId?: string;
   style?: any;
   config?: any;
+
+  count?: number;
 };
 
 export interface IAutomationDoc {
@@ -153,3 +157,16 @@ export type AutomationHistoriesQueryResponse = {
   automationHistories: IAutomationHistory[];
   loading: boolean;
 };
+
+export type Counts = {
+  [key: string]: number;
+};
+
+export type AutomationsCount = {
+  total: number;
+  byStatus: Counts;
+};
+
+export type CountQueryResponse = {
+  automationsTotalCount: AutomationsCount;
+} & QueryResponse;
