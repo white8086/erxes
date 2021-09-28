@@ -20,24 +20,20 @@ export const Content = styled.div`
   transition: background 0.3s ease;
   border-radius: 3px;
   min-height: 50px;
-
   p {
     color: ${colors.textPrimary};
     font-size: 13px;
   }
-
   img,
   table,
   * {
     max-width: 576px !important;
   }
-
   ul,
   ol {
     padding-left: 20px;
     margin: 0 0 10px;
   }
-
   &:hover {
     background: rgba(10, 30, 65, 0.08);
     cursor: pointer;
@@ -46,7 +42,6 @@ export const Content = styled.div`
 
 export const PriceContainer = styled.div`
   overflow: hidden;
-
   ul {
     float: left;
   }
@@ -65,11 +60,9 @@ export const Footer = styled.div`
   margin-top: 8px;
   border-top: 1px dotted ${colors.borderPrimary};
   font-size: 11px;
-
   ul {
     float: left;
   }
-
   > i {
     padding: 3px;
   }
@@ -90,12 +83,10 @@ export const HeaderRow = styled(FlexContent)`
 
 export const HeaderContent = styled.div`
   flex: 1;
-
   textarea {
     border-bottom: none;
     min-height: auto;
     padding: 5px 0;
-
     &:focus {
       border-bottom: 1px solid ${colors.colorSecondary};
     }
@@ -106,26 +97,21 @@ export const TitleRow = styled.div`
   display: flex;
   align-items: center;
   font-size: 16px;
-
   i {
     margin-right: 8px;
   }
-
   label {
     font-size: 13px;
     text-transform: initial;
   }
-
   input {
     font-weight: bold;
   }
-
   textarea {
     font-weight: bold;
     border-bottom: none;
     min-height: auto;
     padding: 5px 0;
-
     &:focus {
       border-bottom: 1px solid ${colors.colorSecondary};
     }
@@ -133,14 +119,12 @@ export const TitleRow = styled.div`
 `;
 
 export const ContentWrapper = styledTS<{ isEditing: boolean }>(styled.div)`
-
   ${props =>
     props.isEditing &&
     css`
       margin-bottom: ${dimensions.coreSpacing}px;
       background-color: ${colors.colorWhite};
       box-shadow: 0 0 6px 1px ${colors.shadowPrimary};
-
       ${TitleRow} {
         padding: ${dimensions.unitSpacing}px ${dimensions.coreSpacing}px;
       }
@@ -151,7 +135,6 @@ export const MetaInfo = styled.div`
   display: flex;
   align-items: center;
   margin-top: 5px;
-
   > * {
     margin-right: 5px;
   }
@@ -162,17 +145,14 @@ export const HeaderContentSmall = styled.div`
   margin-left: 20px;
   min-width: 160px;
   flex-shrink: 0;
-
   p {
     font-size: 16px;
     margin-bottom: 5px;
     font-weight: bold;
   }
-
   label {
     margin-right: 0;
   }
-
   input.form-control {
     box-shadow: none;
     border-radius: 0;
@@ -183,7 +163,6 @@ export const HeaderContentSmall = styled.div`
     padding: 0 !important;
     height: 20px;
     width: 160px;
-
     &:focus {
       box-shadow: none;
     }
@@ -208,7 +187,6 @@ export const LeftContainer = styled.div`
   margin-right: ${dimensions.coreSpacing}px;
   flex: 1;
   max-width: 620px;
-
   textarea {
     resize: none;
   }
@@ -224,7 +202,6 @@ export const WatchIndicator = styled.span`
   align-items: center;
   border-radius: ${borderRadius};
   padding: 3px;
-
   > i {
     color: ${colors.colorWhite};
     margin: 0 5px;
@@ -250,13 +227,11 @@ export const RightButton = styled(Button)`
   font-size: 13px;
   box-shadow: none;
   position: relative;
-
   > i {
     color: ${colors.textPrimary};
     margin-right: 5px;
     font-size: 14px;
   }
-
   &:hover {
     color: ${colors.colorCoreDarkGray};
     background: ${rgba(buttonColor, 0.08)};
@@ -273,7 +248,6 @@ export const MoveContainer = styled(FlexContent)`
 
 export const ActionContainer = styled(MoveContainer)`
   flex-wrap: wrap;
-
   > div {
     margin: 0 ${dimensions.unitSpacing / 2}px ${dimensions.unitSpacing / 2}px 0;
   }
@@ -288,7 +262,6 @@ export const MoveFormContainer = styled.div`
 
 export const ItemsWrapper = styled.div`
   padding: 12px 12px 0 12px;
-
   > div {
     box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 4px 0px;
     background: ${colors.bgLight};
@@ -298,7 +271,6 @@ export const ItemsWrapper = styled.div`
 export const PipelineName = styled.div`
   font-weight: bold;
   font-size: 15px;
-
   &:hover {
     cursor: pointer;
   }
@@ -321,23 +293,18 @@ export const StageItem = styledTS<{ isPass: boolean }>(styled.li)`
   flex: 1;
   text-align: right;
   position: relative;
-
   &:first-child {
     flex: unset;
-
     &:before {
       display: none;
     }
-
     i {
       margin-left: 0;
     }
   }
-
   &:last-child i {
     margin-right: 0;
   }
-
   &:before {
     content: '';
     height: 2px;
@@ -349,7 +316,6 @@ export const StageItem = styledTS<{ isPass: boolean }>(styled.li)`
     left: 0;
     position: absolute;
   }
-
   span {
     position: relative;
     z-index: 10;
@@ -357,7 +323,6 @@ export const StageItem = styledTS<{ isPass: boolean }>(styled.li)`
     background: ${colors.bgLight};
     display: inline-block;
   }
-
   i {
     font-size: 30px;
     margin: 0 -3px;
@@ -372,7 +337,6 @@ export const SelectValue = styled.div`
   align-items: center;
   margin-left: -7px;
   padding-left: 25px;
-
   img {
     position: absolute;
     left: 0;
@@ -397,7 +361,6 @@ export const Avatar = styled.img`
 export const Status = styled.div`
   margin-bottom: 4px;
   overflow: hidden;
-
   > span {
     border-radius: ${borderRadius};
     padding: 1px 4px;
@@ -422,12 +385,10 @@ export const ArchiveStatus = styled.div`
   background-size: 14px 14px;
   min-height: 30px;
   padding: 12px 12px 12px 40px;
-
   span {
     font-size: 16px;
     padding-left: 10px;
   }
-
   i {
     font-size: 16px;
   }

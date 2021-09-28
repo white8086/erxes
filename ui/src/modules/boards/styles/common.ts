@@ -12,7 +12,6 @@ export const stageHeight = 'calc(100vh - 200px)';
 export const BoardContainer = styled(Contents)`
   margin: 0;
   position: unset;
-
   > div {
     padding-left: 20px;
   }
@@ -54,13 +53,13 @@ export const GroupByContent = styled.div`
       width: auto;
     }
   }
-
+  
   > i {
     padding 5px 0;
     margin-right: 5px;
     color: ${colors.colorCoreGray};
   }
-
+  
   span {
     padding 5px 0;
     color: ${colors.colorCoreGray};
@@ -97,15 +96,12 @@ export const ColorButton = styledTS<{ color?: string }>(styled.div)`
   color: ${props => props.color || colors.colorPrimaryDark};
   padding: 0 10px;
   transition: background 0.3s ease;
-
   > i {
     margin-right: 5px;
   }
-
   > span {
     margin-right: 5px;
   }
-
   &:hover {
     cursor: pointer;
     background-color: ${props => rgba(props.color || colors.colorPrimary, 0.2)};

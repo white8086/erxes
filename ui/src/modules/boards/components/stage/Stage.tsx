@@ -86,9 +86,98 @@ export default class Stage extends React.Component<Props, State> {
     }, 1000);
   }
 
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
+    const { stage, index, length, items, loadingItems } = this.props;
+    const { showSortOptions } = this.state;
+
+    if (
+      showSortOptions !== nextState.showSortOptions ||
+      index !== nextProps.index ||
+      loadingItems() !== nextProps.loadingItems() ||
+      length !== nextProps.length ||
+      JSON.stringify(stage) !== JSON.stringify(nextProps.stage) ||
+      JSON.stringify(items) !== JSON.stringify(nextProps.items)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
   onClosePopover = () => {
     this.overlayTrigger.hide();
   };
+
+  toggleSortOptions = () => {
+    const { showSortOptions } = this.state;
+
+    this.setState({ showSortOptions: !showSortOptions });
+  };
+
+  renderPopover() {
+    const { stage } = this.props;
+    const { showSortOptions } = this.state;
+
+    const archiveList = () => {
+      this.props.archiveList();
+      this.onClosePopover();
+    };
+
+    const archiveItems = () => {
+      this.props.archiveItems();
+      this.onClosePopover();
+    };
+
+    const removeStage = () => {
+      this.props.removeStage(stage._id);
+      this.onClosePopover();
+    };
+
+    return (
+      <Popover id="stage-popover">
+        <ActionList>
+          {showSortOptions ? (
+            this.renderSortOptions()
+          ) : (
+            <>
+              <li onClick={archiveItems} key="archive-items">
+                {__('Archive All Cards in This List')}
+              </li>
+              <li onClick={archiveList} key="archive-list">
+                {__('Archive This List')}
+              </li>
+              <li onClick={removeStage} key="remove-stage">
+                {__('Remove stage')}
+              </li>
+
+              <Dropdown.Divider />
+
+              <li onClick={this.toggleSortOptions}>{__('Sort By')}</li>
+            </>
+          )}
+        </ActionList>
+      </Popover>
+    );
+  }
+
+  renderCtrl() {
+    return (
+      <OverlayTrigger
+        ref={overlayTrigger => {
+          this.overlayTrigger = overlayTrigger;
+        }}
+        trigger="click"
+        placement="bottom-start"
+        rootClose={true}
+        container={this}
+        overlay={this.renderPopover()}
+      >
+        <ActionButton>
+          <Icon icon="ellipsis-h" />
+        </ActionButton>
+      </OverlayTrigger>
+    );
+  }
 
   renderSortOptions() {
     const { showSortOptions } = this.state;
@@ -169,95 +258,6 @@ export default class Stage extends React.Component<Props, State> {
         </li>
       </>
     );
-  }
-
-  toggleSortOptions = () => {
-    const { showSortOptions } = this.state;
-
-    this.setState({ showSortOptions: !showSortOptions });
-  };
-
-  renderPopover() {
-    const { stage } = this.props;
-    const { showSortOptions } = this.state;
-
-    const archiveList = () => {
-      this.props.archiveList();
-      this.onClosePopover();
-    };
-
-    const archiveItems = () => {
-      this.props.archiveItems();
-      this.onClosePopover();
-    };
-
-    const removeStage = () => {
-      this.props.removeStage(stage._id);
-      this.onClosePopover();
-    };
-
-    return (
-      <Popover id="stage-popover">
-        <ActionList>
-          {showSortOptions ? (
-            this.renderSortOptions()
-          ) : (
-            <>
-              <li onClick={archiveItems} key="archive-items">
-                {__('Archive All Cards in This List')}
-              </li>
-              <li onClick={archiveList} key="archive-list">
-                {__('Archive This List')}
-              </li>
-              <li onClick={removeStage} key="remove-stage">
-                {__('Remove stage')}
-              </li>
-
-              <Dropdown.Divider />
-
-              <li onClick={this.toggleSortOptions}>{__('Sort By')}</li>
-            </>
-          )}
-        </ActionList>
-      </Popover>
-    );
-  }
-
-  renderCtrl() {
-    return (
-      <OverlayTrigger
-        ref={overlayTrigger => {
-          this.overlayTrigger = overlayTrigger;
-        }}
-        trigger="click"
-        placement="bottom-start"
-        rootClose={true}
-        container={this}
-        overlay={this.renderPopover()}
-      >
-        <ActionButton>
-          <Icon icon="ellipsis-h" />
-        </ActionButton>
-      </OverlayTrigger>
-    );
-  }
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    const { stage, index, length, items, loadingItems } = this.props;
-    const { showSortOptions } = this.state;
-
-    if (
-      showSortOptions !== nextState.showSortOptions ||
-      index !== nextProps.index ||
-      loadingItems() !== nextProps.loadingItems() ||
-      length !== nextProps.length ||
-      JSON.stringify(stage) !== JSON.stringify(nextProps.stage) ||
-      JSON.stringify(items) !== JSON.stringify(nextProps.items)
-    ) {
-      return true;
-    }
-
-    return false;
   }
 
   onScroll = (e: React.UIEvent<HTMLDivElement>) => {

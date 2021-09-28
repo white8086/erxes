@@ -23,7 +23,6 @@ const StageRoot = styledTS<{ isDragging: boolean }>(styled.div)`
   transition: box-shadow 0.3s ease;
   background: ${stageGray};
   overflow: hidden;
-
   ${props => css`
     box-shadow: ${props.isDragging
       ? 'rgba(0, 0, 0, 0.2) 0px 5px 20px 0px'
@@ -32,7 +31,6 @@ const StageRoot = styledTS<{ isDragging: boolean }>(styled.div)`
 `;
 
 const Content = styledTS<{ type?: string }>(styled.div)`
-
   h5 {
     ${props => css`
       margin: ${props.type === 'growthHack' ? '0 20px 10px 0' : '0 20px 8px 0'};
@@ -44,10 +42,8 @@ const Content = styledTS<{ type?: string }>(styled.div)`
 
 const Indicator = styled.div`
   display: flex;
-
   > div {
     margin-right: 4px;
-
     &:last-of-type {
       margin: 0;
     }
@@ -72,12 +68,10 @@ const Header = styled.div`
   padding: 12px 16px;
   position: relative;
   border-radius: 3px 3px 0 0;
-
   h4 {
     margin: 0;
     font-size: 14px;
     font-weight: bold;
-
     span {
       color: ${secondaryText};
       margin-left: 5px;
@@ -109,22 +103,18 @@ const Amount = styled.ul`
   max-width: 230px;
   font-size: 12px;
   display: inline-block;
-
   li {
     float: left;
     padding-right: 5px;
     line-height: 22px;
-
     span {
       font-weight: bold;
       font-size: 10px;
     }
-
     &:after {
       content: '/';
       margin-left: 5px;
     }
-
     &:last-child:after {
       content: '';
     }
@@ -170,12 +160,10 @@ const AddNew = styled.a`
   user-select: none;
   border-radius: 0 0 3px 3px;
   font-weight: 500;
-
   &:hover {
     background: ${hoverColor};
     cursor: pointer;
   }
-
   i {
     margin-right: 8px;
   }
@@ -194,7 +182,6 @@ const LoadingContent = styled.div`
   padding: 2px 0;
   border-radius: ${borderRadius};
   box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 2px 0px;
-
   img {
     width: 100%;
   }
@@ -208,8 +195,7 @@ export const StageTitle = styled.h4`
 
 export const GroupTitle = styled.div`
   display: flex;
-
-  p {
+  <<<<<<< head =======>>>>>>>1edb0577a66da5d929e96f7d3f411256ab3a2ea0 p {
     border-radius: 14px;
     padding: ${dimensions.unitSpacing - 9}px ${dimensions.unitSpacing - 1}px;
     text-transform: uppercase;

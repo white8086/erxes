@@ -44,7 +44,6 @@ const boardGetLast = `
     boardGetLast(type: $type) {
       _id
       name
-
       pipelines {
         _id
         name
@@ -58,7 +57,6 @@ const boardDetail = `
     boardDetail(_id: $_id) {
       _id
       name
-
       pipelines {
         _id
         name
