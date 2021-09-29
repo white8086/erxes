@@ -11,7 +11,7 @@ import { Alert } from 'modules/common/utils';
 import React from 'react';
 
 import Common from '../Common';
-import PlaceHolderInput from '../PlaceHolderInput';
+import PlaceHolderInput from '../includes/PlaceHolderInput';
 
 type Props = {
   closeModal: () => void;

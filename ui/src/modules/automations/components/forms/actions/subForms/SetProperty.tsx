@@ -13,7 +13,7 @@ import React from 'react';
 import Select from 'react-select-plus';
 import Common from '../Common';
 import { PROPERTY_OPERATOR, PROPERTY_TYPES } from '../constants';
-import PlaceHolderInput from '../PlaceHolderInput';
+import PlaceHolderInput from '../includes/PlaceHolderInput';
 
 type Props = {
   closeModal: () => void;
