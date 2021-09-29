@@ -5,7 +5,14 @@ import DueDateLabel from 'modules/boards/components/DueDateLabel';
 import Labels from 'modules/boards/components/label/Labels';
 import EditForm from 'modules/boards/containers/editForm/EditForm';
 import { ItemDate } from 'modules/boards/styles/common';
-import { LastUpdate, Left, PriceContainer } from 'modules/boards/styles/item';
+import {
+  LastUpdate,
+  Left,
+  PriceContainer,
+  ColumnChild,
+  LabelColumn,
+  StageColumn
+} from 'modules/boards/styles/item';
 import { IItem, IOptions } from 'modules/boards/types';
 import { __ } from 'modules/common/utils';
 import React from 'react';
@@ -53,16 +60,20 @@ class ListItemRow extends React.PureComponent<Props> {
 
     if (groupType === 'stage') {
       return (
-        <>
+        <LabelColumn>
           {this.checkNull(
             Boolean(labels.length > 0),
             <Labels labels={labels} />
           )}
-        </>
+        </LabelColumn>
       );
     }
 
-    return <h6>{stage ? stage.name : '-'}</h6>;
+    return (
+      <StageColumn>
+        <span>{stage ? stage.name : '-'}</span>
+      </StageColumn>
+    );
   };
 
   renderPriority = () => {
@@ -70,17 +81,21 @@ class ListItemRow extends React.PureComponent<Props> {
     const { priority, labels } = item;
 
     if (groupType === 'priority') {
-      return <Labels labels={labels} />;
+      return (
+        <LabelColumn>
+          <Labels labels={labels} />
+        </LabelColumn>
+      );
     }
 
     return (
-      <>
+      <td>
         {priority ? (
           <PriorityIndicator isFullBackground={true} value={priority} />
         ) : (
           '-'
         )}
-      </>
+      </td>
     );
   };
 
@@ -93,14 +108,6 @@ class ListItemRow extends React.PureComponent<Props> {
   };
 
   render() {
-    const styleTr = {
-      cursor: 'pointer'
-    };
-
-    const cartWidth = {
-      width: '500px'
-    };
-
     const { item, onClick, groupType } = this.props;
 
     const {
@@ -114,23 +121,23 @@ class ListItemRow extends React.PureComponent<Props> {
 
     return (
       <>
-        <tr onClick={onClick} key={item._id} style={styleTr}>
-          <td style={cartWidth}>
+        <tr onClick={onClick} key={item._id} style={{ cursor: 'pointer' }}>
+          <ColumnChild>
             <h5>{item.name}</h5>
             <LastUpdate>
               {__('Last updated')}: {this.renderDate(item.modifiedAt)}
             </LastUpdate>
-          </td>
-          <td>{this.renderStage()}</td>
+          </ColumnChild>
+          {this.renderStage()}
           {(groupType === 'assignee' || groupType === 'dueDate') && (
-            <td>
+            <LabelColumn>
               {this.checkNull(
                 Boolean(labels.length > 0),
                 <Labels labels={labels} />
               )}
-            </td>
+            </LabelColumn>
           )}
-          <td>{this.renderPriority()}</td>
+          {this.renderPriority()}
           <td>
             {this.checkNull(
               Boolean(closeDate || isComplete),
@@ -155,12 +162,12 @@ class ListItemRow extends React.PureComponent<Props> {
               <Details color="#F7CE53" items={customers || []} />
             )}
           </td>
-          <td>
+          <ColumnChild>
             {this.checkNull(
               Boolean(companies && companies.length > 0),
               <Details color="#EA475D" items={companies || []} />
             )}
-          </td>
+          </ColumnChild>
         </tr>
         {this.renderForm()}
       </>
