@@ -31,9 +31,15 @@ const TaskMainActionBar = (props: Props) => {
   const { queryParams, onSelect } = props;
 
   // get selected type from URL
-  const viewType = window.location.href.includes('calendar')
-    ? 'calendar'
-    : 'board';
+  let viewType = 'board';
+
+  if (window.location.href.includes('calendar')) {
+    viewType = 'calendar';
+  }
+
+  if (window.location.href.includes('chart')) {
+    viewType = 'chart';
+  }
 
   const viewChooser = () => {
     const onFilterClick = (type: string) => {
@@ -48,6 +54,7 @@ const TaskMainActionBar = (props: Props) => {
 
     const boardLink = onFilterClick('board');
     const calendarLink = onFilterClick('calendar');
+    const chartLink = onFilterClick('chart');
 
     return (
       <ButtonGroup>
@@ -61,6 +68,11 @@ const TaskMainActionBar = (props: Props) => {
             to={calendarLink}
             className={viewType === 'calendar' ? 'active' : ''}
           >
+            <Icon icon="calender" />
+          </Link>
+        </Tip>
+        <Tip text={__('Chart')} placement="bottom">
+          <Link to={chartLink} className={viewType === 'chart' ? 'active' : ''}>
             <Icon icon="calender" />
           </Link>
         </Tip>

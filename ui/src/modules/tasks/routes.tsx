@@ -42,7 +42,13 @@ const tasks = () => {
 const boards = ({ location }) => {
   const queryParams = queryString.parse(location.search);
 
-  return <TaskBoard queryParams={queryParams} />;
+  return <TaskBoard viewType="board" queryParams={queryParams} />;
+};
+
+const chart = ({ location }) => {
+  const queryParams = queryString.parse(location.search);
+
+  return <TaskBoard viewType="chart" queryParams={queryParams} />;
 };
 
 const calendar = ({ location }) => {
@@ -76,6 +82,13 @@ const routes = () => {
         exact={true}
         path="/task/calendar"
         component={calendar}
+      />
+
+      <Route
+        key="task/chart"
+        exact={true}
+        path="/task/chart"
+        component={chart}
       />
     </>
   );
