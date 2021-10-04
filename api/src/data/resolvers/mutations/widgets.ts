@@ -319,7 +319,7 @@ const widgetMutations = {
     }
 
     if (visitorId) {
-      await sendToVisitorLog(
+      sendToVisitorLog(
         {
           visitorId,
           integrationId: integration._id,
@@ -699,7 +699,7 @@ const widgetMutations = {
     }
 
     if (visitorId) {
-      await sendToVisitorLog({ visitorId, location: browserInfo }, 'update');
+      sendToVisitorLog({ visitorId, location: browserInfo }, 'update');
     }
 
     try {
