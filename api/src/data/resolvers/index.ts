@@ -53,7 +53,6 @@ import Automation from './automation';
 import AutomationNote from './automationNote';
 import Department from './departments';
 import Trigger from './trigger';
-import Action from './action';
 
 const resolvers: any = {
   ...customScalars,
@@ -111,8 +110,7 @@ const resolvers: any = {
   Department,
   Automation,
   AutomationNote,
-  Trigger,
-  Action
+  Trigger
 };
 
 export default resolvers;

@@ -47,10 +47,12 @@ export const types = `
     conditionsConjunction: String
 
     getSubSegments: [Segment]
-    getConditionSegments: [Segment]
+    subSegmentConditions: [Segment]
 
     boardId: String
     pipelineId: String
+
+    count: Int
   }
 `;
 

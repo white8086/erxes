@@ -2,21 +2,20 @@ import Button from 'modules/common/components/Button';
 import { FlexRightItem } from 'modules/layout/styles';
 import PropertyCondition from 'modules/segments/containers/form/PropertyCondition';
 import { IField, ISegmentCondition, ISegmentMap } from 'modules/segments/types';
-import { CenterContent } from 'erxes-ui/lib/styles/main';
 import { __ } from 'modules/common/utils';
 import React from 'react';
 import {
   Condition,
   ConditionItem,
-  ConditionRemove,
   ConjunctionButtons,
   ConjunctionButtonsVertical,
   FilterRow,
-  SegmentBackIcon
+  ConditionRemove
 } from '../styles';
-import ConditionDetail from '../../containers/preview/ConditionDetail';
-import PropertyForm from '../form/PropertyForm';
+import PropertyDetail from '../../containers/preview/PropertyDetail';
+
 import Icon from 'modules/common/components/Icon';
+import { CenterContent } from 'erxes-ui/lib/layout/styles';
 
 type Props = {
   segment: ISegmentMap;
@@ -38,7 +37,7 @@ type Props = {
     segmentKey: string,
     conjunction: string
   ) => void;
-  onClickField?: (field, condition) => void;
+  onClickField: (field, condition, segmentKey) => void;
   chosenField?: IField;
   chosenCondition?: ISegmentCondition;
   isAutomation: boolean;
@@ -54,14 +53,6 @@ class ConditionsList extends React.Component<Props, State> {
 
     this.state = { chosenField: undefined, chosenCondition: undefined };
   }
-
-  onClickField = (field, condition) => {
-    if (this.props.onClickField) {
-      return this.props.onClickField(field, condition);
-    }
-
-    return;
-  };
 
   addProperty = () => {
     const { segment, addNewProperty } = this.props;
@@ -174,21 +165,18 @@ class ConditionsList extends React.Component<Props, State> {
     return (
       <ConditionItem useMargin={useMargin} key={Math.random()}>
         <FilterRow>
-          <ConditionDetail
-            onClickField={this.onClickField}
+          <PropertyDetail
+            onClickField={this.props.onClickField}
             condition={condition}
             pipelineId={segment.pipelineId}
             segmentId={segment._id}
+            segmentKey={segment.key}
           />
 
           <FlexRightItem>
-            <Button
-              className="round"
-              size="small"
-              btnStyle="simple"
-              icon="times"
-              onClick={this.removeCondition.bind(this, condition)}
-            />
+            <div onClick={this.removeCondition.bind(this, condition)}>
+              <Icon icon="times" size={16} />
+            </div>
           </FlexRightItem>
         </FilterRow>
       </ConditionItem>
@@ -196,35 +184,12 @@ class ConditionsList extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      segment,
-      index,
-      addCondition,
-      chosenField,
-      chosenCondition,
-      onClickBackToList
-    } = this.props;
+    const { segment, index } = this.props;
 
     const { conditions } = segment;
 
     if (conditions.length === 0 && index === 0) {
       return <PropertyCondition {...this.props} hideBackButton={true} />;
-    }
-
-    if (chosenField && chosenCondition) {
-      return (
-        <>
-          <SegmentBackIcon onClick={onClickBackToList}>
-            <Icon icon="angle-left" size={20} /> back
-          </SegmentBackIcon>
-          <PropertyForm
-            field={chosenField}
-            condition={chosenCondition}
-            segment={segment}
-            addCondition={addCondition}
-          />
-        </>
-      );
     }
 
     return (

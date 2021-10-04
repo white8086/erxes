@@ -26,10 +26,12 @@ import ConditionsList from '../preview/ConditionsList';
 import { ColorPick, ColorPicker } from 'modules/settings/styles';
 import React from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import { FilterBox, SegmentWrapper } from '../styles';
+import { FilterBox, SegmentBackIcon, SegmentWrapper } from '../styles';
 import PropertyCondition from '../../containers/form/PropertyCondition';
 import { Link } from 'react-router-dom';
 import { isBoardKind } from 'modules/segments/utils';
+import Icon from 'modules/common/components/Icon';
+import PropertyForm from '../form/PropertyForm';
 
 type Props = {
   contentType: string;
@@ -52,6 +54,7 @@ type Props = {
 
   isModal?: boolean;
   isAutomation?: boolean;
+  count: number;
 };
 
 type State = {
@@ -71,6 +74,7 @@ type State = {
 
   chosenField?: IField;
   chosenCondition?: ISegmentCondition;
+  chosenSegmentKey?: string;
 };
 
 class SegmentFormAutomations extends React.Component<Props, State> {
@@ -88,7 +92,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       conditionsConjunction: 'and',
       boardId: '',
       pipelineId: '',
-      getConditionSegments: [
+      subSegmentConditions: [
         {
           contentType: props.contentType || 'customer',
           conditionsConjunction: 'and'
@@ -98,7 +102,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
 
     if (
       !props.segment ||
-      (props.segment && props.segment.getConditionSegments.length === 0)
+      (props.segment && props.segment.subSegmentConditions.length === 0)
     ) {
       state = 'list';
       showAddGroup = false;
@@ -106,12 +110,12 @@ class SegmentFormAutomations extends React.Component<Props, State> {
 
     if (
       props.segment ||
-      (props.segment && props.segment.getConditionSegments.length > 0)
+      (props.segment && props.segment.subSegmentConditions.length > 0)
     ) {
       state = 'list';
     }
 
-    const segments = segment.getConditionSegments.map((item: ISegment) => ({
+    const segments = segment.subSegmentConditions.map((item: ISegment) => ({
       _id: item._id,
       key: Math.random().toString(),
       contentType: item.contentType || 'customer',
@@ -284,7 +288,10 @@ class SegmentFormAutomations extends React.Component<Props, State> {
                   <ControlLabel>Board</ControlLabel>
                   <Select
                     value={boardId}
-                    options={boards.map(b => ({ value: b._id, label: b.name }))}
+                    options={boards.map(b => ({
+                      value: b._id,
+                      label: b.name
+                    }))}
                     onChange={onChangeBoardItem.bind(this, 'boardId')}
                   />
                 </FormGroup>
@@ -443,8 +450,25 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       chosenField,
       chosenCondition,
       boardId,
-      pipelineId
+      pipelineId,
+      chosenSegmentKey
     } = this.state;
+
+    if (chosenField && chosenCondition && chosenSegmentKey) {
+      return (
+        <>
+          <SegmentBackIcon onClick={this.onClickBackToList}>
+            <Icon icon="angle-left" size={20} /> back
+          </SegmentBackIcon>
+          <PropertyForm
+            field={chosenField}
+            condition={chosenCondition}
+            segmentKey={chosenSegmentKey}
+            addCondition={this.addCondition}
+          />
+        </>
+      );
+    }
 
     if (state !== 'form') {
       return segments.map((segment, index) => {
@@ -493,15 +517,17 @@ class SegmentFormAutomations extends React.Component<Props, State> {
     return <></>;
   };
 
-  onClickField = (field, condition) => {
+  onClickField = (field, condition, segmentKey) => {
     this.setState({
       chosenField: field,
       chosenCondition: condition,
-      showAddGroup: false
+      showAddGroup: false,
+      chosenSegmentKey: segmentKey,
+      state: 'form'
     });
   };
 
-  renderFilterItem = () => {
+  renderAddGroupButton = () => {
     const { state, showAddGroup } = this.state;
 
     let show = false;
@@ -522,7 +548,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
             onClick={this.addSegment}
             size="small"
             btnStyle="simple"
-            icon="plus"
+            icon="add"
           >
             Add new group
           </Button>
@@ -573,20 +599,17 @@ class SegmentFormAutomations extends React.Component<Props, State> {
     };
   };
 
-  renderForm = (formProps: IFormProps) => {
+  renderSaveButton = (formProps: IFormProps) => {
+    const { segments, state, subOf } = this.state;
+    const { values, isSubmitted } = formProps;
     const {
-      segment,
       renderButton,
+      segment,
       afterSave,
       closeModal,
-      isModal,
-      contentType,
-      previewCount
+      previewCount,
+      isModal
     } = this.props;
-
-    const { subOf, segments } = this.state;
-
-    const { values, isSubmitted } = formProps;
 
     const conditionsForPreview: IConditionsForPreview[] = [];
 
@@ -603,10 +626,46 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       }
     };
 
+    if (segments.length > 0 && segments[0].conditions.length > 0) {
+      if (state !== 'form') {
+        return (
+          <>
+            {isModal ? (
+              <Button id="segment-show-count" onClick={onPreviewCount}>
+                Refresh count
+              </Button>
+            ) : (
+              <Button
+                id="segment-show-count"
+                icon="crosshairs"
+                onClick={onPreviewCount}
+              >
+                Show count
+              </Button>
+            )}
+
+            {renderButton({
+              name: 'segment',
+              values: this.generateDoc(values),
+              callback: closeModal || afterSave,
+              isSubmitted,
+              object: segment
+            })}
+          </>
+        );
+      }
+    }
+
+    return <></>;
+  };
+
+  renderForm = (formProps: IFormProps) => {
+    const { closeModal, isModal, contentType } = this.props;
+
     return (
       <>
         {this.renderDetailForm(formProps)}
-        {this.renderFilterItem()}
+        {this.renderAddGroupButton()}
         <ModalFooter id="button-group">
           <Button.Group>
             {isModal ? (
@@ -619,30 +678,14 @@ class SegmentFormAutomations extends React.Component<Props, State> {
                 Cancel
               </Button>
             ) : (
-              <>
-                <Link to={`/segments/${contentType}`}>
-                  <Button btnStyle="simple" icon="times-circle">
-                    Cancel
-                  </Button>
-                </Link>
-
-                <Button
-                  id="segment-show-count"
-                  icon="crosshairs"
-                  onClick={onPreviewCount}
-                >
-                  Show count
+              <Link to={`/segments/${contentType}`}>
+                <Button btnStyle="simple" icon="times-circle">
+                  Cancel
                 </Button>
-              </>
+              </Link>
             )}
 
-            {renderButton({
-              name: 'segment',
-              values: this.generateDoc(values),
-              callback: closeModal || afterSave,
-              isSubmitted,
-              object: segment
-            })}
+            {this.renderSaveButton(formProps)}
           </Button.Group>
         </ModalFooter>
       </>

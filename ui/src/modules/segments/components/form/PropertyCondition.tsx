@@ -51,14 +51,14 @@ class PropertyCondition extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { boardId = '', contentType, pipelineId = '' } = props;
+    const { boardId = '', contentType, pipelineId = '', forms = [] } = props;
 
     this.state = {
       propertyType: contentType,
       searchValue: '',
       boardId,
       pipelineId,
-      formId: ''
+      formId: forms[0] ? forms[0].formId : ''
     };
   }
 
@@ -68,31 +68,6 @@ class PropertyCondition extends React.Component<Props, State> {
 
   onClickBack = () => {
     this.setState({ chosenField: undefined, searchValue: '' });
-  };
-
-  renderFieldDetail = () => {
-    const {
-      chosenField,
-      propertyType,
-      pipelineId,
-      boardId,
-      formId
-    } = this.state;
-
-    if (chosenField) {
-      return (
-        <PropertyForm
-          {...this.props}
-          boardId={boardId}
-          pipelineId={pipelineId}
-          propertyType={propertyType}
-          formId={formId}
-          field={chosenField}
-        />
-      );
-    }
-
-    return;
   };
 
   onSearch = e => {
@@ -164,6 +139,10 @@ class PropertyCondition extends React.Component<Props, State> {
 
     if (propertyType !== 'form_submission') {
       return null;
+    }
+
+    if (forms[0] && formId === '') {
+      this.setState({ formId: forms[0].formId });
     }
 
     return (
@@ -263,6 +242,7 @@ class PropertyCondition extends React.Component<Props, State> {
         </SegmentBackIcon>
         <PropertyForm
           {...this.props}
+          segmentKey={this.props.segment.key}
           propertyType={propertyType}
           field={chosenField}
           boardId={boardId}
