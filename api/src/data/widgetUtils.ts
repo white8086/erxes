@@ -123,7 +123,7 @@ export const convertVisitorToCustomer = async (visitorId: string) => {
     debugError(`Update event error ${e.message}`);
   }
 
-  await sendToVisitorLog({ visitorId }, 'remove');
+  sendToVisitorLog({ visitorId }, 'remove');
 
   return customer;
 };
