@@ -18,7 +18,7 @@ import { ICustomerDocument } from '../db/models/definitions/customers';
 import { ISubmission } from '../db/models/definitions/fields';
 import { debugBase, debugError } from '../debuggers';
 import { client, fetchElk, getIndexPrefix } from '../elasticsearch';
-import { getVisitorLog, sendToVisitorLog } from './logUtils';
+import { sendToLog } from './logUtils';
 import { getDocument } from './resolvers/mutations/cacheUtils';
 import { findCompany, findCustomer } from './utils';
 
@@ -37,9 +37,9 @@ export const getOrCreateEngageMessage = async (
 
   let visitor;
 
-  if (visitorId) {
-    visitor = await getVisitorLog(visitorId);
-  }
+  // if (visitorId) {
+  //   visitor = await getVisitorLog(visitorId);
+  // }
 
   if (!customer && !visitor) {
     return null;
@@ -73,28 +73,13 @@ export const getOrCreateEngageMessage = async (
   return Messages.findOne(Conversations.widgetsUnreadMessagesQuery(convs));
 };
 
-export const convertVisitorToCustomer = async (visitorId: string) => {
-  let visitor;
+export const receiveVisitorDetail = async (visitor) => {
+  const { visitorId } = visitor;
 
-  try {
-    visitor = await getVisitorLog(visitorId);
+  delete visitor.visitorId;
+  delete visitor._id;
 
-    delete visitor.visitorId;
-    delete visitor._id;
-  } catch (e) {
-    debugError(e.message);
-  }
-
-  const doc = { state: 'visitor', ...visitor };
-  const customer = await Customers.createCustomer(doc);
-
-  await Messages.updateVisitorEngageMessages(visitorId, customer._id);
-  await Conversations.updateMany(
-    {
-      visitorId
-    },
-    { $set: { customerId: customer._id, visitorId: '' } }
-  );
+  const customer = await Customers.update({ visitorId }, { $set: visitor });
 
   const index = `${getIndexPrefix()}events`;
 
@@ -123,7 +108,7 @@ export const convertVisitorToCustomer = async (visitorId: string) => {
     debugError(`Update event error ${e.message}`);
   }
 
-  await sendToVisitorLog({ visitorId }, 'remove');
+  sendToLog('visitor:removeEntry', { visitorId });
 
   return customer;
 };
@@ -179,9 +164,9 @@ export const getOrCreateEngageMessageElk = async (
 
   let visitor;
 
-  if (visitorId) {
-    visitor = await getVisitorLog(visitorId);
-  }
+  // if (visitorId) {
+  //   visitor = await getVisitorLog(visitorId);
+  // }
 
   if (!customer && !visitor) {
     return null;
