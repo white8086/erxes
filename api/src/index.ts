@@ -49,7 +49,6 @@ import userMiddleware from './middlewares/userMiddleware';
 import webhookMiddleware from './middlewares/webhookMiddleware';
 import widgetsMiddleware from './middlewares/widgetsMiddleware';
 import init from './startup';
-import { getVisitorLog } from "./data/logUtils";
 
 // load environment variables
 dotenv.config();
@@ -293,7 +292,7 @@ app.get('/read-file', async (req: any, res, next) => {
     res.attachment(key);
 
     return res.send(response);
-  } catch (e: any) {
+  } catch (e) {
     if (e.message.includes('key does not exist')) {
       return res.status(404).send('Not found');
     }
@@ -439,32 +438,6 @@ httpServer.listen(PORT, () => {
     initBroker(app).catch(e => {
       debugError(`Error ocurred during message broker init ${e.message}`);
     });
-
-    setTimeout(async () => {
-      let i = 0;
-
-      const promises: any = [];
-
-      while (i<5000) {
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve('done')
-          }, 10);
-        });
-
-        i++;
-
-        const promise = getVisitorLog(Math.random());
-
-        promises.push(promise);
-      }
-
-      console.log('started waiting .............')
-
-      await Promise.all(promises);
-
-      console.log('done waiting .............')
-    }, 5000)
 
     initMemoryStorage();
 
