@@ -194,21 +194,11 @@ export const StageTitle = styled.h4`
 
 export const GroupTitle = styled.div`
   display: flex;
-  <<<<<<< head =======>>>>>>>1edb0577a66da5d929e96f7d3f411256ab3a2ea0 p {
+
+  span {
     border-radius: 14px;
-    padding: ${dimensions.unitSpacing - 9}px ${dimensions.unitSpacing - 1}px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    font-size: 11px;
-    margin-left: ${dimensions.unitSpacing - 5}px;
-    display: inline-block;
-    line-height: 1.32857143;
+    padding: ${dimensions.unitSpacing - 8}px ${dimensions.unitSpacing - 1}px;
     background: rgba(101, 105, 223, 0.15);
-    color: ${colors.textPrimary};
-    border: none;
-    font-weight: 500;
-    -webkit-animation: none;
-    animation: none;
   }
 `;
 
