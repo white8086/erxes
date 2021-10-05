@@ -23,29 +23,20 @@ import { getDocument } from './resolvers/mutations/cacheUtils';
 import { findCompany, findCustomer } from './utils';
 
 export const getOrCreateEngageMessage = async (
+  integrationId: string,
   browserInfo: IBrowserInfo,
   visitorId?: string,
   customerId?: string
 ) => {
-  let integrationId;
-
   let customer;
 
   if (customerId) {
     customer = await Customers.getCustomer(customerId);
   }
 
-  let visitor;
-
-  // if (visitorId) {
-  //   visitor = await getVisitorLog(visitorId);
-  // }
-
-  if (!customer && !visitor) {
+  if (!customer && !visitorId) {
     return null;
   }
-
-  integrationId = customer ? customer.integrationId : visitor.integrationId;
 
   const integration = await Integrations.getIntegration({
     _id: integrationId,
@@ -59,7 +50,7 @@ export const getOrCreateEngageMessage = async (
     brandId: brand._id,
     integrationId: integration._id,
     customer,
-    visitor,
+    visitorId,
     browserInfo
   });
 
@@ -142,12 +133,11 @@ const fetchHelper = async (index: string, query, errorMessage?: string) => {
 };
 
 export const getOrCreateEngageMessageElk = async (
+  integrationId: string,
   browserInfo: IBrowserInfo,
   visitorId?: string,
   customerId?: string
 ) => {
-  let integrationId;
-
   let customer;
 
   if (customerId) {
@@ -162,17 +152,9 @@ export const getOrCreateEngageMessageElk = async (
     }
   }
 
-  let visitor;
-
-  // if (visitorId) {
-  //   visitor = await getVisitorLog(visitorId);
-  // }
-
-  if (!customer && !visitor) {
+  if (!customer && !visitorId) {
     return null;
   }
-
-  integrationId = customer ? customer.integrationId : visitor.integrationId;
 
   const integration = await fetchHelper(
     'integrations',
@@ -202,7 +184,7 @@ export const getOrCreateEngageMessageElk = async (
     brandId: brand._id,
     integrationId: integration._id,
     customer,
-    visitor,
+    visitorId,
     browserInfo
   });
 
