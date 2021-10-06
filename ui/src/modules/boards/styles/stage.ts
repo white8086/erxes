@@ -85,7 +85,6 @@ const Body = styled.div`
   overflow-x: hidden;
   overflow-y: hidden;
   margin: 0 4px;
-
   &:hover {
     overflow-y: auto;
   }

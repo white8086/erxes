@@ -45,21 +45,17 @@ export const RootBack = styled.div`
 export const GroupByContent = styled.div`
   display: flex;
   font-size: 11px;
-
   .dropdown {
     padding: 0 8px;
-
     .menu {
       width: auto;
     }
   }
-  
   > i {
     padding 5px 0;
     margin-right: 5px;
     color: ${colors.colorCoreGray};
   }
-  
   span {
     padding 5px 0;
     color: ${colors.colorCoreGray};

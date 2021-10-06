@@ -53,7 +53,7 @@ export const HeaderButton = styledTS<{
 }>(styled.div)`
   padding: 0 ${dimensions.unitSpacing}px;
   line-height: ${dimensions.coreSpacing + 10}px;
-  height: ${dimensions.coreSpacing + 12}px; 
+  height: ${dimensions.coreSpacing + 12}px;
   border-radius: ${dimensions.unitSpacing - 6}px;
   transition: background 0.3s ease;
   background: ${props => props.hasBackground && 'rgba(0, 0, 0, 0.04)'};
@@ -61,12 +61,10 @@ export const HeaderButton = styledTS<{
   display: inline-block;
   vertical-align: middle;
   font-size: ${typography.fontSizeHeading8}px;
-  
   > i {
     color: ${props =>
       props.isActive ? colors.colorCoreLightGray : colors.colorCoreGray};
     margin-right: ${dimensions.unitSpacing - 5}px;
-    
     ${props =>
       props.rightIconed &&
       css`

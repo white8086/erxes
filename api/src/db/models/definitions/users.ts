@@ -153,16 +153,16 @@ export const userSchema = schemaHooksWrapper(
       default: false,
       label: 'Check if user shows'
     }),
-    customFieldsData: field({
-      type: [customFieldSchema],
-      optional: true,
-      label: 'Custom fields data'
-    }),
     score: field({
       type: Number,
       optional: true,
       label: 'Score',
       esType: 'number'
+    }),
+    customFieldsData: field({
+      type: [customFieldSchema],
+      optional: true,
+      label: 'Custom fields data'
     })
   }),
   'erxes_users'
