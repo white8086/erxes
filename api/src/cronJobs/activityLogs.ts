@@ -1,11 +1,9 @@
 import * as dotenv from 'dotenv';
 import * as schedule from 'node-schedule';
-// import { RABBITMQ_QUEUES } from '../data/constants';
 import { ACTIVITY_LOG_ACTIONS, putActivityLog } from '../data/logUtils';
 import { fetchSegment } from '../data/modules/segments/queryBuilder';
 import { connect } from '../db/connection';
 import { Segments } from '../db/models';
-// import messageBroker from '../messageBroker';
 
 /**
  * Send conversation messages to customer
@@ -26,17 +24,8 @@ export const createActivityLogsFromSegments = async () => {
       action: ACTIVITY_LOG_ACTIONS.CREATE_SEGMENT_LOG,
       data: { segment, contentIds, type: segment.contentType }
     });
-
-    // messageBroker().sendMessage(RABBITMQ_QUEUES.AUTOMATIONS_TRIGGER, {
-    //   type: segment.contentType,
-    //   targets: result
-    // });
   }
 };
-
-// setTimeout(() => {
-//   createActivityLogsFromSegments();
-// }, 5000);
 
 /**
  * *    *    *    *    *    *

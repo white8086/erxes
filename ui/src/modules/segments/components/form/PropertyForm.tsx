@@ -168,9 +168,9 @@ class PropertyForm extends React.Component<Props, State> {
 
     const operators = OPERATORS[type || ''] || OPERATORS.string;
 
-    return operators.map(operator => {
+    return operators.map((operator, index) => {
       return (
-        <>
+        <div key={index}>
           <FormControl
             componentClass="radio"
             onChange={this.onClickOperator.bind(this, operator)}
@@ -180,7 +180,7 @@ class PropertyForm extends React.Component<Props, State> {
             {operator.name}
           </FormControl>
           {this.renderInput(operator)}
-        </>
+        </div>
       );
     });
   };

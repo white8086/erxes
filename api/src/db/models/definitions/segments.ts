@@ -68,8 +68,8 @@ export interface ISegment {
   contentType: string;
   name: string;
   description?: string;
-  subOf: string;
-  color: string;
+  subOf?: string;
+  color?: string;
 
   conditions: ICondition[];
   conditionsConjunction?: 'and' | 'or';
@@ -161,12 +161,13 @@ export const segmentSchema = schemaWrapper(
     contentType: field({
       type: String,
       enum: CONTENT_TYPES.ALL,
-      label: 'Content type'
+      label: 'Content type',
+      index: true
     }),
     name: field({ type: String, optional: true }),
     description: field({ type: String, optional: true }),
-    subOf: field({ type: String, optional: true }),
-    color: field({ type: String, optional: true }),
+    subOf: field({ type: String, optional: true, index: true }),
+    color: field({ type: String }),
 
     conditionsConjunction: field({
       type: String,

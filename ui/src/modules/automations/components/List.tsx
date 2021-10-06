@@ -20,7 +20,6 @@ interface IProps extends IRouterProps {
   loading: boolean;
   searchValue: string;
   totalCount: number;
-  // TODO: check is below line not throwing error ?
   toggleBulk: () => void;
   toggleAll: (targets: IAutomation[], containerId: string) => void;
   bulk: any[];
@@ -220,9 +219,11 @@ class AutomationsList extends React.Component<IProps, State> {
                 <img src="/images/actions/automation.svg" alt="empty-img" />
 
                 <p>
-                  <b>You don’t have any automations yet.</b>
-                  Automatically execute repetitive tasks and make sure nothing
-                  falls through the cracks.
+                  <b>{__('You don’t have any automations yet')}.</b>
+                  {__(
+                    'Automatically execute repetitive tasks and make sure nothing falls through the cracks'
+                  )}
+                  .
                 </p>
               </EmptyContent>
             }

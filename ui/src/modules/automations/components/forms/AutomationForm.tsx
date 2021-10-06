@@ -87,6 +87,7 @@ type State = {
   zoomStep: number;
   zoom: number;
   percentage: number;
+  automationNotes: IAutomationNote[];
 };
 
 class AutomationForm extends React.Component<Props, State> {
@@ -96,7 +97,7 @@ class AutomationForm extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    const { automation } = this.props;
+    const { automation, automationNotes = [] } = this.props;
 
     this.state = {
       name: automation.name,
@@ -116,7 +117,8 @@ class AutomationForm extends React.Component<Props, State> {
       zoomStep: 0.025,
       zoom: 1,
       percentage: 100,
-      activeAction: {} as IAction
+      activeAction: {} as IAction,
+      automationNotes
     };
   }
 
@@ -158,6 +160,13 @@ class AutomationForm extends React.Component<Props, State> {
 
       instanceZoom.setZoom(zoom);
     };
+
+    if (
+      (prevProps.automationNotes || []).length !==
+      (this.props.automationNotes || []).length
+    ) {
+      this.setState({ automationNotes: this.props.automationNotes || [] });
+    }
   }
 
   componentWillUnmount() {
@@ -490,7 +499,7 @@ class AutomationForm extends React.Component<Props, State> {
     const item = activeId.split('-');
     const type = item[0];
 
-    return (this.props.automationNotes || []).filter(note => {
+    return (this.state.automationNotes || []).filter(note => {
       if (type === 'trigger' && note.triggerId !== item[1]) {
         return null;
       }
@@ -504,12 +513,16 @@ class AutomationForm extends React.Component<Props, State> {
   };
 
   renderNotes(key: string) {
-    if ((this.checkNote(key) || []).length === 0) {
+    const noteCount = (this.checkNote(key) || []).length;
+
+    if (noteCount === 0) {
       return ``;
     }
 
     return `
-      <div class="note-badge note-badge-${key}" title="Notes" id="${key}">
+      <div class="note-badge note-badge-${key}" title=${__(
+      'Notes'
+    )} id="${key}">
         <i class="icon-notes"></i>
       </div>
     `;
@@ -524,15 +537,17 @@ class AutomationForm extends React.Component<Props, State> {
   }
 
   renderControl = (key: string, item: ITrigger | IAction, onClick: any) => {
-    const idElm = `${key}-${item.id ? item.id : Math.random()}`;
+    const idElm = `${key}-${item.id}`;
 
     jquery('#canvas').append(`
       <div class="${key} control" id="${idElm}" style="${item.style}">
         <div class="trigger-header">
           <div class='custom-menu'>
             <div>
-              <i class="icon-notes add-note" title="Write Note"></i>
-              <i class="icon-trash-alt delete-control" id="${idElm}" title="Delete control"></i>
+              <i class="icon-notes add-note" title=${__('Write Note')}></i>
+              <i class="icon-trash-alt delete-control" id="${idElm}" title=${__(
+      'Delete control'
+    )}></i>
             </div>
           </div>
           <div>
@@ -623,9 +638,9 @@ class AutomationForm extends React.Component<Props, State> {
     return (
       <BarItems>
         <ToggleWrapper>
-          <span className={isActive ? 'active' : ''}>Inactive</span>
+          <span className={isActive ? 'active' : ''}>{__('Inactive')}</span>
           <Toggle defaultChecked={isActive} onChange={this.onToggle} />
-          <span className={!isActive ? 'active' : ''}>Active</span>
+          <span className={!isActive ? 'active' : ''}>{__('Active')}</span>
         </ToggleWrapper>
         <ActionBarButtonsWrapper>
           {this.renderButtons()}
@@ -710,7 +725,7 @@ class AutomationForm extends React.Component<Props, State> {
         return (
           <>
             <BackIcon onClick={onBack}>
-              <Icon icon="angle-left" size={20} /> Back to triggers
+              <Icon icon="angle-left" size={20} /> {__('Back to triggers')}
             </BackIcon>
             <ScrolledContent>
               <TriggerDetailForm
@@ -734,7 +749,7 @@ class AutomationForm extends React.Component<Props, State> {
         return (
           <>
             <BackIcon onClick={onBackAction}>
-              <Icon icon="angle-left" size={20} /> Back to actions
+              <Icon icon="angle-left" size={20} /> {__('Back to actions')}
             </BackIcon>
             <ActionDetailForm
               activeAction={activeAction}
@@ -787,7 +802,7 @@ class AutomationForm extends React.Component<Props, State> {
             onClick={this.toggleDrawer.bind(this, 'triggers')}
           >
             <Icon icon="file-plus" size={25} />
-            <p>How do you want to trigger this automation?</p>
+            <p>{__('How do you want to trigger this automation')}?</p>
           </div>
         </Container>
       );

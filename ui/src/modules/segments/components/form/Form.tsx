@@ -32,6 +32,7 @@ import { Link } from 'react-router-dom';
 import { isBoardKind } from 'modules/segments/utils';
 import Icon from 'modules/common/components/Icon';
 import PropertyForm from '../form/PropertyForm';
+import EventForm from './EventForm';
 
 type Props = {
   contentType: string;
@@ -50,6 +51,7 @@ type Props = {
   previewCount?: (args: {
     conditions: IConditionsForPreview[];
     subOf?: string;
+    conditionsConjunction?: string;
   }) => void;
 
   isModal?: boolean;
@@ -72,7 +74,7 @@ type State = {
   showAddGroup: boolean;
   chosenSegment?: ISegmentMap;
 
-  chosenField?: IField;
+  chosenProperty?: IField;
   chosenCondition?: ISegmentCondition;
   chosenSegmentKey?: string;
 };
@@ -81,7 +83,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    let state = 'form';
+    let state = 'propertyForm';
     let showAddGroup = true;
 
     const segment: ISegment = props.segment || {
@@ -138,7 +140,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { subOf, segments } = this.state;
+    const { subOf, segments, conditionsConjunction } = this.state;
     const { previewCount } = this.props;
 
     const conditionsForPreview: IConditionsForPreview[] = [];
@@ -151,7 +153,11 @@ class SegmentFormAutomations extends React.Component<Props, State> {
     });
 
     if (previewCount) {
-      previewCount({ conditions: conditionsForPreview, subOf });
+      previewCount({
+        conditions: conditionsForPreview,
+        subOf,
+        conditionsConjunction
+      });
     }
   }
 
@@ -341,7 +347,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
         segments,
         state: 'list',
         showAddGroup: true,
-        chosenField: undefined,
+        chosenProperty: undefined,
         chosenCondition: undefined
       });
     }
@@ -378,7 +384,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
     this.setState({
       chosenSegment: undefined,
       state: 'list',
-      chosenField: undefined,
+      chosenProperty: undefined,
       chosenCondition: undefined
     });
   };
@@ -399,7 +405,15 @@ class SegmentFormAutomations extends React.Component<Props, State> {
 
     const foundedSegment = segments.find(segment => segment.key === segmentKey);
 
-    this.setState({ chosenSegment: foundedSegment, state: 'form' });
+    this.setState({ chosenSegment: foundedSegment, state: 'propertyForm' });
+  };
+
+  addNewEvent = (segmentKey: string) => {
+    const segments = [...this.state.segments];
+
+    const foundedSegment = segments.find(segment => segment.key === segmentKey);
+
+    this.setState({ chosenSegment: foundedSegment, state: 'eventForm' });
   };
 
   addSegment = () => {
@@ -413,7 +427,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
     };
 
     this.setState({
-      state: 'form',
+      state: 'propertyForm',
       segments: [...this.state.segments, newSegment],
       chosenSegment: newSegment
     });
@@ -441,27 +455,27 @@ class SegmentFormAutomations extends React.Component<Props, State> {
   };
 
   renderConditionsList = () => {
-    const { contentType, isAutomation } = this.props;
+    const { contentType, isAutomation, events } = this.props;
     const {
       segments,
       state,
       chosenSegment,
       conditionsConjunction,
-      chosenField,
+      chosenProperty,
       chosenCondition,
       boardId,
       pipelineId,
       chosenSegmentKey
     } = this.state;
 
-    if (chosenField && chosenCondition && chosenSegmentKey) {
+    if (chosenProperty && chosenCondition && chosenSegmentKey) {
       return (
         <>
           <SegmentBackIcon onClick={this.onClickBackToList}>
             <Icon icon="angle-left" size={20} /> back
           </SegmentBackIcon>
           <PropertyForm
-            field={chosenField}
+            field={chosenProperty}
             condition={chosenCondition}
             segmentKey={chosenSegmentKey}
             addCondition={this.addCondition}
@@ -470,7 +484,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       );
     }
 
-    if (state !== 'form') {
+    if (state === 'list') {
       return segments.map((segment, index) => {
         return (
           <ConditionsList
@@ -478,6 +492,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
             conditionsConjunction={conditionsConjunction}
             changeConditionsConjunction={this.changeConditionsConjunction}
             addNewProperty={this.addNewProperty}
+            addNewEvent={this.addNewEvent}
             onClickBackToList={this.onClickBackToList}
             removeCondition={this.removeCondition}
             removeSegment={this.removeSegment}
@@ -486,8 +501,9 @@ class SegmentFormAutomations extends React.Component<Props, State> {
             segment={segment}
             addCondition={this.addCondition}
             changeSubSegmentConjunction={this.changeSubSegmentConjunction}
-            onClickField={this.onClickField}
-            chosenField={chosenField}
+            onClickProperty={this.onClickProperty}
+            onClickEvent={this.onClickEvent}
+            chosenProperty={chosenProperty}
             chosenCondition={chosenCondition}
             isAutomation={isAutomation || false}
             boardId={boardId}
@@ -497,7 +513,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       });
     }
 
-    if (chosenSegment) {
+    if (chosenSegment && state === 'propertyForm') {
       return (
         <PropertyCondition
           key={Math.random()}
@@ -514,16 +530,40 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       );
     }
 
+    if ((chosenSegment || chosenSegmentKey) && state === 'eventForm') {
+      return (
+        <EventForm
+          condition={chosenCondition}
+          key={Math.random()}
+          segmentKey={
+            chosenSegment ? chosenSegment.key : chosenSegmentKey || ''
+          }
+          onClickBackToList={this.onClickBackToList}
+          addCondition={this.addCondition}
+          events={events}
+        />
+      );
+    }
+
     return <></>;
   };
 
-  onClickField = (field, condition, segmentKey) => {
+  onClickProperty = (field, condition, segmentKey) => {
     this.setState({
-      chosenField: field,
+      chosenProperty: field,
       chosenCondition: condition,
       showAddGroup: false,
       chosenSegmentKey: segmentKey,
-      state: 'form'
+      state: 'propertyForm'
+    });
+  };
+
+  onClickEvent = (condition, segmentKey) => {
+    this.setState({
+      chosenCondition: condition,
+      showAddGroup: false,
+      chosenSegmentKey: segmentKey,
+      state: 'eventForm'
     });
   };
 
@@ -600,7 +640,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
   };
 
   renderSaveButton = (formProps: IFormProps) => {
-    const { segments, state, subOf } = this.state;
+    const { segments, state, subOf, conditionsConjunction } = this.state;
     const { values, isSubmitted } = formProps;
     const {
       renderButton,
@@ -622,41 +662,63 @@ class SegmentFormAutomations extends React.Component<Props, State> {
 
     const onPreviewCount = () => {
       if (previewCount) {
-        previewCount({ conditions: conditionsForPreview, subOf });
+        previewCount({
+          conditions: conditionsForPreview,
+          subOf,
+          conditionsConjunction
+        });
       }
     };
 
-    if (segments.length > 0 && segments[0].conditions.length > 0) {
-      if (state !== 'form') {
-        return (
-          <>
-            {isModal ? (
-              <Button id="segment-show-count" onClick={onPreviewCount}>
-                Refresh count
-              </Button>
-            ) : (
-              <Button
-                id="segment-show-count"
-                icon="crosshairs"
-                onClick={onPreviewCount}
-              >
-                Show count
-              </Button>
-            )}
+    if (
+      segments.length > 0 &&
+      segments[0].conditions.length > 0 &&
+      state === 'list'
+    ) {
+      return (
+        <>
+          {isModal ? (
+            <Button id="segment-show-count" onClick={onPreviewCount}>
+              Refresh count
+            </Button>
+          ) : (
+            <Button
+              id="segment-show-count"
+              icon="crosshairs"
+              onClick={onPreviewCount}
+            >
+              Show count
+            </Button>
+          )}
 
-            {renderButton({
-              name: 'segment',
-              values: this.generateDoc(values),
-              callback: closeModal || afterSave,
-              isSubmitted,
-              object: segment
-            })}
-          </>
-        );
-      }
+          {renderButton({
+            name: 'segment',
+            values: this.generateDoc(values),
+            callback: closeModal || afterSave,
+            isSubmitted,
+            object: segment
+          })}
+        </>
+      );
     }
 
     return <></>;
+  };
+
+  renderCount = () => {
+    const { segments, state } = this.state;
+    const { count, isModal } = this.props;
+
+    if (
+      segments.length > 0 &&
+      segments[0].conditions.length > 0 &&
+      state === 'list' &&
+      isModal
+    ) {
+      return <div>Items found: {count}</div>;
+    }
+
+    return null;
   };
 
   renderForm = (formProps: IFormProps) => {
@@ -666,6 +728,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       <>
         {this.renderDetailForm(formProps)}
         {this.renderAddGroupButton()}
+        {this.renderCount()}
         <ModalFooter id="button-group">
           <Button.Group>
             {isModal ? (

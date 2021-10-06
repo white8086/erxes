@@ -19,5 +19,5 @@ export interface IContext {
     HelpersApi: any;
     ClientPortalAPI: any;
   };
-  dataLoaders?: IDataLoaders;
+  dataLoaders: IDataLoaders;
 }

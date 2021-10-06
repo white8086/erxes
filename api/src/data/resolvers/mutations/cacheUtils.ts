@@ -56,13 +56,12 @@ export const getDocumentList = async (
         break;
       }
 
-      case 'tags': {
-        list = await Tags.find().lean();
-        break;
-      }
-
       case 'products': {
         list = await Products.find().lean();
+        break;
+      }
+      case 'tags': {
+        list = await Tags.find().lean();
         break;
       }
     }
