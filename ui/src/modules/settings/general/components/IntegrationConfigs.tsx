@@ -203,6 +203,19 @@ class IntegrationConfigs extends React.Component<Props, State> {
         <CollapseContent title="Telnyx SMS">
           {this.renderItem('TELNYX_API_KEY')}
         </CollapseContent>
+
+        <CollapseContent title="Viber">
+          <Info>
+            <a
+              target="_blank"
+              href="https://erxes.org/administrator/system-config#whatsapp-integration"
+              rel="noopener noreferrer"
+            >
+              {__('Learn how to set Viber Integration Variables')}
+            </a>
+          </Info>
+          {this.renderItem('VIBER_WEBHOOK_CALLBACK_URL')}
+        </CollapseContent>
       </ContentBox>
     );
   };

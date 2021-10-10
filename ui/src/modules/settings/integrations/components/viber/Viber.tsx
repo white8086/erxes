@@ -23,7 +23,7 @@ class Viber extends React.Component<Props> {
     return {
       name: values.name,
       brandId: values.brandId,
-      kind: 'smooch-viber',
+      kind: 'viber',
       data: {
         displayName: values.name,
         token: values.token

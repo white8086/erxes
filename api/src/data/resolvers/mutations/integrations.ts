@@ -275,6 +275,8 @@ const integrationMutations = {
         user
       );
     } catch (e) {
+      console.log(e);
+
       await Integrations.deleteOne({ _id: integration._id });
       throw new Error(e);
     }

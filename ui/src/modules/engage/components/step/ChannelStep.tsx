@@ -69,6 +69,11 @@ class ChannelStep extends React.Component<Props> {
           'comment-alt-message',
           `Send bulk SMS online with simple and direct texts`
         )}
+        {this.renderBox(
+          METHODS.VIBER,
+          'viber',
+          `Send messages to multiple Viber users who subscribe to the account`
+        )}
       </FullContent>
     );
   }

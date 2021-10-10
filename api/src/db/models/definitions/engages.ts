@@ -44,6 +44,11 @@ interface IShortMessage {
   fromIntegrationId: string;
 }
 
+interface IViberMessage {
+  content: string;
+  integrationId: string;
+}
+
 export interface IEngageMessage {
   kind: string;
   segmentIds?: string[];
@@ -65,6 +70,7 @@ export interface IEngageMessage {
   messenger?: IMessenger;
   lastRunAt?: Date;
   shortMessage?: IShortMessage;
+  viber?: IViberMessage;
 
   totalCustomersCount?: number;
   validCustomersCount?: number;
@@ -138,6 +144,14 @@ export const smsSchema = new Schema(
   { _id: false }
 );
 
+export const viberSchema = new Schema(
+  {
+    content: field({ type: String, label: 'content' }),
+    integrationId: field({ type: String, label: 'Configured integration' })
+  },
+  { _id: false }
+);
+
 export const engageMessageSchema = schemaWrapper(
   new Schema({
     _id: field({ pkey: true }),
@@ -195,6 +209,7 @@ export const engageMessageSchema = schemaWrapper(
     validCustomersCount: field({ type: Number, optional: true }),
 
     shortMessage: field({ type: smsSchema, label: 'Short message' }),
+    viber: field({ type: viberSchema, label: 'Viber broadcast' }),
     createdBy: field({ type: String, label: 'Created user id' }),
     runCount: field({
       type: Number,

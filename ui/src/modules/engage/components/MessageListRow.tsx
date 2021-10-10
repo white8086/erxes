@@ -225,6 +225,11 @@ class Row extends React.Component<Props> {
         label = __('Messenger');
 
         break;
+      case METHODS.VIBER:
+        icon = 'viber';
+        label = 'Viber broadcast';
+
+        break;
       default:
         break;
     }

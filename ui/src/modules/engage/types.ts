@@ -36,6 +36,10 @@ export interface IEngageSms {
   content: string;
   fromIntegrationId: string;
 }
+export interface IViberMessage {
+  integrationId: string;
+  content: string;
+}
 
 export interface IEngageStats {
   send: number;
@@ -107,6 +111,7 @@ export interface IEngageMessageDoc {
   messenger?: IEngageMessenger;
   scheduleDate?: IEngageScheduleDate;
   shortMessage?: IEngageSms;
+  viber?: IViberMessage;
 }
 
 export interface IEngageMessage extends IEngageMessageDoc {

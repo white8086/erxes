@@ -30,6 +30,7 @@ import initTwitter from './twitter/controller';
 import userMiddleware from './userMiddleware';
 import initDaily from './videoCall/controller';
 import initWhatsapp from './whatsapp/controller';
+import initViber from './viber/controller';
 
 const app = express();
 
@@ -185,6 +186,9 @@ initSmooch(app);
 
 // init telnyx
 initTelnyx(app);
+
+// init viber
+initViber(app);
 
 // Error handling middleware
 app.use((error, _req, res, _next) => {

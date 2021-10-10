@@ -44,7 +44,7 @@ class FormBase extends React.Component<Props> {
       return this.sendError(__('Write a title'));
     }
 
-    if (!doc.fromUserId && doc.method !== METHODS.SMS) {
+    if (!doc.fromUserId && ![METHODS.SMS, METHODS.VIBER].includes(doc.method)) {
       return this.sendError(__('Choose a sender'));
     }
 

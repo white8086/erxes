@@ -47,7 +47,8 @@ export const METHODS = {
   MESSENGER: 'messenger',
   EMAIL: 'email',
   SMS: 'sms',
-  ALL: ['messenger', 'email', 'sms']
+  VIBER: 'viber',
+  ALL: ['messenger', 'email', 'sms', 'viber']
 };
 
 export const ENGAGE_KINDS = {
@@ -103,6 +104,7 @@ export const KIND_CHOICES = {
   SMOOCH_TWILIO: 'smooch-twilio',
   WHATSAPP: 'whatsapp',
   TELNYX: 'telnyx',
+  VIBER: 'viber',
   WEBHOOK: 'webhook',
   ALL: [
     'messenger',
@@ -125,6 +127,7 @@ export const KIND_CHOICES = {
     'smooch-twilio',
     'whatsapp',
     'telnyx',
+    'viber',
     'webhook'
   ]
 };

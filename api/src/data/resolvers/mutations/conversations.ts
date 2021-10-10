@@ -385,6 +385,10 @@ const conversationMutations = {
       requestName = 'replyWhatsApp';
     }
 
+    if (kind === KIND_CHOICES.VIBER) {
+      requestName = 'replyViber';
+    }
+
     await sendConversationToIntegrations(
       type,
       integrationId,

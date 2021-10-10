@@ -205,6 +205,10 @@ export const send = async (engageMessage: IEngageMessageDocument) => {
       'sendEngageSms'
     );
   }
+
+  if (engageMessage.method === METHODS.VIBER) {
+    console.log('customersSelector: ', customersSelector);
+  }
 };
 
 // Prepares queue data to engages-email-sender

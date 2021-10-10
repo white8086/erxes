@@ -111,6 +111,11 @@ export const types = `
     content: String!
     fromIntegrationId: String!
   }
+
+  input EngageMessageViberInput {
+    content: String!
+    integrationId: String!
+  }
 `;
 
 const listParams = `
@@ -150,7 +155,8 @@ const commonParams = `
   email: EngageMessageEmail,
   scheduleDate: EngageScheduleDateInput,
   messenger: EngageMessageMessenger,
-  shortMessage: EngageMessageSmsInput
+  shortMessage: EngageMessageSmsInput,
+  viber: EngageMessageViberInput
 `;
 
 export const mutations = `

@@ -3,6 +3,7 @@ import { field } from './utils';
 
 export interface IIntegration {
   kind: string;
+  name: string;
   accountId: string;
   emailScope?: string;
   nylasToken?: string;
@@ -41,6 +42,7 @@ export interface IIntegrationDocument extends IIntegration, Document {}
 export const integrationSchema = new Schema({
   _id: field({ pkey: true }),
   kind: String,
+  name: String,
   accountId: String,
   erxesApiId: String,
   phoneNumber: field({

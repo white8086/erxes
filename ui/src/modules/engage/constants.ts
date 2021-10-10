@@ -39,7 +39,8 @@ export const METHODS = {
   MESSENGER: 'messenger',
   EMAIL: 'email',
   SMS: 'sms',
-  ALL_LIST: ['messenger', 'email', 'sms']
+  VIBER: 'viber',
+  ALL_LIST: ['messenger', 'email', 'sms', 'viber']
 };
 
 export const SENT_AS_CHOICES = {

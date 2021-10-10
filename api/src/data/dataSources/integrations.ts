@@ -82,6 +82,10 @@ export default class IntegrationsAPI extends RESTDataSource {
     return this.post('/whatsapp/reply', params);
   }
 
+  public async replyViber(params) {
+    return this.post('/viber/reply', params);
+  }
+
   public async updateConfigs(configsMap) {
     return this.post('/update-configs', { configsMap });
   }

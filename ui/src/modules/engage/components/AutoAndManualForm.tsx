@@ -17,6 +17,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { IBreadCrumbItem, IConditionsRule } from '../../common/types';
 import { METHODS } from '../constants';
+import ViberForm from '../containers/ViberForm';
 import {
   IEngageEmail,
   IEngageMessage,
@@ -24,7 +25,8 @@ import {
   IEngageMessenger,
   IEngageScheduleDate,
   IEngageSms,
-  IIntegrationWithPhone
+  IIntegrationWithPhone,
+  IViberMessage
 } from '../types';
 import SmsForm from './SmsForm';
 import ChannelStep from './step/ChannelStep';
@@ -66,6 +68,7 @@ type State = {
   shortMessage?: IEngageSms;
   rules: IConditionsRule[];
   isSaved: boolean;
+  viber?: IViberMessage;
 };
 
 class AutoAndManualForm extends React.Component<Props, State> {
@@ -98,12 +101,15 @@ class AutoAndManualForm extends React.Component<Props, State> {
       email: message.email,
       scheduleDate: message.scheduleDate,
       shortMessage: message.shortMessage,
+      viber: message.viber,
       rules,
       isSaved: false
     };
   }
 
   changeState = <T extends keyof State>(key: T, value: State[T]) => {
+    console.log('key: ', key);
+    console.log('value:', value);
     this.setState(({ [key]: value } as unknown) as Pick<State, keyof State>);
   };
 
@@ -125,7 +131,8 @@ class AutoAndManualForm extends React.Component<Props, State> {
       fromUserId: this.state.fromUserId,
       method: this.state.method,
       scheduleDate: this.state.scheduleDate,
-      shortMessage: this.state.shortMessage
+      shortMessage: this.state.shortMessage,
+      viber: this.state.viber
     } as IEngageMessageDoc;
 
     if (this.state.method === METHODS.EMAIL) {
@@ -146,6 +153,9 @@ class AutoAndManualForm extends React.Component<Props, State> {
       if (doc.shortMessage) {
         delete doc.shortMessage;
       }
+      if (doc.viber) {
+        delete doc.viber;
+      }
     }
     if (this.state.method === METHODS.MESSENGER) {
       const messenger = this.state.messenger || ({} as IEngageMessenger);
@@ -164,6 +174,9 @@ class AutoAndManualForm extends React.Component<Props, State> {
       if (doc.shortMessage) {
         delete doc.shortMessage;
       }
+      if (doc.viber) {
+        delete doc.viber;
+      }
     }
     if (this.state.method === METHODS.SMS) {
       const shortMessage = this.state.shortMessage || {
@@ -180,6 +193,27 @@ class AutoAndManualForm extends React.Component<Props, State> {
 
       if (doc.email) {
         delete doc.email;
+      }
+      if (doc.messenger) {
+        delete doc.messenger;
+      }
+      if (doc.viber) {
+        delete doc.viber;
+      }
+    }
+    if (this.state.method === METHODS.VIBER) {
+      const viber = this.state.viber || ({} as IViberMessage);
+
+      doc.viber = {
+        integrationId: viber.integrationId || '',
+        content: viber.content
+      };
+
+      if (doc.email) {
+        delete doc.email;
+      }
+      if (doc.shortMessage) {
+        delete doc.shortMessage;
       }
       if (doc.messenger) {
         delete doc.messenger;
@@ -261,6 +295,7 @@ class AutoAndManualForm extends React.Component<Props, State> {
       scheduleDate,
       method,
       shortMessage,
+      viber,
       isSaved
     } = this.state;
 
@@ -277,6 +312,21 @@ class AutoAndManualForm extends React.Component<Props, State> {
             fromUserId={fromUserId}
             smsConfig={smsConfig}
             integrations={integrations}
+          />
+        </Step>
+      );
+    }
+
+    if (method === METHODS.VIBER) {
+      return (
+        <Step noButton={true} title="Compose your message" img={imagePath}>
+          <ViberForm
+            onChange={this.changeState}
+            viber={viber || ({} as IViberMessage)}
+            content={content}
+            scheduleDate={scheduleDate}
+            isSaved={isSaved}
+            messageKind={kind}
           />
         </Step>
       );
