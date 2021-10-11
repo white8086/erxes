@@ -22,6 +22,11 @@ cube(`Leads`, {
       type: `string`
     },
 
+    leadstatus: {
+      sql: `leadStatus`,
+      type: `string`
+    },
+
     tag: {
       sql: `${CUBE}."tagIds"`,
       type: `string`
