@@ -35,11 +35,7 @@ import { get, set } from '../../../inmemoryStorage';
 import messageBroker from '../../../messageBroker';
 import { graphqlPubsub } from '../../../pubsub';
 import { sendToLog } from '../../logUtils';
-import {
-  RABBITMQ_QUEUES,
-  AUTO_BOT_MESSAGES,
-  BOT_MESSAGE_TYPES
-} from '../../constants';
+import { AUTO_BOT_MESSAGES, BOT_MESSAGE_TYPES } from '../../constants';
 import { IContext } from '../../types';
 import {
   findCompany,
@@ -235,12 +231,6 @@ const widgetMutations = {
     };
 
     await sendToWebhook('create', 'popupSubmitted', formData);
-
-    messageBroker().sendMessage(RABBITMQ_QUEUES.AUTOMATIONS_TRIGGER, {
-      triggerType: 'formSubmit',
-      data: formData,
-      targetId: args.formId
-    });
 
     return {
       status: 'ok',
