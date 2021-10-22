@@ -255,6 +255,20 @@ export const PRODUCT_STATUSES = {
   ALL: ['active', 'deleted']
 };
 
+export const PRODUCT_CATEGORY_STATUSES = {
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  ARCHIVED: 'archived',
+  ALL: ['active', 'disabled', 'archived']
+};
+
+export const PRODUCT_SUPPLY = {
+  UNIQUE: 'unique',
+  LIMITED: 'limited',
+  UNLIMITED: 'unlimited',
+  ALL: ['unique', 'limited', 'unlimited']
+};
+
 export const PIPELINE_VISIBLITIES = {
   PUBLIC: 'public',
   PRIVATE: 'private',
@@ -733,7 +747,7 @@ export const CUSTOMER_SELECT_OPTIONS = {
 
 export const DEFAULT_CONSTANT_VALUES = {
   sex_choices: DEFAULT_SEX_CHOICES,
-  company_industry_types: DEFAULT_COMPANY_INDUSTRY_TYPES.map(v => ({
+  company_industry_types: DEFAULT_COMPANY_INDUSTRY_TYPES.map((v) => ({
     label: v,
     value: v
   })),
@@ -847,4 +861,10 @@ export const WEBHOOK_STATUS = {
   AVAILABLE: 'available',
   UNAVAILABLE: 'unavailable',
   ALL: ['available', 'unavailable']
+};
+
+export const REACTION_CHOICES = {
+  LIKE: 'like',
+  DISLIKE: 'disLike',
+  ALL: ['like', 'dislike']
 };

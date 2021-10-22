@@ -26,7 +26,7 @@ import ConditionsList from '../preview/ConditionsList';
 import { ColorPick, ColorPicker } from 'modules/settings/styles';
 import React from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import { FilterBox, SegmentBackIcon, SegmentWrapper } from '../styles';
+import { FilterBox, SegmentBackIcon, SegmentWrapper, Count } from '../styles';
 import PropertyCondition from '../../containers/form/PropertyCondition';
 import { Link } from 'react-router-dom';
 import { isBoardKind } from 'modules/segments/utils';
@@ -55,8 +55,9 @@ type Props = {
   }) => void;
 
   isModal?: boolean;
-  isAutomation?: boolean;
+  hideDetailForm?: boolean;
   count: number;
+  usageType?: string;
 };
 
 type State = {
@@ -206,10 +207,10 @@ class SegmentFormAutomations extends React.Component<Props, State> {
   };
 
   renderDetailForm = (formProps: IFormProps) => {
-    const { isAutomation, contentType, boards = [] } = this.props;
+    const { hideDetailForm, contentType, boards = [] } = this.props;
     const { name, description, color, boardId, pipelineId } = this.state;
 
-    if (isAutomation) {
+    if (hideDetailForm) {
       return;
     }
 
@@ -455,7 +456,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
   };
 
   renderConditionsList = () => {
-    const { contentType, isAutomation, events } = this.props;
+    const { contentType, hideDetailForm, events } = this.props;
     const {
       segments,
       state,
@@ -505,7 +506,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
             onClickEvent={this.onClickEvent}
             chosenProperty={chosenProperty}
             chosenCondition={chosenCondition}
-            isAutomation={isAutomation || false}
+            hideDetailForm={hideDetailForm || false}
             boardId={boardId}
             pipelineId={pipelineId}
           />
@@ -522,7 +523,7 @@ class SegmentFormAutomations extends React.Component<Props, State> {
           contentType={contentType}
           segment={chosenSegment}
           addCondition={this.addCondition}
-          isAutomation={isAutomation || false}
+          hideDetailForm={hideDetailForm || false}
           changeSubSegmentConjunction={this.changeSubSegmentConjunction}
           boardId={boardId}
           pipelineId={pipelineId}
@@ -648,19 +649,20 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       afterSave,
       closeModal,
       previewCount,
-      isModal
+      isModal,
+      usageType
     } = this.props;
 
-    const conditionsForPreview: IConditionsForPreview[] = [];
-
-    segments.forEach((cond: ISegmentMap) => {
-      conditionsForPreview.push({
-        type: 'subSegment',
-        subSegmentForPreview: cond
-      });
-    });
-
     const onPreviewCount = () => {
+      const conditionsForPreview: IConditionsForPreview[] = [];
+
+      segments.forEach((cond: ISegmentMap) => {
+        conditionsForPreview.push({
+          type: 'subSegment',
+          subSegmentForPreview: cond
+        });
+      });
+
       if (previewCount) {
         previewCount({
           conditions: conditionsForPreview,
@@ -675,11 +677,30 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       segments[0].conditions.length > 0 &&
       state === 'list'
     ) {
+      if (usageType && usageType === 'export') {
+        return (
+          <>
+            {renderButton({
+              name: 'segment',
+              text: 'Apply',
+              values: this.generateDoc(values),
+              callback: closeModal || afterSave,
+              isSubmitted,
+              object: segment
+            })}
+          </>
+        );
+      }
+
       return (
         <>
           {isModal ? (
-            <Button id="segment-show-count" onClick={onPreviewCount}>
-              ${__('Refresh count')}
+            <Button
+              id="segment-show-count"
+              onClick={onPreviewCount}
+              icon="refresh-1"
+            >
+              {__('Refresh count')}
             </Button>
           ) : (
             <Button
@@ -707,7 +728,11 @@ class SegmentFormAutomations extends React.Component<Props, State> {
 
   renderCount = () => {
     const { segments, state } = this.state;
-    const { count, isModal } = this.props;
+    const { count, isModal, usageType } = this.props;
+
+    if (usageType && usageType === 'export') {
+      return null;
+    }
 
     if (
       segments.length > 0 &&
@@ -715,7 +740,11 @@ class SegmentFormAutomations extends React.Component<Props, State> {
       state === 'list' &&
       isModal
     ) {
-      return <div>Items found: {count}</div>;
+      return (
+        <Count>
+          {__('Items Found')}: <span>{count}</span>
+        </Count>
+      );
     }
 
     return null;
