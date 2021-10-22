@@ -1,4 +1,4 @@
-import Integrations from '../models/Integrations';
+import Integrations, { IIntegration } from '../models/Integrations';
 import {
   createMessage,
   createOrUpdateConversation,
@@ -6,6 +6,8 @@ import {
 } from './store';
 import * as crypto from 'crypto';
 import { FILE_MIME_TYPES } from '../constants';
+import { ViberClient } from 'messaging-api-viber';
+import { getConfig } from '../utils';
 
 export const receiveMessage = async (requestBody, integration) => {
   const { sender, message, message_token } = requestBody;
@@ -41,7 +43,9 @@ export const findIntegrationFromSignature = async (
   rawBody: string,
   signature: string
 ) => {
-  const integrations = await Integrations.find({ kind: 'viber' }).lean();
+  const integrations = await Integrations.find({
+    kind: 'messaging-api-viber'
+  }).lean();
 
   let result = null;
 
@@ -149,4 +153,30 @@ export const generateContent = async message => {
   }
 
   return { content, attachments };
+};
+
+export const setWebhook = async (integration: IIntegration) => {
+  const client = new ViberClient({
+    accessToken: integration.viberBotToken,
+    sender: {
+      name: integration.name
+    }
+  });
+
+  const webhookUrl = await getConfig('VIBER_WEBHOOK_CALLBACK_URL');
+
+  return await client.setWebhook(webhookUrl).catch(error => {
+    throw new Error(error);
+  });
+};
+
+export const removeWebhook = async (integration: IIntegration) => {
+  const client = new ViberClient({
+    accessToken: integration.viberBotToken,
+    sender: {
+      name: integration.name
+    }
+  });
+
+  return client.removeWebhook();
 };

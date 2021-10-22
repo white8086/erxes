@@ -174,16 +174,6 @@ export const send = async (engageMessage: IEngageMessageDocument) => {
     }
   }
 
-  const user = await Users.findOne({ _id: fromUserId });
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  if (!engageMessage.isLive) {
-    return;
-  }
-
   const customersSelector = await generateCustomerSelector({
     engageId: engageMessage._id,
     customerIds,
@@ -191,6 +181,20 @@ export const send = async (engageMessage: IEngageMessageDocument) => {
     tagIds: customerTagIds,
     brandIds
   });
+
+  if (!engageMessage.isLive) {
+    return;
+  }
+
+  if (engageMessage.method === METHODS.VIBER) {
+    console.log('viber');
+  }
+
+  const user = await Users.findOne({ _id: fromUserId });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
 
   if (engageMessage.method === METHODS.EMAIL) {
     return sendEmailOrSms(
@@ -204,10 +208,6 @@ export const send = async (engageMessage: IEngageMessageDocument) => {
       { engageMessage, customersSelector, user },
       'sendEngageSms'
     );
-  }
-
-  if (engageMessage.method === METHODS.VIBER) {
-    console.log('customersSelector: ', customersSelector);
   }
 };
 

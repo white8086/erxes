@@ -28,7 +28,7 @@ const INTEGRATION_FORM = {
   callpro: CallPro,
   chatfuel: Chatfuel,
   'smooch-viber': Viber,
-  viber: Viber,
+  'messaging-api-viber': Viber,
   'smooch-telegram': Telegram,
   whatsapp: Whatsapp,
   telnyx: TelnyxForm,

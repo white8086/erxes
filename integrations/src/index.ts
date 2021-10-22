@@ -105,6 +105,8 @@ app.post(
     async (req, res) => {
       const { integrationId } = req.body;
 
+      console.log('integrationId: ', integrationId);
+
       await removeIntegration(integrationId);
 
       debugResponse(debugIntegrations, req);

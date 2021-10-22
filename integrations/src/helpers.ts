@@ -97,6 +97,15 @@ import {
   Conversations as WhatsappConversations,
   Customers as WhatsappCustomers
 } from './whatsapp/models';
+import {
+  ConversationMessages as MAViberConversationMessages,
+  Conversations as MAViberConversations,
+  Customers as MAViberCustomers
+} from './viber/models';
+import {
+  removeWebhook as removeViberWebhook,
+  setWebhook as setViberWebhook
+} from './viber/utils';
 
 export const removeIntegration = async (
   integrationErxesApiId: string,
@@ -105,6 +114,8 @@ export const removeIntegration = async (
   const integration = await Integrations.findOne({
     erxesApiId: integrationErxesApiId
   });
+
+  console.log(integration);
 
   if (!integration) {
     throw new Error('Integration not found');
@@ -510,6 +521,21 @@ export const removeIntegration = async (
     }
   }
 
+  if (kind === 'messaging-api-viber') {
+    debugSmooch('Removing MA Viber entries');
+    const conversationIds = await MAViberConversations.find(selector).distinct(
+      '_id'
+    );
+
+    await removeViberWebhook(integration);
+
+    await MAViberCustomers.deleteMany(selector);
+    await MAViberConversations.deleteMany(selector);
+    await MAViberConversationMessages.deleteMany({
+      conversationId: { $in: conversationIds }
+    });
+  }
+
   await Integrations.deleteOne({ _id });
 
   return erxesApiId;
@@ -620,6 +646,10 @@ export const updateIntegrationConfigs = async (configsMap): Promise<void> => {
   const prevChatApiUID = await getValueAsString('CHAT_API_UID');
   const prevTwitterConfig = await getTwitterConfig();
 
+  const prevMAViberWebhook = await getValueAsString(
+    'VIBER_WEBHOOK_CALLBACK_URL'
+  );
+
   await Configs.updateConfigs(configsMap);
 
   resetConfigsCache();
@@ -646,6 +676,9 @@ export const updateIntegrationConfigs = async (configsMap): Promise<void> => {
     'CHAT_API_WEBHOOK_CALLBACK_URL'
   );
   const updatedChatApiUID = await getValueAsString('CHAT_API_UID');
+  const updatedMAViberWebhook = await getValueAsString(
+    'VIBER_WEBHOOK_CALLBACK_URL'
+  );
 
   try {
     if (
@@ -714,6 +747,18 @@ export const updateIntegrationConfigs = async (configsMap): Promise<void> => {
       await setupWhatsapp();
     } catch (e) {
       debugError(e);
+    }
+  }
+
+  if (prevMAViberWebhook !== updatedMAViberWebhook) {
+    const viberIntegrations = await Integrations.find({
+      kind: 'messaging-api-viber'
+    }).lean();
+    if (viberIntegrations.length > 0) {
+      for (const viber of viberIntegrations) {
+        await removeViberWebhook(viber);
+        await setViberWebhook(viber);
+      }
     }
   }
 };

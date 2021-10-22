@@ -41,7 +41,7 @@ export default withProps<Props>(
       name: 'integrationsQueries',
       options: {
         variables: {
-          kind: 'viber'
+          kind: 'messaging-api-viber'
         }
       }
     })

@@ -186,7 +186,8 @@ export type IntegrationTypes =
   | 'smooch-telegram'
   | 'smooch-viber'
   | 'smooch-line'
-  | 'smooch-twilio';
+  | 'smooch-twilio'
+  | 'messaging-api-viber';
 
 export type IntegrationsQueryResponse = {
   integrations: IIntegration[];
@@ -220,6 +221,7 @@ export type ByKindTotalCount = {
   line: number;
   twilio: number;
   whatsapp: number;
+  'messaging-api-viber': number;
 };
 
 type IntegrationsCount = {

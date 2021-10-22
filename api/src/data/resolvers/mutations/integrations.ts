@@ -361,7 +361,8 @@ const integrationMutations = {
           'smooch-twilio',
           'whatsapp',
           'telnyx',
-          'webhook'
+          'webhook',
+          'messaging-api-viber'
         ].includes(integration.kind)
       ) {
         await dataSources.IntegrationsAPI.removeIntegration({

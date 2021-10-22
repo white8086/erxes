@@ -86,7 +86,7 @@ export const INTEGRATION_KINDS = {
   SMOOCH_TWILIO: 'smooch-twilio',
   WHATSAPP: 'whatsapp',
   TELNYX: 'telnyx',
-  VIBER: 'viber',
+  MESSAGING_API_VIBER: 'messaging-api-viber',
   WEBHOOK: 'webhook',
   ALL: [
     { text: 'Messenger', value: 'messenger' },
@@ -106,7 +106,7 @@ export const INTEGRATION_KINDS = {
     { text: 'Viber by Smooch', value: 'smooch-viber' },
     { text: 'Line by Smooch', value: 'smooch-line' },
     { text: 'SMS Twilio by Smooch', value: 'smooch-twilio' },
-    { text: 'Viber', value: 'viber' },
+    { text: 'Viber by Messaging-api', value: 'messaging-api-viber' },
 
     { text: 'IMAP by Nylas', value: 'nylas-imap' },
     { text: 'Gmail by Nylas', value: 'nylas-gmail' },
@@ -340,13 +340,13 @@ export const INTEGRATIONS = [
       'All integrations, For support teams, Marketing automation, Messaging, Conversation'
   },
   {
-    name: 'Viber',
+    name: 'Viber by Messaging-api',
     description: 'Connect Viber to your Team Inbox',
     inMessenger: false,
     isAvailable: true,
-    kind: 'viber',
+    kind: 'messaging-api-viber',
     logo: '/images/integrations/viber.png',
-    createModal: 'viber',
+    createModal: 'messaging-api-viber',
     category:
       'All integrations, For support teams, Marketing automation, Messaging, Conversation'
   },

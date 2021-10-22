@@ -134,13 +134,13 @@ loadConversationClass();
 
 // tslint:disable-next-line:variable-name
 export const Customers = model<ICustomerDocument, ICustomerModel>(
-  'customers_viber',
+  'customers_ma_viber',
   customerSchema
 );
 
 // tslint:disable-next-line:variable-name
 export const Conversations = model<IConversationDocument, IConversationModel>(
-  'conversations_viber',
+  'conversations_ma_viber',
   conversationSchema
 );
 
@@ -148,4 +148,4 @@ export const Conversations = model<IConversationDocument, IConversationModel>(
 export const ConversationMessages = model<
   IConversationMessageDocument,
   IConversationMessageModel
->('conversation_messages_viber', conversationMessageSchema);
+>('conversation_messages_ma_viber', conversationMessageSchema);

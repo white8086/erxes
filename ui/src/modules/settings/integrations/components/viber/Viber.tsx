@@ -23,7 +23,7 @@ class Viber extends React.Component<Props> {
     return {
       name: values.name,
       brandId: values.brandId,
-      kind: 'viber',
+      kind: 'messaging-api-viber',
       data: {
         displayName: values.name,
         token: values.token

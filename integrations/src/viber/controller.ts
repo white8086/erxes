@@ -37,7 +37,7 @@ const init = async app => {
   );
 
   app.post(
-    '/viber/create-integration',
+    '/messaging-api-viber/create-integration',
     routeErrorHandling(async (req, res) => {
       debugRequest(debugViber, req);
 
@@ -45,7 +45,7 @@ const init = async app => {
       const { token, displayName } = JSON.parse(data);
 
       let integration = await Integrations.findOne({
-        $and: [{ viberBotToken: token }, { kind: 'viber' }]
+        $and: [{ viberBotToken: token }, { kind: 'messaging-api-viber' }]
       });
 
       if (integration) {
@@ -59,7 +59,7 @@ const init = async app => {
       }
 
       integration = await Integrations.create({
-        kind: 'viber',
+        kind: 'messaging-api-viber',
         erxesApiId: integrationId,
         viberBotToken: token,
         name: displayName
@@ -71,9 +71,6 @@ const init = async app => {
           name: integration.name
         }
       });
-
-      // do not forget remove next line
-      await client.removeWebhook();
 
       await client.setWebhook(webhookUrl).catch(error => {
         throw new Error(error);
