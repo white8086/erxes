@@ -8,6 +8,7 @@ import { getLineWebhookUrl } from './smooch/api';
 import { sendSms } from './telnyx/api';
 import { userIds } from './userMiddleware';
 import { getConfig } from './utils';
+import { broadcast } from './viber/utils';
 
 dotenv.config();
 
@@ -81,6 +82,10 @@ export const initBroker = async server => {
 
     if (action === 'sendConversationSms') {
       await sendSms(payload);
+    }
+
+    if (action === 'broadcastViber') {
+      await broadcast(payload);
     }
   });
 };

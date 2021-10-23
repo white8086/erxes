@@ -8,6 +8,24 @@ import * as crypto from 'crypto';
 import { FILE_MIME_TYPES } from '../constants';
 import { ViberClient } from 'messaging-api-viber';
 import { getConfig } from '../utils';
+import { Customers } from './models';
+
+export type IBroadCastParams = {
+  customerIds: string[];
+  fromIntegration: string;
+  title: string;
+  kind: string;
+  content: string;
+};
+
+export const viberClient = (integration: IIntegration) => {
+  return new ViberClient({
+    accessToken: integration.viberBotToken,
+    sender: {
+      name: integration.name
+    }
+  });
+};
 
 export const receiveMessage = async (requestBody, integration) => {
   const { sender, message, message_token } = requestBody;
@@ -179,4 +197,25 @@ export const removeWebhook = async (integration: IIntegration) => {
   });
 
   return client.removeWebhook();
+};
+
+export const broadcast = async (data: IBroadCastParams) => {
+  const { fromIntegration, customerIds, content } = data;
+  const integration = await Integrations.getIntegration({
+    erxesApiId: fromIntegration,
+    kind: 'messaging-api-viber'
+  });
+  const customers = await (
+    await Customers.find({ erxesApiId: { $in: customerIds } }, { viberId: 1 })
+  ).map(e => e.viberId);
+
+  if (customers.length === 0) {
+    throw new Error('No customers found');
+  }
+
+  const client = viberClient(integration);
+
+  console.log('contetn: ', content);
+  const rs = await client.broadcastText(customers, content);
+  console.log('result: ', rs);
 };

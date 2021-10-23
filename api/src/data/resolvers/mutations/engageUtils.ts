@@ -18,6 +18,7 @@ import { IUserDocument } from '../../../db/models/definitions/users';
 import { fetchElk } from '../../../elasticsearch';
 import { get, removeKey, set } from '../../../inmemoryStorage';
 import messageBroker from '../../../messageBroker';
+import { stream } from '../../bulkUtils';
 import { MESSAGE_KINDS } from '../../constants';
 import { fetchSegment } from '../../modules/segments/queryBuilder';
 import { chunkArray, isUsingElk, replaceEditorAttributes } from '../../utils';
@@ -145,6 +146,13 @@ const sendQueueMessage = (args: any) => {
   return messageBroker().sendMessage('erxes-api:engages-notification', args);
 };
 
+const sendQueueMessageIntegration = (args: any) => {
+  return messageBroker().sendMessage(
+    'erxes-api:integrations-notification',
+    args
+  );
+};
+
 export const send = async (engageMessage: IEngageMessageDocument) => {
   const {
     customerIds,
@@ -187,7 +195,7 @@ export const send = async (engageMessage: IEngageMessageDocument) => {
   }
 
   if (engageMessage.method === METHODS.VIBER) {
-    console.log('viber');
+    return broadcastViber({ engageMessage, customersSelector });
   }
 
   const user = await Users.findOne({ _id: fromUserId });
@@ -209,6 +217,47 @@ export const send = async (engageMessage: IEngageMessageDocument) => {
       'sendEngageSms'
     );
   }
+};
+
+const broadcastViber = async ({
+  engageMessage,
+  customersSelector
+}: {
+  engageMessage: IEngageMessage;
+  customersSelector: any;
+}) => {
+  const { viber } = engageMessage;
+
+  if (!viber) {
+    throw new Error('Viber attributes not found');
+  }
+
+  console.log('engageMessage: ', engageMessage);
+
+  await stream(
+    async chunk => {
+      const payload = {
+        customerIds: chunk,
+        fromIntegration: viber.integrationId,
+        title: engageMessage.title,
+        kind: engageMessage.kind,
+        content: viber.content
+      };
+
+      await sendQueueMessageIntegration({ action: 'broadcastViber', payload });
+    },
+    (variables, root) => {
+      const parentIds = variables.parentIds || [];
+
+      parentIds.push(root._id);
+
+      variables.parentIds = parentIds;
+    },
+    () => {
+      return Customers.find(customersSelector, { _id: 1 }) as any;
+    },
+    300
+  );
 };
 
 // Prepares queue data to engages-email-sender
